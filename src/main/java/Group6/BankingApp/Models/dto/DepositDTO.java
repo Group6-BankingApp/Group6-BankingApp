@@ -1,13 +1,12 @@
-package Group6.BankingApp.Models;
+package Group6.BankingApp.Models.dto;
 
-public class WithdrawDTO {
-
+public class DepositDTO {
     private double amount;
 
-    public WithdrawDTO() {
+    public DepositDTO() {
     }
 
-    public WithdrawDTO(double amount) {
+    public DepositDTO(double amount) {
         this.amount = amount;
     }
 
