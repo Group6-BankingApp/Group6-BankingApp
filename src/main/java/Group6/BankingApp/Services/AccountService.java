@@ -4,6 +4,7 @@ import Group6.BankingApp.DAL.AccountRepository;
 import Group6.BankingApp.DAL.UserRepository;
 import Group6.BankingApp.Models.Account;
 import Group6.BankingApp.Models.User;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
@@ -29,7 +30,11 @@ public class AccountService {
     }
 
     public void updateAccount(Account account) {
-        accountRepository.save(account);
+        try {
+            accountRepository.save(account);
+        }catch (Exception ex){
+            throw new EntityNotFoundException("Account not found");
+        }
     }
 
     public void deleteAccount(String iban) {
