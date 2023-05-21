@@ -3,7 +3,10 @@ package Group6.BankingApp.Services;
 import Group6.BankingApp.DAL.AccountRepository;
 import Group6.BankingApp.DAL.UserRepository;
 import Group6.BankingApp.Models.Account;
+import Group6.BankingApp.Models.DebitCard;
 import Group6.BankingApp.Models.User;
+import Group6.BankingApp.Models.dto.AccountDTO;
+import Group6.BankingApp.Models.dto.UserDTO;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -21,17 +24,22 @@ public class AccountService {
         return (List<Account>) accountRepository.findAll();
     }
 
-    public Account getAccountById(String iban) {
+    public Account getAccountByIban(String iban) {
         return accountRepository.findById(iban).orElse(null);
     }
 
-    public void addAccount(Account account) {
-        accountRepository.save(account);
+    public Account addAccount(AccountDTO accountDTO)
+    {
+        return accountRepository.save(new Account(accountDTO.getIban(), accountDTO.getUser(), "current", accountDTO.getCardUUID(), accountDTO.getPin(), accountDTO.getDailyLimit(), 100.00, 500.00, "open"));
     }
 
-    public void updateAccount(Account account) {
+    public Account updateAccountByIban(String iban,AccountDTO accountDTO) {
         try {
-            accountRepository.save(account);
+            Account accountToUpdate = accountRepository.findById(iban).orElse(null);
+            accountToUpdate.setAccountType(accountDTO.getAccountType());
+            accountToUpdate.setDailyLimit(accountDTO.getDailyLimit());
+            accountToUpdate.setPin(accountDTO.getPin());
+            return accountRepository.save(accountToUpdate);
         }catch (Exception ex){
             throw new EntityNotFoundException("Account not found");
         }

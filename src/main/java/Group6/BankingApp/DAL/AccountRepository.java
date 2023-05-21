@@ -1,6 +1,7 @@
 package Group6.BankingApp.DAL;
 
 import Group6.BankingApp.Models.*;
+import Group6.BankingApp.Models.dto.AccountDTO;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 

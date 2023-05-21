@@ -36,6 +36,18 @@ public class Account {
         this.debitCard = debitCard;
     }
 
+    public Account(String iban, User user, String accountType, String cardUUID, String pin, double dailyLimit, double balance, double absoluteLimit, String status) {
+        this.iban = iban;
+        this.user = user;
+        this.accountType = accountType;
+        this.cardUUID = cardUUID;
+        this.pin = pin;
+        this.dailyLimit = dailyLimit;
+        this.balance = balance;
+        this.absoluteLimit = absoluteLimit;
+        this.status = status;
+    }
+
     public Account() {
     }
 
