@@ -1,46 +1,43 @@
 package Group6.BankingApp.Models;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
-import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
-
-import java.math.BigDecimal;
 
 @Entity
 public class Account {
 
     @Id
+    @Column(unique = true)
     private String iban;
-
-    @ManyToOne
-    private User user;
-    private String status;
+    private String firstName;
+    private String lastName;
     private String accountType;
-    private BigDecimal balance;
-    private BigDecimal absoluteLimit;
-    private BigDecimal minimumBalance;
-
-    @OneToOne
-    private AccountPin pin;
-
+    private String cardUUID;
+    private String pin;
+    private double dailyLimit;
+    private double balance;
+    private double absoluteLimit;
+    private String status;
     @OneToOne
     private DebitCard debitCard;
 
-    public Account() {
-    }
-
-    public Account(String iban, User user, String status, String accountType, BigDecimal balance, BigDecimal absoluteLimit, BigDecimal minimumBalance, AccountPin pin, DebitCard debitCard) {
+    public Account(String iban, String firstName, String lastName, String accountType, String cardUUID, String pin, double dailyLimit, double balance, double absoluteLimit, String status, DebitCard debitCard) {
         this.iban = iban;
-        this.user = user;
-        this.status = status;
+        this.firstName = firstName;
+        this.lastName = lastName;
         this.accountType = accountType;
+        this.cardUUID = cardUUID;
+        this.pin = pin;
+        this.dailyLimit = dailyLimit;
         this.balance = balance;
         this.absoluteLimit = absoluteLimit;
-        this.minimumBalance = minimumBalance;
-        this.pin = pin;
+        this.status = status;
         this.debitCard = debitCard;
+    }
+
+    public Account() {
     }
 
     public String getIban() {
@@ -51,20 +48,44 @@ public class Account {
         this.iban = iban;
     }
 
-    public User getUser() {
-        return user;
+    public String getFirstName() {
+        return firstName;
     }
 
-    public void setUser(User user) {
-        this.user = user;
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
     }
 
-    public String getStatus() {
-        return status;
+    public String getLastName() {
+        return lastName;
     }
 
-    public void setStatus(String status) {
-        this.status = status;
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
+    }
+
+    public String getCardUUID() {
+        return cardUUID;
+    }
+
+    public void setCardUUID(String cardUUID) {
+        this.cardUUID = cardUUID;
+    }
+
+    public String getPin() {
+        return pin;
+    }
+
+    public void setPin(String pin) {
+        this.pin = pin;
+    }
+
+    public double getDailyLimit() {
+        return dailyLimit;
+    }
+
+    public void setDailyLimit(double dailyLimit) {
+        this.dailyLimit = dailyLimit;
     }
 
     public String getAccountType() {
@@ -75,36 +96,28 @@ public class Account {
         this.accountType = accountType;
     }
 
-    public BigDecimal getBalance() {
+    public double getBalance() {
         return balance;
     }
 
-    public void setBalance(BigDecimal balance) {
+    public void setBalance(double balance) {
         this.balance = balance;
     }
 
-    public BigDecimal getAbsoluteLimit() {
+    public double getAbsoluteLimit() {
         return absoluteLimit;
     }
 
-    public void setAbsoluteLimit(BigDecimal absoluteLimit) {
+    public void setAbsoluteLimit(double absoluteLimit) {
         this.absoluteLimit = absoluteLimit;
     }
 
-    public BigDecimal getMinimumBalance() {
-        return minimumBalance;
+    public String getStatus() {
+        return status;
     }
 
-    public void setMinimumBalance(BigDecimal minimumBalance) {
-        this.minimumBalance = minimumBalance;
-    }
-
-    public AccountPin getPin() {
-        return pin;
-    }
-
-    public void setPin(AccountPin pin) {
-        this.pin = pin;
+    public void setStatus(String status) {
+        this.status = status;
     }
 
     public DebitCard getDebitCard() {
