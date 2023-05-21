@@ -1,18 +1,18 @@
 package Group6.BankingApp.Models;
 
+import jakarta.persistence.OneToOne;
+
 public class AccountDTO {
 
     private String iban;
-    private String firstName;
-    private String lastName;
+    private User user;
     private String cardUUID;
     private String pin;
     private double dailyLimit;
 
-    public AccountDTO(String iban, String firstName, String lastName, String cardUUID, String pin, double dailyLimit) {
+    public AccountDTO(String iban, User user, String cardUUID, String pin, double dailyLimit) {
         this.iban = iban;
-        this.firstName = firstName;
-        this.lastName = lastName;
+        this.user = user;
         this.cardUUID = cardUUID;
         this.pin = pin;
         this.dailyLimit = dailyLimit;
@@ -29,20 +29,12 @@ public class AccountDTO {
         this.iban = iban;
     }
 
-    public String getFirstName() {
-        return firstName;
+    public User getUser() {
+        return user;
     }
 
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
-    }
-
-    public String getLastName() {
-        return lastName;
-    }
-
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
+    public void setUser(User user) {
+        this.user = user;
     }
 
     public String getCardUUID() {
