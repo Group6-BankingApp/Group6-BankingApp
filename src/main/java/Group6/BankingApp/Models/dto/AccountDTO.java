@@ -1,4 +1,4 @@
-package Group6.BankingApp.Models;
+package Group6.BankingApp.Models.dto;
 
 import jakarta.persistence.OneToOne;
 

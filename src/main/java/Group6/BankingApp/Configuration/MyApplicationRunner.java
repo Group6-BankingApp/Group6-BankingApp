@@ -14,7 +14,6 @@ import java.util.Arrays;
 import java.util.List;
 
 @Component
-@ConditionalOnProperty(name = "app.db-init", havingValue = "true")
 public class MyApplicationRunner implements ApplicationRunner {
 
     private UserRepository userRepository;
@@ -27,8 +26,11 @@ public class MyApplicationRunner implements ApplicationRunner {
 
         List<User> users=
                 Arrays.asList(
-                        new User("John", "Doe", "john.doe@gmail.com", "123456", "123456789", Role.CUSTOMER));
+                        new User("John", "Doe", "john.doe@gmail.com", "123456", "123456789", Role.CUSTOMER),
+                        new User("Jane", "Doe", "jane.doe@gmail.com", "123456", "123456789", Role.CUSTOMER),
+                        new User("Adam", "Addey", "ad.ad@gmail.com", "123456", "123456789", Role.CUSTOMER)
+                        );
 
-        users.forEach(user -> userRepository.save(user));
+        userRepository.saveAll(users);
     }
 }
