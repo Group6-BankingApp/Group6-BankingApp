@@ -6,9 +6,12 @@ import Group6.BankingApp.Models.Account;
 import Group6.BankingApp.Models.DebitCard;
 import Group6.BankingApp.Models.User;
 import Group6.BankingApp.Models.dto.AccountDTO;
+import Group6.BankingApp.Models.dto.DebitCardDTO;
 import Group6.BankingApp.Models.dto.UserDTO;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
@@ -30,7 +33,7 @@ public class AccountService {
 
     public Account addAccount(AccountDTO accountDTO)
     {
-        return accountRepository.save(new Account(accountDTO.getIban(), accountDTO.getUser(), "current", accountDTO.getCardUUID(), accountDTO.getPin(), accountDTO.getDailyLimit(), 100.00, 500.00, "open"));
+        return accountRepository.save(new Account(accountDTO.getIban(), accountDTO.getUser(), "current", accountDTO.getCardUUID(), accountDTO.getPin(), accountDTO.getDailyLimit(), 100.00, 500.00, true));
     }
 
     public Account updateAccountByIban(String iban,AccountDTO accountDTO) {
@@ -42,6 +45,43 @@ public class AccountService {
             return accountRepository.save(accountToUpdate);
         }catch (Exception ex){
             throw new EntityNotFoundException("Account not found");
+        }
+    }
+
+    public List<AccountDTO> getAccountsWithSkipAndLimit(Integer skip, Integer limit){
+        Pageable pageable = PageRequest.of(skip, limit);
+        return accountRepository.findAllByOrderByCreatedDateDesc(pageable);
+    }
+
+    public void deactivateAccount(String iban, DebitCardDTO debitCardDTO) {
+        Account account = accountRepository.findByIban(iban);
+        if (account != null && account.getDebitCard() != null && account.getDebitCard().getCardNumber().equals(debitCardDTO.getCardNumber())) {
+            account.setStatus(false);
+            accountRepository.save(account);
+        } else {
+            throw new EntityNotFoundException("Invalid account or debit card");
+        }
+    }
+
+    public void deactivateDebitCard(String iban, DebitCardDTO debitCardDTO) {
+        Account account = accountRepository.findByIban(iban);
+
+        if (account != null && account.getDebitCard() != null && account.getDebitCard().getCardNumber().equals(debitCardDTO.getCardNumber())) {
+            DebitCard debitCard = account.getDebitCard();
+            debitCard.setActive(false);
+            account.setDebitCard(debitCard);
+            accountRepository.save(account);
+        } else {
+            throw new EntityNotFoundException("Invalid account or debit card");
+        }
+    }
+
+    public double getAccountBalance(String iban, String pin) {
+        Account account = accountRepository.findByIban(iban);
+        if (account != null) {
+            return account.getBalance();
+        } else {
+            throw new EntityNotFoundException("Invalid account or pin");
         }
     }
 

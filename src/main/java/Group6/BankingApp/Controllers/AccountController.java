@@ -2,12 +2,15 @@ package Group6.BankingApp.Controllers;
 
 import Group6.BankingApp.Models.Account;
 import Group6.BankingApp.Models.dto.AccountDTO;
+import Group6.BankingApp.Models.dto.DebitCardDTO;
 import Group6.BankingApp.Services.AccountService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 //import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -33,7 +36,7 @@ public class AccountController {
                 return ResponseEntity.badRequest().build();
             }
 
-            List<AccountDTO> accounts = accountService.getAccounts(skip, limit);
+            List<AccountDTO> accounts = accountService.getAccountsWithSkipAndLimit(skip, limit);
 
             return ResponseEntity.ok().body(accounts);
         } catch (Exception e) {
@@ -118,23 +121,32 @@ public class AccountController {
         }
     }
 
-    @GetMapping("/accounts/balance")
-    public ResponseEntity<Map<String, Double>> getAccountBalance(
-            @RequestParam("Iban") String Iban,
-            @RequestParam("pin") String pin
-    ) {
-        try {
-            double balance = accountService.getAccountBalance(Iban, pin);
+//    @GetMapping("/accounts/balance")
+//    public ResponseEntity<Map<String, Double>> getAccountBalance(
+//            @RequestParam("Iban") String Iban,
+//            @RequestParam("pin") String pin
+//    ) {
+//        try {
+//            double balance = accountService.getAccountBalance(Iban, pin);
+//
+//            if (balance >= 0) {
+//                Map<String, Double> responseBody = new HashMap<>();
+//                responseBody.put("balance", balance);
+//                return ResponseEntity.ok().body(responseBody);
+//            } else {
+//                return ResponseEntity.notFound().build();
+//            }
+//        } catch (Exception e) {
+//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+//        }
+//    }
 
-            if (balance >= 0) {
-                Map<String, Double> responseBody = new HashMap<>();
-                responseBody.put("balance", balance);
-                return ResponseEntity.ok().body(responseBody);
-            } else {
-                return ResponseEntity.notFound().build();
-            }
+    @GetMapping("/accounts/balance")
+    public double getAccountBalance(@RequestParam("iban") String iban, @RequestParam("pin") String pin) {
+        try {
+            return accountService.getAccountBalance(iban, pin);
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to retrieve account balance", e);
         }
     }
 
@@ -145,18 +157,22 @@ public class AccountController {
     ) {
         try {
             if (debitCardDTO == null) {
-                return ResponseEntity.badRequest().build();
-            }
-
-            boolean isDeactivated = accountService.deactivateDebitCard(Iban, debitCardDTO);
-
-            if (isDeactivated) {
-                return ResponseEntity.ok().build();
-            } else {
                 return ResponseEntity.notFound().build();
             }
+
+//          boolean isDeactivated = accountService.deactivateAccount(Iban, debitCardDTO);
+            else {
+                accountService.deactivateDebitCard(Iban, debitCardDTO);
+                return ResponseEntity.ok().build();
+            }
+//            if (isDeactivated) {
+//                return ResponseEntity.ok().build();
+//            } else {
+//                return ResponseEntity.notFound().build();
+//            }
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+//            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to deactivate account", e);
         }
     }
 
