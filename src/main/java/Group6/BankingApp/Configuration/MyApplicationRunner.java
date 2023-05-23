@@ -1,6 +1,7 @@
 package Group6.BankingApp.Configuration;
 
 import Group6.BankingApp.DAL.UserRepository;
+import Group6.BankingApp.Models.Account;
 import Group6.BankingApp.Models.Role;
 import Group6.BankingApp.Models.User;
 import jakarta.persistence.Entity;
@@ -32,5 +33,10 @@ public class MyApplicationRunner implements ApplicationRunner {
                         );
 
         userRepository.saveAll(users);
+
+//        List<Account> accounts =
+//                Arrays.asList(
+//                        new Account("NL02ABNA0123456789", users.get(1), "saving", "123", "123", 10.00, 100.00, 100.00, )
+//                );
     }
 }

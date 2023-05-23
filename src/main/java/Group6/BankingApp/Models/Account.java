@@ -19,11 +19,11 @@ public class Account {
     private double dailyLimit;
     private double balance;
     private double absoluteLimit;
-    private String status;
+    private boolean status;
     @OneToOne
     private DebitCard debitCard;
 
-    public Account(String iban, User user, String accountType, String cardUUID, String pin, double dailyLimit, double balance, double absoluteLimit, String status, DebitCard debitCard) {
+    public Account(String iban, User user, String accountType, String cardUUID, String pin, double dailyLimit, double balance, double absoluteLimit, boolean status, DebitCard debitCard) {
         this.iban = iban;
         this.user = user;
         this.accountType = accountType;
@@ -34,6 +34,18 @@ public class Account {
         this.absoluteLimit = absoluteLimit;
         this.status = status;
         this.debitCard = debitCard;
+    }
+
+    public Account(String iban, User user, String accountType, String cardUUID, String pin, double dailyLimit, double balance, double absoluteLimit, boolean status) {
+        this.iban = iban;
+        this.user = user;
+        this.accountType = accountType;
+        this.cardUUID = cardUUID;
+        this.pin = pin;
+        this.dailyLimit = dailyLimit;
+        this.balance = balance;
+        this.absoluteLimit = absoluteLimit;
+        this.status = status;
     }
 
     public Account() {
@@ -103,11 +115,11 @@ public class Account {
         this.absoluteLimit = absoluteLimit;
     }
 
-    public String getStatus() {
+    public boolean getStatus() {
         return status;
     }
 
-    public void setStatus(String status) {
+    public void setStatus(boolean status) {
         this.status = status;
     }
 

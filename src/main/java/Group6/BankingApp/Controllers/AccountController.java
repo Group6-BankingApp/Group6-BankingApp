@@ -1,12 +1,16 @@
 package Group6.BankingApp.Controllers;
 
 import Group6.BankingApp.Models.Account;
+import Group6.BankingApp.Models.dto.AccountDTO;
+import Group6.BankingApp.Models.dto.DebitCardDTO;
 import Group6.BankingApp.Services.AccountService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 //import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -32,7 +36,7 @@ public class AccountController {
                 return ResponseEntity.badRequest().build();
             }
 
-            List<AccountDTO> accounts = accountService.getAccounts(skip, limit);
+            List<AccountDTO> accounts = accountService.getAccountsWithSkipAndLimit(skip, limit);
 
             return ResponseEntity.ok().body(accounts);
         } catch (Exception e) {
@@ -41,19 +45,18 @@ public class AccountController {
     }
 
     @PostMapping("/accounts")
-    public ResponseEntity<AccountDTO> createAccount(@RequestBody NewAccountDTO newAccount) {
+    public ResponseEntity<Account> createAccount(@RequestBody AccountDTO newAccount) {
         try {
             if (newAccount == null) {
                 return ResponseEntity.<AccountDTO>badRequest().build();
             }
 
             String generatedIban = generateIban();
-            Account x = new Account(newAccount);
-            x.setIban(generatedIban);
-            AccountDTO createdAccount = accountService.addAccount(x);
+            newAccount.setIban(generatedIban);
+            Account createdAccount = accountService.addAccount(newAccount);
             return ResponseEntity.status(HttpStatus.CREATED).body(createdAccount);
         } catch (Exception e) {
-            return ResponseEntity.<AccountDTO>badRequest().build();
+            return ResponseEntity.<Account>badRequest().build();
         }
     }
 
@@ -62,22 +65,22 @@ public class AccountController {
     }
 
     @GetMapping("/accounts/{Iban}")
-    public ResponseEntity<AccountDTO> getAccountByIban(@PathVariable("Iban") String Iban) {
+    public ResponseEntity<Account> getAccountByIban(@PathVariable("Iban") String Iban) {
         try {
-            AccountDTO account = accountService.getAccountByIban(Iban);
+            Account account = accountService.getAccountByIban(Iban);
 
             if (account != null) {
-                return ResponseEntity.<AccountDTO>ok().body(account);
+                return ResponseEntity.<Account>ok().body(account);
             } else {
-                return ResponseEntity.<AccountDTO>notFound().build();
+                return ResponseEntity.<Account>notFound().build();
             }
         } catch (Exception e) {
-            return ResponseEntity.<AccountDTO>notFound().build();
+            return ResponseEntity.<Account>notFound().build();
         }
     }
 
     @PutMapping("/accounts/{Iban}")
-    public ResponseEntity<Void> updateAccountByIban(
+    public ResponseEntity<Account> updateAccountByIban(
             @PathVariable("Iban") String Iban,
             @RequestBody AccountDTO updatedAccount
     ) {
@@ -86,13 +89,15 @@ public class AccountController {
                 return ResponseEntity.badRequest().build();
             }
 
-            boolean isUpdated = accountService.updateAccountByIban(Iban, updatedAccount);
-
-            if (isUpdated) {
-                return ResponseEntity.ok().build();
-            } else {
-                return ResponseEntity.notFound().build();
-            }
+//            boolean isUpdated = accountService.updateAccountByIban(Iban, updatedAccount);
+//
+//            if (isUpdated) {
+//                return ResponseEntity.ok().build();
+//            } else {
+//                return ResponseEntity.notFound().build();
+//            }
+            Account account = accountService.updateAccountByIban(Iban, updatedAccount);
+            return ResponseEntity.ok().body(account);
         } catch (Exception e) {
             return ResponseEntity.notFound().build();
         }
@@ -102,35 +107,46 @@ public class AccountController {
     public ResponseEntity<Void> deleteAccountByIban(@PathVariable("Iban") String Iban) {
         try {
 
-            boolean isDeleted = accountService.deleteAccountByIban(Iban);
-
-            if (isDeleted) {
-                return ResponseEntity.ok().build();
-            } else {
-                return ResponseEntity.notFound().build();
-            }
+//            boolean isDeleted = accountService.deleteAccountByIban(Iban);
+//
+//            if (isDeleted) {
+//                return ResponseEntity.ok().build();
+//            } else {
+//                return ResponseEntity.notFound().build();
+//            }
+            accountService.deleteAccount(Iban);
+            return ResponseEntity.ok().build();
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
 
-    @GetMapping("/accounts/balance")
-    public ResponseEntity<Map<String, Double>> getAccountBalance(
-            @RequestParam("Iban") String Iban,
-            @RequestParam("pin") String pin
-    ) {
-        try {
-            double balance = accountService.getAccountBalance(Iban, pin);
+//    @GetMapping("/accounts/balance")
+//    public ResponseEntity<Map<String, Double>> getAccountBalance(
+//            @RequestParam("Iban") String Iban,
+//            @RequestParam("pin") String pin
+//    ) {
+//        try {
+//            double balance = accountService.getAccountBalance(Iban, pin);
+//
+//            if (balance >= 0) {
+//                Map<String, Double> responseBody = new HashMap<>();
+//                responseBody.put("balance", balance);
+//                return ResponseEntity.ok().body(responseBody);
+//            } else {
+//                return ResponseEntity.notFound().build();
+//            }
+//        } catch (Exception e) {
+//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+//        }
+//    }
 
-            if (balance >= 0) {
-                Map<String, Double> responseBody = new HashMap<>();
-                responseBody.put("balance", balance);
-                return ResponseEntity.ok().body(responseBody);
-            } else {
-                return ResponseEntity.notFound().build();
-            }
+    @GetMapping("/accounts/balance")
+    public double getAccountBalance(@RequestParam("iban") String iban, @RequestParam("pin") String pin) {
+        try {
+            return accountService.getAccountBalance(iban, pin);
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to retrieve account balance", e);
         }
     }
 
@@ -141,23 +157,27 @@ public class AccountController {
     ) {
         try {
             if (debitCardDTO == null) {
-                return ResponseEntity.badRequest().build();
-            }
-
-            boolean isDeactivated = accountService.deactivateDebitCard(Iban, debitCardDTO);
-
-            if (isDeactivated) {
-                return ResponseEntity.ok().build();
-            } else {
                 return ResponseEntity.notFound().build();
             }
+
+//          boolean isDeactivated = accountService.deactivateAccount(Iban, debitCardDTO);
+            else {
+                accountService.deactivateDebitCard(Iban, debitCardDTO);
+                return ResponseEntity.ok().build();
+            }
+//            if (isDeactivated) {
+//                return ResponseEntity.ok().build();
+//            } else {
+//                return ResponseEntity.notFound().build();
+//            }
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+//            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to deactivate account", e);
         }
     }
 
     @PutMapping("/accounts/{Iban}/pin")
-    public ResponseEntity<Void> updatePIN(
+    public ResponseEntity<Account> updatePIN(
             @PathVariable("Iban") String Iban,
             @RequestBody AccountDTO accountDTO
     ) {
@@ -166,13 +186,15 @@ public class AccountController {
                 return ResponseEntity.badRequest().build();
             }
 
-            boolean isUpdated = accountService.updateAccount(accountDTO);
-
-            if (isUpdated) {
-                return ResponseEntity.status(HttpStatus.CREATED).build();
-            } else {
-                return ResponseEntity.badRequest().build();
-            }
+//            boolean isUpdated = accountService.updateAccount(accountDTO);
+//
+//            if (isUpdated) {
+//                return ResponseEntity.status(HttpStatus.CREATED).build();
+//            } else {
+//                return ResponseEntity.badRequest().build();
+//            }
+            Account account = accountService.updateAccountByIban(Iban, accountDTO);
+            return ResponseEntity.ok().body(account);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }

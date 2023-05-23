@@ -1,24 +1,35 @@
 package Group6.BankingApp.Models.dto;
 
+import Group6.BankingApp.Models.User;
 import jakarta.persistence.OneToOne;
 
 public class AccountDTO {
 
     private String iban;
     private User user;
+    private String accountType;
     private String cardUUID;
     private String pin;
     private double dailyLimit;
 
-    public AccountDTO(String iban, User user, String cardUUID, String pin, double dailyLimit) {
+    public AccountDTO(String iban, User user, String accountType, String cardUUID, String pin, double dailyLimit) {
         this.iban = iban;
         this.user = user;
+        this.accountType = accountType;
         this.cardUUID = cardUUID;
         this.pin = pin;
         this.dailyLimit = dailyLimit;
     }
 
     public AccountDTO() {
+    }
+
+    public String getAccountType() {
+        return accountType;
+    }
+
+    public void setAccountType(String accountType) {
+        this.accountType = accountType;
     }
 
     public String getIban() {
