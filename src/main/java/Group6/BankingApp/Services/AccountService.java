@@ -50,8 +50,10 @@ public class AccountService {
 
     public List<AccountDTO> getAccountsWithSkipAndLimit(Integer skip, Integer limit){
         Pageable pageable = PageRequest.of(skip, limit);
-        return accountRepository.findAllByOrderByCreatedDateDesc(pageable);
+        return accountRepository.findAllBy(pageable);
     }
+
+    //findAllByOrderByCreatedDateDesc
 
     public void deactivateAccount(String iban, DebitCardDTO debitCardDTO) {
         Account account = accountRepository.findByIban(iban);

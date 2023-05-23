@@ -20,11 +20,13 @@ public interface AccountRepository extends CrudRepository<Account, String> {
 
     Account findByIban(String iban);
 
-    List<AccountDTO> findAllByOrderByCreatedDateDesc(Pageable pageable);
+    List<AccountDTO> findAllBy(Pageable pageable);
 
     @Override
     <A extends Account> A save(A entity);
 
     @Override
     void deleteById(String iban);
+
+    //findAllByOrderByCreatedDateDesc
 }
