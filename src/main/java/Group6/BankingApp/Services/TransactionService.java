@@ -27,4 +27,12 @@ public class TransactionService {
     public Transaction addTransaction(Transaction transaction) {
         return transactionRepository.save(new Transaction(transaction.getUserId(), transaction.getTimeCreated(), transaction.getSenderIban(), transaction.getRecieverIban(), transaction.getAmount()));
     }
+
+    public Transaction Deposit(Transaction transaction) {
+        return transactionRepository.save(new Transaction(transaction.getUserId(), transaction.getTimeCreated(), transaction.getSenderIban(), transaction.getRecieverIban(), transaction.getAmount()));
+    }
+
+    public Transaction Withdraw(Transaction transaction) {
+        return transactionRepository.save(new Transaction(transaction.getUserId(), transaction.getTimeCreated(), transaction.getSenderIban(), transaction.getRecieverIban(), transaction.getAmount()));
+    }
 }
