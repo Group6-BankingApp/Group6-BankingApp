@@ -2,7 +2,6 @@ package Group6.BankingApp.Controllers;
 
 import Group6.BankingApp.Models.Transaction;
 import Group6.BankingApp.Services.TransactionService;
-import Group6.BankingApp.Services.TransactionService;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 //import org.springframework.security.access.prepost.PreAuthorize;
@@ -11,7 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping(value="/users", produces = MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping(value="/transactions", produces = MediaType.APPLICATION_JSON_VALUE)
 public class TransactionController {
 
     private  final TransactionService transactionService;
@@ -43,6 +42,25 @@ public class TransactionController {
     public ResponseEntity addTransaction(@RequestBody Transaction transaction) {
         try{
             Transaction newTransaction=transactionService.addTransaction(transaction);
+            return ResponseEntity.status(201).body(newTransaction);
+        }catch (Exception e){
+            return ResponseEntity.internalServerError().body(e.getCause().getMessage());
+        }
+    }
+
+    @PostMapping
+    public ResponseEntity Deposit(@RequestBody Transaction transaction) {
+        try{
+            Transaction newTransaction=transactionService.Deposit(transaction);
+            return ResponseEntity.status(201).body(newTransaction);
+        }catch (Exception e){
+            return ResponseEntity.internalServerError().body(e.getCause().getMessage());
+        }
+    }
+    @PostMapping
+    public ResponseEntity Withdraw(@RequestBody Transaction transaction) {
+        try{
+            Transaction newTransaction=transactionService.Withdraw(transaction);
             return ResponseEntity.status(201).body(newTransaction);
         }catch (Exception e){
             return ResponseEntity.internalServerError().body(e.getCause().getMessage());
