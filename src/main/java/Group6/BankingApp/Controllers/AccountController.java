@@ -40,7 +40,8 @@ public class AccountController {
 
             return ResponseEntity.ok().body(accounts);
         } catch (Exception e) {
-            return ResponseEntity.notFound().build();
+            //return ResponseEntity.notFound().build();
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to retrieve accounts", e);
         }
     }
 

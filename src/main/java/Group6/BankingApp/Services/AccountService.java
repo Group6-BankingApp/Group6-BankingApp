@@ -9,12 +9,17 @@ import Group6.BankingApp.Models.dto.AccountDTO;
 import Group6.BankingApp.Models.dto.DebitCardDTO;
 import Group6.BankingApp.Models.dto.UserDTO;
 import jakarta.persistence.EntityNotFoundException;
+import org.hibernate.service.spi.ServiceException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
+@Service
 public class AccountService {
 
     @Autowired
@@ -33,7 +38,23 @@ public class AccountService {
 
     public Account addAccount(AccountDTO accountDTO)
     {
-        return accountRepository.save(new Account(accountDTO.getIban(), accountDTO.getUser(), "current", accountDTO.getCardUUID(), accountDTO.getPin(), accountDTO.getDailyLimit(), 100.00, 500.00, true));
+        try {
+            Account account = new Account(
+                    accountDTO.getIban(),
+                    accountDTO.getUser(),
+                    accountDTO.getAccountType(),
+                    accountDTO.getCardUUID(),
+                    accountDTO.getPin(),
+                    accountDTO.getDailyLimit(),
+                    0.0, // Set initial balance to 0.0
+                    0.0, // Set initial absolute limit to 0.0
+                    true, // Set initial status to true
+                    null // Set initial debit card to null
+            );
+            return accountRepository.save(account);
+        } catch (Exception ex) {
+            throw new ServiceException("Failed to add account", ex);
+        }
     }
 
     public Account updateAccountByIban(String iban,AccountDTO accountDTO) {
@@ -49,11 +70,16 @@ public class AccountService {
     }
 
     public List<AccountDTO> getAccountsWithSkipAndLimit(Integer skip, Integer limit){
-        Pageable pageable = PageRequest.of(skip, limit);
-        return accountRepository.findAllBy(pageable);
+        try {
+            List<AccountDTO> accounts = accountRepository.findAllBy(PageRequest.of(0, limit));
+            if(accounts.size() > skip){
+                return accounts.subList(skip, Math.min(skip+limit, accounts.size()));
+            } else
+                return Collections.emptyList();
+        }catch (Exception ex){
+            throw new ServiceException("Failed to retrieve accounts", ex);
+        }
     }
-
-    //findAllByOrderByCreatedDateDesc
 
     public void deactivateAccount(String iban, DebitCardDTO debitCardDTO) {
         Account account = accountRepository.findByIban(iban);
@@ -65,25 +91,30 @@ public class AccountService {
         }
     }
 
-    public void deactivateDebitCard(String iban, DebitCardDTO debitCardDTO) {
-        Account account = accountRepository.findByIban(iban);
+    public void deactivateDebitCard(String iban, DebitCardDTO debitCardDTO){
+        try {
+            Account account = accountRepository.findByIban(iban);
+            if(account == null)
+                throw new ServiceException("Invalid IBAN");
 
-        if (account != null && account.getDebitCard() != null && account.getDebitCard().getCardNumber().equals(debitCardDTO.getCardNumber())) {
             DebitCard debitCard = account.getDebitCard();
+            if (debitCard == null && debitCard.getCardNumber() != debitCardDTO.getCardNumber())
+                throw new ServiceException("Invalid debit card details");
             debitCard.setActive(false);
-            account.setDebitCard(debitCard);
             accountRepository.save(account);
-        } else {
-            throw new EntityNotFoundException("Invalid account or debit card");
+        }catch (Exception ex){
+            throw new ServiceException("Failed to deactivate debit card", ex);
         }
     }
 
     public double getAccountBalance(String iban, String pin) {
-        Account account = accountRepository.findByIban(iban);
-        if (account != null) {
+        try{
+            Account account = accountRepository.findByIban(iban);
+            if (account == null && account.getPin() != pin)
+                throw new EntityNotFoundException("Invalid account or pin");
             return account.getBalance();
-        } else {
-            throw new EntityNotFoundException("Invalid account or pin");
+        }catch (Exception ex){
+            throw new ServiceException("Failed to retrieve account balance", ex);
         }
     }
 
