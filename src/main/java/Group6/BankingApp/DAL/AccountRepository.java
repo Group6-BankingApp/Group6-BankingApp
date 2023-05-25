@@ -28,5 +28,4 @@ public interface AccountRepository extends CrudRepository<Account, String> {
     @Override
     void deleteById(String iban);
 
-    //findAllByOrderByCreatedDateDesc
 }
