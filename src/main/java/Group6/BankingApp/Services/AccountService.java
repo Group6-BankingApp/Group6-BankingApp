@@ -46,10 +46,10 @@ public class AccountService {
                     accountDTO.getCardUUID(),
                     accountDTO.getPin(),
                     accountDTO.getDailyLimit(),
-                    0.0, // Set initial balance to 0.0
-                    0.0, // Set initial absolute limit to 0.0
-                    true, // Set initial status to true
-                    null // Set initial debit card to null
+                    0.0,
+                    0.0,
+                    true,
+                    null
             );
             return accountRepository.save(account);
         } catch (Exception ex) {
