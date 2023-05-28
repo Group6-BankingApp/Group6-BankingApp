@@ -47,7 +47,7 @@ public class TransactionController {
             return ResponseEntity.internalServerError().body(e.getCause().getMessage());
         }
     }
-
+/*
     @PostMapping
     public ResponseEntity Deposit(@RequestBody Transaction transaction) {
         try{
@@ -65,5 +65,5 @@ public class TransactionController {
         }catch (Exception e){
             return ResponseEntity.internalServerError().body(e.getCause().getMessage());
         }
-    }
+    }*/
 }

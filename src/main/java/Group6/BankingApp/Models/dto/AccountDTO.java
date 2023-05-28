@@ -1,5 +1,6 @@
 package Group6.BankingApp.Models.dto;
 
+import Group6.BankingApp.Models.Account;
 import Group6.BankingApp.Models.User;
 import jakarta.persistence.OneToOne;
 
@@ -19,6 +20,15 @@ public class AccountDTO {
         this.cardUUID = cardUUID;
         this.pin = pin;
         this.dailyLimit = dailyLimit;
+    }
+
+    public AccountDTO(Account account){
+        this.iban = account.getIban();
+        this.user = account.getUser();
+        this.accountType = account.getAccountType();
+        this.cardUUID = account.getCardUUID();
+        this.pin = account.getPin();
+        this.dailyLimit = account.getDailyLimit();
     }
 
     public AccountDTO() {
