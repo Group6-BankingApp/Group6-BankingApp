@@ -48,7 +48,7 @@ public class TransactionController {
         }
     }
 
-    @PostMapping
+    /*@PostMapping
     public ResponseEntity Deposit(@RequestBody Transaction transaction) {
         try{
             Transaction newTransaction=transactionService.Deposit(transaction);
@@ -56,8 +56,8 @@ public class TransactionController {
         }catch (Exception e){
             return ResponseEntity.internalServerError().body(e.getCause().getMessage());
         }
-    }
-    @PostMapping
+    }*/
+    /*@PostMapping
     public ResponseEntity Withdraw(@RequestBody Transaction transaction) {
         try{
             Transaction newTransaction=transactionService.Withdraw(transaction);
@@ -65,5 +65,5 @@ public class TransactionController {
         }catch (Exception e){
             return ResponseEntity.internalServerError().body(e.getCause().getMessage());
         }
-    }
+    }*/
 }
