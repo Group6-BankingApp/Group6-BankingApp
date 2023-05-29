@@ -14,10 +14,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
+import org.springframework.data.domain.Pageable;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class AccountService {
@@ -69,23 +71,55 @@ public class AccountService {
         }
     }
 
-    public List<AccountDTO> getAccountsWithSkipAndLimit(Integer skip, Integer limit){
+//    public List<AccountDTO> getAccountsWithSkipAndLimit(Integer skip, Integer limit){
+//        try {
+//            List<Account> accounts = accountRepository.findAllBy(PageRequest.of(1, limit));
+//
+//            List<AccountDTO> DTOs = new ArrayList<>();
+//
+//            for (Account account : accounts) {
+//                DTOs.add(new AccountDTO(account));
+//            }
+//
+//            if(accounts.size() > skip){
+//                return DTOs.subList(skip, Math.min(skip+limit, DTOs.size()));
+//            } else
+//                return Collections.emptyList();
+//        }catch (Exception ex){
+//            throw new ServiceException("Failed to retrieve accounts", ex);
+//        }
+//    }
+
+//    public List<AccountDTO> findAllAccounts(Pageable pageable) {
+//        List<Account> accounts = accountRepository.findAllBy(pageable);
+//        return accounts.stream()
+//                .map(this::mapToAccountDTO)
+//                .collect(Collectors.toList());
+//    }
+
+    public List<AccountDTO> findAllAccounts(Integer skip, Integer limit) {
         try {
-            List<Account> accounts = accountRepository.findAllBy(PageRequest.of(1, limit));
-
-            List<AccountDTO> DTOs = new ArrayList<>();
-
-            for (Account account : accounts) {
-                DTOs.add(new AccountDTO(account));
-            }
-
-            if(accounts.size() > skip){
-                return DTOs.subList(skip, Math.min(skip+limit, DTOs.size()));
-            } else
-                return Collections.emptyList();
+            List<Account> accounts = accountRepository.findAllBy(PageRequest.of(skip, limit));
+            if(accounts == null)
+                throw new NullPointerException("Accounts list is null");
+            
+            return accounts.stream()
+                    .map(this::mapToAccountDTO)
+                    .collect(Collectors.toList());
         }catch (Exception ex){
             throw new ServiceException("Failed to retrieve accounts", ex);
         }
+    }
+
+    private AccountDTO mapToAccountDTO(Account account) {
+        AccountDTO accountDTO = new AccountDTO();
+        accountDTO.setIban(account.getIban());
+        accountDTO.setUser(account.getUser());
+        accountDTO.setAccountType(account.getAccountType());
+        accountDTO.setCardUUID(account.getCardUUID());
+        accountDTO.setPin(account.getPin());
+        accountDTO.setDailyLimit(account.getDailyLimit());
+        return accountDTO;
     }
 
     public void deactivateAccount(String iban, DebitCardDTO debitCardDTO) {

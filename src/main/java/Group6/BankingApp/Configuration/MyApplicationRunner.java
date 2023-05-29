@@ -52,7 +52,7 @@ public class MyApplicationRunner implements ApplicationRunner {
         debitCardRepository.save(debitCard2);
 
         // Create and save Accounts
-        Account account1 = new Account("IBAN1", users.get(0), "Savings", null, null, 1000.0, 0.0, 5000.0, true, null);
+        Account account1 = new Account("IBAN1", users.get(2), "Savings", null, null, 1000.0, 0.0, 5000.0, true, null);
         account1.setDebitCard(debitCard1); // Associate debitCard1 with account1
         accountRepository.save(account1);
         Account account2 = new Account("IBAN2", users.get(1), "Savings", null, null, 2000.0, 0.0, 10000.0, true, null);

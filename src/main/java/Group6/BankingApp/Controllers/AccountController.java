@@ -5,12 +5,14 @@ import Group6.BankingApp.Models.dto.AccountDTO;
 import Group6.BankingApp.Models.dto.DebitCardDTO;
 import Group6.BankingApp.Services.AccountService;
 import Group6.BankingApp.Services.UserService;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 //import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
+import org.springframework.data.domain.Pageable;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -27,11 +29,42 @@ public class AccountController {
         this.accountService = accountService;
     }
 
+//    @GetMapping
+//    public ResponseEntity<List<AccountDTO>> getAccounts(
+//            @RequestParam(value = "skip", required = false) Integer skip,
+//            @RequestParam(value = "limit", required = false) Integer limit
+//    ) {
+//        try {
+//            if (skip != null && skip < 0) {
+//                return ResponseEntity.badRequest().build();
+//            } else if (skip == null) {
+//                skip = 0;
+//            }
+//            if (limit != null && (limit < 0 || limit > 50)) {
+//                return ResponseEntity.badRequest().build();
+//            } else if (limit == null) {
+//                limit = 0;
+//            }
+//            List<AccountDTO> accounts = null;
+//            try{
+//                 accounts = accountService.getAccountsWithSkipAndLimit(skip, limit);
+//            }catch(Exception ex)
+//            {
+//                //pass exception to external try catch
+//                throw ex;
+//            }
+//            return ResponseEntity.ok().body(accounts);
+//        } catch (Exception e) {
+//            //return ResponseEntity.notFound().build();
+//            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to retrieve accounts", e);
+//        }
+//    }
+
     @GetMapping
-    public ResponseEntity<List<AccountDTO>> getAccounts(
-            @RequestParam(value = "skip", required = false) Integer skip,
-            @RequestParam(value = "limit", required = false) Integer limit
-    ) {
+    public ResponseEntity<List<AccountDTO>> getAllAccounts() {
+        Integer skip = 0;
+        Integer limit = 10;
+
         try {
             if (skip != null && skip < 0) {
                 return ResponseEntity.badRequest().build();
@@ -44,16 +77,13 @@ public class AccountController {
                 limit = 0;
             }
             List<AccountDTO> accounts = null;
-            try{
-                 accounts = accountService.getAccountsWithSkipAndLimit(skip, limit);
-            }catch(Exception ex)
-            {
-                //pass exception to external try catch
-                throw ex;
+            try {
+                accounts = accountService.findAllAccounts(skip, limit);
+                return ResponseEntity.ok(accounts);
+            }catch (Exception e){
+                throw e;
             }
-            return ResponseEntity.ok().body(accounts);
-        } catch (Exception e) {
-            //return ResponseEntity.notFound().build();
+        }catch (Exception e){
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to retrieve accounts", e);
         }
     }
