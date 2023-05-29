@@ -61,10 +61,10 @@ public class AccountController {
 //    }
 
     @GetMapping
-    public ResponseEntity<List<AccountDTO>> getAllAccounts() {
-        Integer skip = 0;
-        Integer limit = 10;
-
+    public ResponseEntity<List<AccountDTO>> getAllAccounts(
+            @RequestParam(defaultValue = "0") Integer skip,
+            @RequestParam(defaultValue = "40") Integer limit
+    ) {
         try {
             if (skip != null && skip < 0) {
                 return ResponseEntity.badRequest().build();

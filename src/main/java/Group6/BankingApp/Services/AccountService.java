@@ -99,7 +99,9 @@ public class AccountService {
 
     public List<AccountDTO> findAllAccounts(Integer skip, Integer limit) {
         try {
+//            Pageable pageable = PageRequest.of(skip, limit);
             List<Account> accounts = accountRepository.findAllBy(PageRequest.of(skip, limit));
+//            List<Account> accounts = accountRepository.findAllBy(pageable);
             if(accounts == null)
                 throw new NullPointerException("Accounts list is null");
 
