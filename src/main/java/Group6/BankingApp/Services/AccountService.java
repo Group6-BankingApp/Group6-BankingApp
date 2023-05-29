@@ -102,7 +102,7 @@ public class AccountService {
             List<Account> accounts = accountRepository.findAllBy(PageRequest.of(skip, limit));
             if(accounts == null)
                 throw new NullPointerException("Accounts list is null");
-            
+
             return accounts.stream()
                     .map(this::mapToAccountDTO)
                     .collect(Collectors.toList());
