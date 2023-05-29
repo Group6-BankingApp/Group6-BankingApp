@@ -71,9 +71,16 @@ public class AccountService {
 
     public List<AccountDTO> getAccountsWithSkipAndLimit(Integer skip, Integer limit){
         try {
-            List<AccountDTO> accounts = accountRepository.findAllBy(PageRequest.of(0, limit));
+            List<Account> accounts = accountRepository.findAllBy(PageRequest.of(1, limit));
+
+            List<AccountDTO> DTOs = new ArrayList<>();
+
+            for (Account account : accounts) {
+                DTOs.add(new AccountDTO(account));
+            }
+
             if(accounts.size() > skip){
-                return accounts.subList(skip, Math.min(skip+limit, accounts.size()));
+                return DTOs.subList(skip, Math.min(skip+limit, DTOs.size()));
             } else
                 return Collections.emptyList();
         }catch (Exception ex){
