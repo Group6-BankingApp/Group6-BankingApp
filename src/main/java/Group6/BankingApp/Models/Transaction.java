@@ -1,38 +1,45 @@
 package Group6.BankingApp.Models;
-
+import java.util.UUID;
 import java.time.LocalDate;
-
+import Group6.BankingApp.Models.dto.TransactionDTO;
 import jakarta.persistence.*;
 
 @Entity
 @Table(name = "transactions")
 public class Transaction {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long transactionId;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(name = "transactionId", updatable = false, nullable = false)
+    private String transactionId;
     private Long userId;
     private LocalDate timeCreated;
     private String senderIban;
     private String recieverIban;
     private double amount;
+    private String description;
 
     public Transaction() {
     }
 
-    public Transaction(Long userId, LocalDate timeCreated, String senderIban, String recieverIban, double amount) {
-        this.userId = userId;
+    public Transaction(LocalDate timeCreated, String senderIban, String recieverIban, double amount, String description) {
         this.timeCreated = timeCreated;
         this.senderIban = senderIban;
         this.recieverIban = recieverIban;
         this.amount = amount;
+        this.description = description;
     }
 
-    public void setTransactionId(Long transactionId) {
-        this.transactionId = transactionId;
+    //TODO add userId from session token
+    public Transaction(TransactionDTO transactionDTO) {
+        this.timeCreated = LocalDate.now();
+        this.senderIban = transactionDTO.getSenderIban();
+        this.recieverIban = transactionDTO.getRecieverIban();
+        this.amount = transactionDTO.getAmount();
+        this.description = transactionDTO.getDescription();
     }
 
 
-    public Long getTransactionId() {
+    public String getTransactionId() {
         return transactionId;
     }
 
@@ -74,5 +81,13 @@ public class Transaction {
 
     public  void setAmount(Double amount) {
         this.amount = amount;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+    
+    public  void setDescription(String description) {
+        this.description = description;
     }
 }

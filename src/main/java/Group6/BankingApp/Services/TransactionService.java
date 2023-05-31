@@ -20,19 +20,19 @@ public class TransactionService {
         return (List<Transaction>) transactionRepository.findAll();
     }
 
-    public Transaction getTransactionById(Long id) {
+    public Transaction getTransactionById(String id) {
         return transactionRepository.findById(id).orElse(null);
     }
 
     public Transaction addTransaction(Transaction transaction) {
-        return transactionRepository.save(new Transaction(transaction.getUserId(), transaction.getTimeCreated(), transaction.getSenderIban(), transaction.getRecieverIban(), transaction.getAmount()));
+        return transactionRepository.save(transaction);
     }
 
     public Transaction Deposit(Transaction transaction) {
-        return transactionRepository.save(new Transaction(transaction.getUserId(), transaction.getTimeCreated(), transaction.getSenderIban(), transaction.getRecieverIban(), transaction.getAmount()));
+        return transactionRepository.save(transaction);
     }
 
     public Transaction Withdraw(Transaction transaction) {
-        return transactionRepository.save(new Transaction(transaction.getUserId(), transaction.getTimeCreated(), transaction.getSenderIban(), transaction.getRecieverIban(), transaction.getAmount()));
+        return transactionRepository.save(transaction);
     }
 }
