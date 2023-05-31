@@ -3,9 +3,11 @@ package Group6.BankingApp.Configuration;
 import Group6.BankingApp.DAL.AccountRepository;
 import Group6.BankingApp.DAL.DebitCardRepository;
 import Group6.BankingApp.DAL.UserRepository;
+import Group6.BankingApp.DAL.TransactionRepository;
 import Group6.BankingApp.Models.Account;
 import Group6.BankingApp.Models.DebitCard;
 import Group6.BankingApp.Models.Role;
+import Group6.BankingApp.Models.Transaction;
 import Group6.BankingApp.Models.User;
 import Group6.BankingApp.Services.AccountService;
 import jakarta.persistence.Entity;
@@ -26,12 +28,14 @@ public class MyApplicationRunner implements ApplicationRunner {
     private UserRepository userRepository;
     private AccountRepository accountRepository;
     private DebitCardRepository debitCardRepository;
+    private TransactionRepository transactionRrepository;
 
     @Autowired
-    public MyApplicationRunner(UserRepository userRepository, AccountRepository accountRepository, DebitCardRepository debitCardRepository) {
+    public MyApplicationRunner(UserRepository userRepository, AccountRepository accountRepository, DebitCardRepository debitCardRepository, TransactionRepository transactionRrepository) {
         this.userRepository = userRepository;
         this.accountRepository = accountRepository;
         this.debitCardRepository = debitCardRepository;
+        this.transactionRrepository = transactionRrepository;
     }
     @Override
     public void run(ApplicationArguments args) throws Exception {
@@ -58,5 +62,11 @@ public class MyApplicationRunner implements ApplicationRunner {
         Account account2 = new Account("IBAN2", users.get(1), "Savings", null, null, 2000.0, 0.0, 10000.0, true, null);
         account2.setDebitCard(debitCard2); // Associate debitCard2 with account2
         accountRepository.save(account2);
+
+        // Create and save Transactions
+        Transaction transaction1 = new Transaction(LocalDate.now(), "NL67INGB2131241242", "NL67INGB213214124", 200.0);
+        transactionRrepository.save(transaction1);
+        Transaction transaction2 = new Transaction(LocalDate.now(), "NL67INGB12345678", "NL67INGB87654321", 155.0);
+        transactionRrepository.save(transaction2);
     }
 }

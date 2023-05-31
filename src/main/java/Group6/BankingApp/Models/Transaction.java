@@ -19,8 +19,7 @@ public class Transaction {
     public Transaction() {
     }
 
-    public Transaction(Long userId, LocalDate timeCreated, String senderIban, String recieverIban, double amount) {
-        this.userId = userId;
+    public Transaction(LocalDate timeCreated, String senderIban, String recieverIban, double amount) {
         this.timeCreated = timeCreated;
         this.senderIban = senderIban;
         this.recieverIban = recieverIban;
