@@ -64,9 +64,11 @@ public class MyApplicationRunner implements ApplicationRunner {
         accountRepository.save(account2);
 
         // Create and save Transactions
-        Transaction transaction1 = new Transaction(LocalDate.now(), "NL67INGB2131241242", "NL67INGB213214124", 200.0);
+        Transaction transaction1 = new Transaction(LocalDate.now(), "NL67INGB2131241242", "NL67INGB213214124", 200.0, "withdraw");
         transactionRrepository.save(transaction1);
-        Transaction transaction2 = new Transaction(LocalDate.now(), "NL67INGB12345678", "NL67INGB87654321", 155.0);
+        Transaction transaction2 = new Transaction(LocalDate.now(), "NL67INGB12345678", "NL67INGB87654321", 155.0, "deposit");
         transactionRrepository.save(transaction2);
+        Transaction transaction3 = new Transaction(LocalDate.now(), "NL67INGB12348765", "NL67INGB87655555", 100.0, "regular");
+        transactionRrepository.save(transaction3);
     }
 }
