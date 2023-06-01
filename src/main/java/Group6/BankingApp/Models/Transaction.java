@@ -21,8 +21,8 @@ public class Transaction {
     public Transaction() {
     }
 
-    public Transaction(LocalDate timeCreated, String senderIban, String recieverIban, double amount, String description) {
-        this.timeCreated = timeCreated;
+    public Transaction(String senderIban, String recieverIban, double amount, String description) {
+        this.timeCreated = LocalDate.now();
         this.senderIban = senderIban;
         this.recieverIban = recieverIban;
         this.amount = amount;
