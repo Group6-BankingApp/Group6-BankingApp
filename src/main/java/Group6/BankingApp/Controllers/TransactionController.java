@@ -47,8 +47,8 @@ public class TransactionController {
             return ResponseEntity.internalServerError().body(e.getCause().getMessage());
         }
     }
-
-    /*@PostMapping(value = "/deposit")
+/*
+    @PostMapping
     public ResponseEntity Deposit(@RequestBody Transaction transaction) {
         try{
             Transaction newTransaction=transactionService.Deposit(transaction);

@@ -20,7 +20,7 @@ public interface AccountRepository extends CrudRepository<Account, String> {
 
     Account findByIban(String iban);
 
-    List<AccountDTO> findAllBy(Pageable pageable);
+    List<Account> findAllBy(Pageable pageable);
 
     @Override
     <A extends Account> A save(A entity);

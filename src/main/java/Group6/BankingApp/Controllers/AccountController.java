@@ -4,6 +4,7 @@ import Group6.BankingApp.Models.Account;
 import Group6.BankingApp.Models.dto.AccountDTO;
 import Group6.BankingApp.Models.dto.DebitCardDTO;
 import Group6.BankingApp.Services.AccountService;
+import Group6.BankingApp.Services.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -20,10 +21,13 @@ import java.util.List;
 @RequestMapping(value="/accounts", produces = MediaType.APPLICATION_JSON_VALUE)
 public class AccountController {
 
-    private final AccountService accountService = new AccountService();
+    private final AccountService accountService;
 
+    public AccountController(AccountService accountService) {
+        this.accountService = accountService;
+    }
 
-    @GetMapping("/accounts")
+    @GetMapping
     public ResponseEntity<List<AccountDTO>> getAccounts(
             @RequestParam(value = "skip", required = false) Integer skip,
             @RequestParam(value = "limit", required = false) Integer limit
@@ -31,13 +35,22 @@ public class AccountController {
         try {
             if (skip != null && skip < 0) {
                 return ResponseEntity.badRequest().build();
+            } else if (skip == null) {
+                skip = 0;
             }
             if (limit != null && (limit < 0 || limit > 50)) {
                 return ResponseEntity.badRequest().build();
+            } else if (limit == null) {
+                limit = 0;
             }
-
-            List<AccountDTO> accounts = accountService.getAccountsWithSkipAndLimit(skip, limit);
-
+            List<AccountDTO> accounts = null;
+            try{
+                 accounts = accountService.getAccountsWithSkipAndLimit(skip, limit);
+            }catch(Exception ex)
+            {
+                //pass exception to external try catch
+                throw ex;
+            }
             return ResponseEntity.ok().body(accounts);
         } catch (Exception e) {
             //return ResponseEntity.notFound().build();
@@ -45,7 +58,7 @@ public class AccountController {
         }
     }
 
-    @PostMapping("/accounts")
+    @PostMapping
     public ResponseEntity<Account> createAccount(@RequestBody AccountDTO newAccount) {
         try {
             if (newAccount == null) {
@@ -65,7 +78,7 @@ public class AccountController {
         return "NL02ABNA0123456789";
     }
 
-    @GetMapping("/accounts/{Iban}")
+    @GetMapping("/{Iban}")
     public ResponseEntity<Account> getAccountByIban(@PathVariable("Iban") String Iban) {
         try {
             Account account = accountService.getAccountByIban(Iban);
@@ -80,7 +93,7 @@ public class AccountController {
         }
     }
 
-    @PutMapping("/accounts/{Iban}")
+    @PutMapping("/{Iban}")
     public ResponseEntity<Account> updateAccountByIban(
             @PathVariable("Iban") String Iban,
             @RequestBody AccountDTO updatedAccount
@@ -89,7 +102,6 @@ public class AccountController {
             if (updatedAccount == null) {
                 return ResponseEntity.badRequest().build();
             }
-
 //            boolean isUpdated = accountService.updateAccountByIban(Iban, updatedAccount);
 //
 //            if (isUpdated) {
@@ -104,7 +116,7 @@ public class AccountController {
         }
     }
 
-    @DeleteMapping("/accounts/{Iban}")
+    @DeleteMapping("/{Iban}")
     public ResponseEntity<Void> deleteAccountByIban(@PathVariable("Iban") String Iban) {
         try {
 
@@ -142,7 +154,7 @@ public class AccountController {
 //        }
 //    }
 
-    @GetMapping("/accounts/balance")
+    @GetMapping("/balance")
     public double getAccountBalance(@RequestParam("iban") String iban, @RequestParam("pin") String pin) {
         try {
             return accountService.getAccountBalance(iban, pin);
@@ -151,7 +163,7 @@ public class AccountController {
         }
     }
 
-    @PutMapping("/accounts/{Iban}/DebitCard")
+    @PutMapping("/{Iban}/DebitCard")
     public ResponseEntity<Void> deactivateDebitCard(
             @PathVariable("Iban") String Iban,
             @RequestBody DebitCardDTO debitCardDTO
@@ -177,7 +189,7 @@ public class AccountController {
         }
     }
 
-    @PutMapping("/accounts/{Iban}/pin")
+    @PutMapping("/{Iban}/pin")
     public ResponseEntity<Account> updatePIN(
             @PathVariable("Iban") String Iban,
             @RequestBody AccountDTO accountDTO
