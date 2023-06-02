@@ -30,7 +30,7 @@ public class TransactionController {
     }
 
     @GetMapping(value = "/{id}")
-    public ResponseEntity<Transaction> getTransactionById(@PathVariable Long id) {
+    public ResponseEntity<Transaction> getTransactionById(@PathVariable String id) {
         try{
             return ResponseEntity.ok().body(transactionService.getTransactionById(id));
         }catch (Exception e){
@@ -56,8 +56,8 @@ public class TransactionController {
         }catch (Exception e){
             return ResponseEntity.internalServerError().body(e.getCause().getMessage());
         }
-    }
-    @PostMapping
+    }*/
+    /*@PostMapping(value = "/withdraw")
     public ResponseEntity Withdraw(@RequestBody Transaction transaction) {
         try{
             Transaction newTransaction=transactionService.Withdraw(transaction);
