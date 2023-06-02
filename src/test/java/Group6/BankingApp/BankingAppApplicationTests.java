@@ -39,10 +39,10 @@ class BankingAppApplicationTests {
 		int skip = 0;
 		int limit = 10;
 		List<AccountDTO> expectedAccounts = Collections.singletonList(new AccountDTO(/* account data */));
-		Mockito.when(accountService.getAccountsWithSkipAndLimit(skip, limit)).thenReturn(expectedAccounts);
+		Mockito.when(accountService.findAllAccounts(skip, limit)).thenReturn(expectedAccounts);
 
 		// test
-		ResponseEntity<List<AccountDTO>> response = accountController.getAccounts(skip, limit);
+		ResponseEntity<List<AccountDTO>> response = accountController.getAllAccounts(skip, limit);
 
 		assertEquals(HttpStatus.OK, response.getStatusCode());
 		assertEquals(expectedAccounts, response.getBody());
@@ -54,7 +54,7 @@ class BankingAppApplicationTests {
 		int limit = 10;
 
 		// test
-		ResponseEntity<List<AccountDTO>> response = accountController.getAccounts(skip, limit);
+		ResponseEntity<List<AccountDTO>> response = accountController.getAllAccounts(skip, limit);
 
 		assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
 	}
@@ -65,7 +65,7 @@ class BankingAppApplicationTests {
 		int limit = 51;
 
 		// test
-		ResponseEntity<List<AccountDTO>> response = accountController.getAccounts(skip, limit);
+		ResponseEntity<List<AccountDTO>> response = accountController.getAllAccounts(skip, limit);
 
 		assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
 	}
@@ -74,12 +74,12 @@ class BankingAppApplicationTests {
 	public void testGetAccounts_Exception() {
 		int skip = 0;
 		int limit = 10;
-		Mockito.when(accountService.getAccountsWithSkipAndLimit(skip, limit)).thenThrow(new RuntimeException("Some error message"));
+		Mockito.when(accountService.findAllAccounts(skip, limit)).thenThrow(new RuntimeException("Some error message"));
 
 		// test
 		ResponseStatusException exception =
 				org.junit.jupiter.api.Assertions.assertThrows(ResponseStatusException.class, () -> {
-					accountController.getAccounts(skip, limit);
+					accountController.getAllAccounts(skip, limit);
 				});
 		assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, exception.getStatusCode());
 		assertEquals("Failed to retrieve accounts", exception.getReason());

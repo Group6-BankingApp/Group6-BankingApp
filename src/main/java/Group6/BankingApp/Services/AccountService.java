@@ -19,6 +19,7 @@ import org.springframework.data.domain.Pageable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Random;
 import java.util.stream.Collectors;
 
 @Service
@@ -42,7 +43,8 @@ public class AccountService {
     {
         try {
             Account account = new Account(
-                    accountDTO.getIban(),
+                    generateIban(),
+                    //accountDTO.getIban(),
                     accountDTO.getUser(),
                     accountDTO.getAccountType(),
                     accountDTO.getCardUUID(),
@@ -71,46 +73,51 @@ public class AccountService {
         }
     }
 
-//    public List<AccountDTO> getAccountsWithSkipAndLimit(Integer skip, Integer limit){
+//    public List<AccountDTO> findAllAccounts(Integer skip, Integer limit) {
 //        try {
-//            List<Account> accounts = accountRepository.findAllBy(PageRequest.of(1, limit));
+//            List<Account> accounts = accountRepository.findAllBy(PageRequest.of(skip, limit));
+//            if(accounts == null)
+//                throw new NullPointerException("Accounts list is null");
 //
-//            List<AccountDTO> DTOs = new ArrayList<>();
-//
-//            for (Account account : accounts) {
-//                DTOs.add(new AccountDTO(account));
-//            }
-//
-//            if(accounts.size() > skip){
-//                return DTOs.subList(skip, Math.min(skip+limit, DTOs.size()));
-//            } else
-//                return Collections.emptyList();
+//            return accounts.stream()
+//                    .map(this::mapToAccountDTO)
+//                    .collect(Collectors.toList());
 //        }catch (Exception ex){
 //            throw new ServiceException("Failed to retrieve accounts", ex);
 //        }
 //    }
 
-//    public List<AccountDTO> findAllAccounts(Pageable pageable) {
-//        List<Account> accounts = accountRepository.findAllBy(pageable);
-//        return accounts.stream()
-//                .map(this::mapToAccountDTO)
-//                .collect(Collectors.toList());
+    //SQL query
+//    public List<AccountDTO> findAllAccounts(Integer skip, Integer limit){
+//        try {
+//            List<Account> accounts = accountRepository.findAllAccounts(skip, limit);
+//            if (accounts == null)
+//                throw new NullPointerException("Accounts list is null");
+//
+//            return accounts.stream()
+//                    .map(this::mapToAccountDTO)
+//                    .collect(Collectors.toList());
+//        }catch (Exception ex){
+//            throw new ServiceException("Failed to retrieve accounts", ex);
+//        }
 //    }
 
     public List<AccountDTO> findAllAccounts(Integer skip, Integer limit) {
-        try {
-//            Pageable pageable = PageRequest.of(skip, limit);
-            List<Account> accounts = accountRepository.findAllBy(PageRequest.of(skip, limit));
-//            List<Account> accounts = accountRepository.findAllBy(pageable);
-            if(accounts == null)
-                throw new NullPointerException("Accounts list is null");
+        Iterable<Account> allAccounts = accountRepository.findAll();
+        List<Account> accountList = new ArrayList<>();
+        allAccounts.forEach(accountList::add);
 
-            return accounts.stream()
-                    .map(this::mapToAccountDTO)
-                    .collect(Collectors.toList());
-        }catch (Exception ex){
-            throw new ServiceException("Failed to retrieve accounts", ex);
+        int totalAccounts = accountList.size();
+
+        List<AccountDTO> accountDTOs = new ArrayList<>();
+
+        for (int i = skip; i < Math.min(skip + limit, totalAccounts); i++) {
+            Account account = accountList.get(i);
+            AccountDTO accountDTO = mapToAccountDTO(account);
+            accountDTOs.add(accountDTO);
         }
+
+        return accountDTOs;
     }
 
     private AccountDTO mapToAccountDTO(Account account) {
@@ -163,5 +170,20 @@ public class AccountService {
 
     public void deleteAccount(String iban) {
         accountRepository.deleteById(iban);
+    }
+
+    private static final String IBAN_PREFIX = "NL01INHO";
+
+    private String generateIban() {
+        StringBuilder ibanBuilder = new StringBuilder(IBAN_PREFIX);
+
+        // Generate random digits for the remaining part of the IBAN
+        Random random = new Random();
+        for (int i = 0; i < 10; i++) {
+            int randomDigit = random.nextInt(10);
+            ibanBuilder.append(randomDigit);
+        }
+
+        return ibanBuilder.toString();
     }
 }
