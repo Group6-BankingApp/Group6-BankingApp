@@ -26,9 +26,9 @@ public class MyApplicationRunner implements ApplicationRunner {
 
         List<User> users=
                 Arrays.asList(
-                        new User("John", "Doe", "john.doe@gmail.com", "123456", "123456789", Role.CUSTOMER),
-                        new User("Jane", "Doe", "jane.doe@gmail.com", "123456", "123456789", Role.CUSTOMER),
-                        new User("Adam", "Addey", "ad.ad@gmail.com", "123456", "123456789", Role.CUSTOMER)
+                        new User("John", "Doe", "john.doe@gmail.com", "123456", "123456789", Role.CUSTOMER,true),
+                        new User("Jane", "Doe", "jane.doe@gmail.com", "123456", "123456789", Role.CUSTOMER,false),
+                        new User("Adam", "Adey", "ad.ad@gmail.com", "123456", "123456789", Role.CUSTOMER,false)
                         );
 
         userRepository.saveAll(users);
