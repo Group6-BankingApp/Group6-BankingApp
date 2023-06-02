@@ -11,22 +11,21 @@ public class Account {
     @Id
     @Column(unique = true)
     private String iban;
-    private String firstName;
-    private String lastName;
+    @OneToOne
+    private User user;
     private String accountType;
     private String cardUUID;
     private String pin;
     private double dailyLimit;
     private double balance;
     private double absoluteLimit;
-    private String status;
+    private boolean status;
     @OneToOne
     private DebitCard debitCard;
 
-    public Account(String iban, String firstName, String lastName, String accountType, String cardUUID, String pin, double dailyLimit, double balance, double absoluteLimit, String status, DebitCard debitCard) {
+    public Account(String iban, User user, String accountType, String cardUUID, String pin, double dailyLimit, double balance, double absoluteLimit, boolean status, DebitCard debitCard) {
         this.iban = iban;
-        this.firstName = firstName;
-        this.lastName = lastName;
+        this.user = user;
         this.accountType = accountType;
         this.cardUUID = cardUUID;
         this.pin = pin;
@@ -35,6 +34,18 @@ public class Account {
         this.absoluteLimit = absoluteLimit;
         this.status = status;
         this.debitCard = debitCard;
+    }
+
+    public Account(String iban, User user, String accountType, String cardUUID, String pin, double dailyLimit, double balance, double absoluteLimit, boolean status) {
+        this.iban = iban;
+        this.user = user;
+        this.accountType = accountType;
+        this.cardUUID = cardUUID;
+        this.pin = pin;
+        this.dailyLimit = dailyLimit;
+        this.balance = balance;
+        this.absoluteLimit = absoluteLimit;
+        this.status = status;
     }
 
     public Account() {
@@ -48,20 +59,12 @@ public class Account {
         this.iban = iban;
     }
 
-    public String getFirstName() {
-        return firstName;
+    public User getUser() {
+        return user;
     }
 
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
-    }
-
-    public String getLastName() {
-        return lastName;
-    }
-
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
+    public void setUser(User user) {
+        this.user = user;
     }
 
     public String getCardUUID() {
@@ -112,11 +115,11 @@ public class Account {
         this.absoluteLimit = absoluteLimit;
     }
 
-    public String getStatus() {
+    public boolean getStatus() {
         return status;
     }
 
-    public void setStatus(String status) {
+    public void setStatus(boolean status) {
         this.status = status;
     }
 
