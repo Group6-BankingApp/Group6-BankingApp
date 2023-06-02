@@ -52,22 +52,22 @@ public class MyApplicationRunner implements ApplicationRunner {
         debitCardRepository.save(debitCard2);
 
         // Create and save Accounts
-        Account account1 = new Account("IBAN1", users.get(2), "Savings", null, null, 1000.0, 0.0, 5000.0, true, null);
+        Account account1 = new Account("NL53ABNA9501054837", users.get(2), "Savings", null, null, 1000.0, 0.0, 5000.0, true, null);
         account1.setDebitCard(debitCard1);
         accountRepository.save(account1);
-        Account account2 = new Account("IBAN2", users.get(1), "Current", null, null, 2000.0, 0.0, 10000.0, true, null);
+        Account account2 = new Account("NL77INGB2371458805", users.get(1), "Current", null, null, 2000.0, 0.0, 10000.0, true, null);
         account2.setDebitCard(debitCard2);
         accountRepository.save(account2);
-        Account account3 = new Account("IBAN3", users.get(2), "Savings", null, null, 1000.0, 0.0, 5000.0, true, null);
+        Account account3 = new Account("NL02INGB5808504708", users.get(2), "Savings", null, null, 1000.0, 0.0, 5000.0, true, null);
         account3.setDebitCard(debitCard1);
         accountRepository.save(account3);
-        Account account4 = new Account("IBAN4", users.get(1), "Current", null, null, 2000.0, 0.0, 10000.0, true, null);
+        Account account4 = new Account("NL71ABNA8399675482", users.get(1), "Current", null, null, 2000.0, 0.0, 10000.0, true, null);
         account4.setDebitCard(debitCard2);
         accountRepository.save(account4);
-        Account account5 = new Account("IBAN5", users.get(2), "Savings", null, null, 1000.0, 0.0, 5000.0, true, null);
+        Account account5 = new Account("NL80ABNA8135680120", users.get(2), "Savings", null, null, 1000.0, 0.0, 5000.0, true, null);
         account5.setDebitCard(debitCard1);
         accountRepository.save(account5);
-        Account account6 = new Account("IBAN6", users.get(1), "Current", null, null, 2000.0, 0.0, 10000.0, true, null);
+        Account account6 = new Account("NL85ABNA4789170233", users.get(1), "Current", null, null, 2000.0, 0.0, 10000.0, true, null);
         account6.setDebitCard(debitCard2);
         accountRepository.save(account6);
     }
