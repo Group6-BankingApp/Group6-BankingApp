@@ -13,9 +13,6 @@ import java.util.Optional;
 @Repository
 public interface AccountRepository extends CrudRepository<Account, String> {
 
-//    @Override
-//    Iterable<Account> findAll();
-
     @Override
     Optional<Account> findById(String iban);
 
@@ -28,8 +25,5 @@ public interface AccountRepository extends CrudRepository<Account, String> {
 
     @Override
     void deleteById(String iban);
-
-    @Query(value = "SELECT * FROM account LIMIT :limit OFFSET :skip", nativeQuery = true)
-    List<Account> findAllAccounts(Integer skip, Integer limit);
 
 }

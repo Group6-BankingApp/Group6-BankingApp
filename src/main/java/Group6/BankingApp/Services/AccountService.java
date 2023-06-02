@@ -72,51 +72,32 @@ public class AccountService {
         }
     }
 
-//    public List<AccountDTO> findAllAccounts(Integer skip, Integer limit) {
-//        try {
-//            List<Account> accounts = accountRepository.findAllBy(PageRequest.of(skip, limit));
-//            if(accounts == null)
-//                throw new NullPointerException("Accounts list is null");
-//
-//            return accounts.stream()
-//                    .map(this::mapToAccountDTO)
-//                    .collect(Collectors.toList());
-//        }catch (Exception ex){
-//            throw new ServiceException("Failed to retrieve accounts", ex);
-//        }
-//    }
-
-    //SQL query
-//    public List<AccountDTO> findAllAccounts(Integer skip, Integer limit){
-//        try {
-//            List<Account> accounts = accountRepository.findAllAccounts(skip, limit);
-//            if (accounts == null)
-//                throw new NullPointerException("Accounts list is null");
-//
-//            return accounts.stream()
-//                    .map(this::mapToAccountDTO)
-//                    .collect(Collectors.toList());
-//        }catch (Exception ex){
-//            throw new ServiceException("Failed to retrieve accounts", ex);
-//        }
-//    }
-
     public List<AccountDTO> findAllAccounts(Integer skip, Integer limit) {
-        Iterable<Account> allAccounts = accountRepository.findAll();
-        List<Account> accountList = new ArrayList<>();
-        allAccounts.forEach(accountList::add);
+        try {
+            Iterable<Account> allAccounts = accountRepository.findAll();
+            if (allAccounts == null)
+                throw new ServiceException("Failed to retrieve accounts");
 
-        int totalAccounts = accountList.size();
+            List<Account> accountList = new ArrayList<>();
+            allAccounts.forEach(accountList::add);
 
-        List<AccountDTO> accountDTOs = new ArrayList<>();
+            int totalAccounts = accountList.size();
 
-        for (int i = skip; i < Math.min(skip + limit, totalAccounts); i++) {
-            Account account = accountList.get(i);
-            AccountDTO accountDTO = mapToAccountDTO(account);
-            accountDTOs.add(accountDTO);
+            List<AccountDTO> accountDTOs = new ArrayList<>();
+            if(skip >= totalAccounts)
+                return accountDTOs;
+
+            int end = Math.min(skip + limit, totalAccounts);
+            for (int i = skip; i < end; i++) {
+                Account account = accountList.get(i);
+                AccountDTO accountDTO = mapToAccountDTO(account);
+                accountDTOs.add(accountDTO);
+            }
+            return accountDTOs;
+        }catch (Exception ex){
+            //return Collections.emptyList();
+            throw new ServiceException("Failed to retrieve accounts", ex);
         }
-
-        return accountDTOs;
     }
 
     private AccountDTO mapToAccountDTO(Account account) {

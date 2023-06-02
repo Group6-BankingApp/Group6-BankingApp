@@ -30,37 +30,6 @@ public class AccountController {
         this.accountService = accountService;
     }
 
-//    @GetMapping
-//    public ResponseEntity<List<AccountDTO>> getAccounts(
-//            @RequestParam(value = "skip", required = false) Integer skip,
-//            @RequestParam(value = "limit", required = false) Integer limit
-//    ) {
-//        try {
-//            if (skip != null && skip < 0) {
-//                return ResponseEntity.badRequest().build();
-//            } else if (skip == null) {
-//                skip = 0;
-//            }
-//            if (limit != null && (limit < 0 || limit > 50)) {
-//                return ResponseEntity.badRequest().build();
-//            } else if (limit == null) {
-//                limit = 0;
-//            }
-//            List<AccountDTO> accounts = null;
-//            try{
-//                 accounts = accountService.getAccountsWithSkipAndLimit(skip, limit);
-//            }catch(Exception ex)
-//            {
-//                //pass exception to external try catch
-//                throw ex;
-//            }
-//            return ResponseEntity.ok().body(accounts);
-//        } catch (Exception e) {
-//            //return ResponseEntity.notFound().build();
-//            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to retrieve accounts", e);
-//        }
-//    }
-
     @GetMapping
     public ResponseEntity<List<AccountDTO>> getAllAccounts(
             @RequestParam(defaultValue = "0") Integer skip,
