@@ -14,17 +14,19 @@ public class User {
     private String password;
     private String phoneNumber;
     private Role role;
+    private boolean hasAccount;
 
     public User() {
     }
 
-    public User(String firstName, String lastName, String email, String password, String phoneNumber, Role role) {
+    public User(String firstName, String lastName, String email, String password, String phoneNumber, Role role, boolean hasAccount) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
         this.password = password;
         this.phoneNumber = phoneNumber;
         this.role = role;
+        this.hasAccount = hasAccount;
     }
 
     public void setId(Long id) {
@@ -82,5 +84,13 @@ public class User {
 
     public  void setEmail(String email) {
         this.email = email;
+    }
+
+    public boolean getHasAccount() {
+        return hasAccount;
+    }
+
+    public void setHasAccount(boolean hasAccount) {
+        this.hasAccount = hasAccount;
     }
 }

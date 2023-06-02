@@ -12,6 +12,8 @@ public interface UserRepository extends CrudRepository<User, Long> {
     @Override
     Iterable<User> findAll();
 
+    Iterable<User>findAllByHasAccountIsTrue();
+
     @Override
     Optional<User> findById(Long aLong);
 
