@@ -25,14 +25,13 @@ public class DebitCard {
     }
 
     public DebitCard(String cardNumber, LocalDate expirationDate, String cvv, String cardHolderName,
-                     boolean isActive, String uuid, Account account) {
+                     boolean isActive, String uuid) {
         this.cardNumber = cardNumber;
         this.expirationDate = expirationDate;
         this.cvv = cvv;
         this.cardHolderName = cardHolderName;
         this.isActive = isActive;
         this.uuid = uuid;
-        this.account = account;
     }
 
     public String getCardNumber() {

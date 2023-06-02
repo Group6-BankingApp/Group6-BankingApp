@@ -4,47 +4,61 @@ import Group6.BankingApp.Models.Account;
 import Group6.BankingApp.Models.dto.AccountDTO;
 import Group6.BankingApp.Models.dto.DebitCardDTO;
 import Group6.BankingApp.Services.AccountService;
+import Group6.BankingApp.Services.UserService;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 //import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
+import org.springframework.data.domain.Pageable;
 
 import java.util.HashMap;
 import java.util.Map;
 
 import java.util.List;
+import java.util.Random;
 
 @RestController
 @RequestMapping(value="/accounts", produces = MediaType.APPLICATION_JSON_VALUE)
 public class AccountController {
 
-    private final AccountService accountService = new AccountService();
+    private final AccountService accountService;
 
+    public AccountController(AccountService accountService) {
+        this.accountService = accountService;
+    }
 
-    @GetMapping("/accounts")
-    public ResponseEntity<List<AccountDTO>> getAccounts(
-            @RequestParam(value = "skip", required = false) Integer skip,
-            @RequestParam(value = "limit", required = false) Integer limit
+    @GetMapping
+    public ResponseEntity<List<AccountDTO>> getAllAccounts(
+            @RequestParam(defaultValue = "0") Integer skip,
+            @RequestParam(defaultValue = "40") Integer limit
     ) {
         try {
             if (skip != null && skip < 0) {
                 return ResponseEntity.badRequest().build();
+            } else if (skip == null) {
+                skip = 0;
             }
             if (limit != null && (limit < 0 || limit > 50)) {
                 return ResponseEntity.badRequest().build();
+            } else if (limit == null) {
+                limit = 0;
             }
-
-            List<AccountDTO> accounts = accountService.getAccountsWithSkipAndLimit(skip, limit);
-
-            return ResponseEntity.ok().body(accounts);
-        } catch (Exception e) {
-            return ResponseEntity.notFound().build();
+            List<AccountDTO> accounts = null;
+            try {
+                accounts = accountService.findAllAccounts(skip, limit);
+                return ResponseEntity.ok(accounts);
+            }catch (Exception e){
+                throw e;
+            }
+        }catch (Exception e){
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to retrieve accounts", e);
         }
     }
 
-    @PostMapping("/accounts")
+    @PostMapping
     public ResponseEntity<Account> createAccount(@RequestBody AccountDTO newAccount) {
         try {
             if (newAccount == null) {
@@ -60,11 +74,24 @@ public class AccountController {
         }
     }
 
-    private String generateIban() { //Still to be detailed, static for now
-        return "NL02ABNA0123456789";
+
+
+    private static final String IBAN_PREFIX = "NL01INHO";
+
+    private String generateIban() {
+        StringBuilder ibanBuilder = new StringBuilder(IBAN_PREFIX);
+
+        // Generate random digits for the remaining part of the IBAN
+        Random random = new Random();
+        for (int i = 0; i < 10; i++) {
+            int randomDigit = random.nextInt(10);
+            ibanBuilder.append(randomDigit);
+        }
+
+        return ibanBuilder.toString();
     }
 
-    @GetMapping("/accounts/{Iban}")
+    @GetMapping("/{Iban}")
     public ResponseEntity<Account> getAccountByIban(@PathVariable("Iban") String Iban) {
         try {
             Account account = accountService.getAccountByIban(Iban);
@@ -79,7 +106,7 @@ public class AccountController {
         }
     }
 
-    @PutMapping("/accounts/{Iban}")
+    @PutMapping("/{Iban}")
     public ResponseEntity<Account> updateAccountByIban(
             @PathVariable("Iban") String Iban,
             @RequestBody AccountDTO updatedAccount
@@ -88,7 +115,6 @@ public class AccountController {
             if (updatedAccount == null) {
                 return ResponseEntity.badRequest().build();
             }
-
 //            boolean isUpdated = accountService.updateAccountByIban(Iban, updatedAccount);
 //
 //            if (isUpdated) {
@@ -103,7 +129,7 @@ public class AccountController {
         }
     }
 
-    @DeleteMapping("/accounts/{Iban}")
+    @DeleteMapping("/{Iban}")
     public ResponseEntity<Void> deleteAccountByIban(@PathVariable("Iban") String Iban) {
         try {
 
@@ -141,7 +167,7 @@ public class AccountController {
 //        }
 //    }
 
-    @GetMapping("/accounts/balance")
+    @GetMapping("/balance")
     public double getAccountBalance(@RequestParam("iban") String iban, @RequestParam("pin") String pin) {
         try {
             return accountService.getAccountBalance(iban, pin);
@@ -150,7 +176,7 @@ public class AccountController {
         }
     }
 
-    @PutMapping("/accounts/{Iban}/DebitCard")
+    @PutMapping("/{Iban}/DebitCard")
     public ResponseEntity<Void> deactivateDebitCard(
             @PathVariable("Iban") String Iban,
             @RequestBody DebitCardDTO debitCardDTO
@@ -176,7 +202,7 @@ public class AccountController {
         }
     }
 
-    @PutMapping("/accounts/{Iban}/pin")
+    @PutMapping("/{Iban}/pin")
     public ResponseEntity<Account> updatePIN(
             @PathVariable("Iban") String Iban,
             @RequestBody AccountDTO accountDTO
