@@ -43,8 +43,7 @@ public class AccountService {
     {
         try {
             Account account = new Account(
-                    generateIban(),
-                    //accountDTO.getIban(),
+                    accountDTO.getIban(),
                     accountDTO.getUser(),
                     accountDTO.getAccountType(),
                     accountDTO.getCardUUID(),
@@ -170,20 +169,5 @@ public class AccountService {
 
     public void deleteAccount(String iban) {
         accountRepository.deleteById(iban);
-    }
-
-    private static final String IBAN_PREFIX = "NL01INHO";
-
-    private String generateIban() {
-        StringBuilder ibanBuilder = new StringBuilder(IBAN_PREFIX);
-
-        // Generate random digits for the remaining part of the IBAN
-        Random random = new Random();
-        for (int i = 0; i < 10; i++) {
-            int randomDigit = random.nextInt(10);
-            ibanBuilder.append(randomDigit);
-        }
-
-        return ibanBuilder.toString();
     }
 }

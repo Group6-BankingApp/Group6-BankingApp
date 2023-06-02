@@ -18,6 +18,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import java.util.List;
+import java.util.Random;
 
 @RestController
 @RequestMapping(value="/accounts", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -104,8 +105,21 @@ public class AccountController {
         }
     }
 
-    private String generateIban() { //Still to be detailed, static for now
-        return "NL02ABNA0123456789";
+
+
+    private static final String IBAN_PREFIX = "NL01INHO";
+
+    private String generateIban() {
+        StringBuilder ibanBuilder = new StringBuilder(IBAN_PREFIX);
+
+        // Generate random digits for the remaining part of the IBAN
+        Random random = new Random();
+        for (int i = 0; i < 10; i++) {
+            int randomDigit = random.nextInt(10);
+            ibanBuilder.append(randomDigit);
+        }
+
+        return ibanBuilder.toString();
     }
 
     @GetMapping("/{Iban}")
