@@ -7,6 +7,7 @@ import Group6.BankingApp.Models.Account;
 import Group6.BankingApp.Models.DebitCard;
 import Group6.BankingApp.Models.Role;
 import Group6.BankingApp.Models.User;
+import Group6.BankingApp.Models.dto.UserDTO2;
 import Group6.BankingApp.Services.AccountService;
 import jakarta.persistence.Entity;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,23 +53,29 @@ public class MyApplicationRunner implements ApplicationRunner {
         debitCardRepository.save(debitCard2);
 
         // Create and save Accounts
-        Account account1 = new Account("NL01INHO9501054837", users.get(2), "Savings", null, null, 1000.0, 0.0, 5000.0, true, null);
+        Account account1 = new Account("NL01INHO9501054837","Savings", null, null, 1000.0, 0.0, 5000.0, true, null);
         account1.setDebitCard(debitCard1);
+        account1.setUser(users.get(0));
         accountRepository.save(account1);
-        Account account2 = new Account("NL01INHO2371458805", users.get(1), "Current", null, null, 2000.0, 0.0, 10000.0, true, null);
+        Account account2 = new Account("NL01INHO2371458805", "Current", null, null, 2000.0, 0.0, 10000.0, true, null);
         account2.setDebitCard(debitCard2);
+        account2.setUser(users.get(1));
         accountRepository.save(account2);
-        Account account3 = new Account("NL01INHO5808504708", users.get(2), "Savings", null, null, 1000.0, 0.0, 5000.0, true, null);
+        Account account3 = new Account("NL01INHO5808504708", "Savings", null, null, 1000.0, 0.0, 5000.0, true, null);
         account3.setDebitCard(debitCard1);
+        account3.setUser(users.get(2));
         accountRepository.save(account3);
-        Account account4 = new Account("NL01INHO8399675482", users.get(1), "Current", null, null, 2000.0, 0.0, 10000.0, true, null);
-        account4.setDebitCard(debitCard2);
-        accountRepository.save(account4);
-        Account account5 = new Account("NL01INHO8135680120", users.get(2), "Savings", null, null, 1000.0, 0.0, 5000.0, true, null);
-        account5.setDebitCard(debitCard1);
-        accountRepository.save(account5);
-        Account account6 = new Account("NL01INHO4789170233", users.get(1), "Current", null, null, 2000.0, 0.0, 10000.0, true, null);
-        account6.setDebitCard(debitCard2);
-        accountRepository.save(account6);
+//        Account account4 = new Account("NL01INHO8399675482", "Current", null, null, 2000.0, 0.0, 10000.0, true, null);
+//        account4.setDebitCard(debitCard2);
+//        account4.setUser(users.get(0));
+//        accountRepository.save(account4);
+//        Account account5 = new Account("NL01INHO8135680120", users.get(1), "Savings", null, null, 1000.0, 0.0, 5000.0, true, null);
+//        account5.setDebitCard(debitCard1);
+//        account5.setUser(users.get(1));
+//        accountRepository.save(account5);
+//        Account account6 = new Account("NL01INHO4789170233", users.get(0), "Current", null, null, 2000.0, 0.0, 10000.0, true, null);
+//        account6.setDebitCard(debitCard2);
+//        account6.setUser(users.get(2));
+//        accountRepository.save(account6);
     }
 }

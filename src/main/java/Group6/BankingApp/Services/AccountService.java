@@ -8,6 +8,7 @@ import Group6.BankingApp.Models.User;
 import Group6.BankingApp.Models.dto.AccountDTO;
 import Group6.BankingApp.Models.dto.DebitCardDTO;
 import Group6.BankingApp.Models.dto.UserDTO;
+import Group6.BankingApp.Models.dto.UserDTO2;
 import jakarta.persistence.EntityNotFoundException;
 import org.hibernate.service.spi.ServiceException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +17,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.data.domain.Pageable;
 
+import java.io.Console;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -75,8 +77,8 @@ public class AccountService {
     public List<AccountDTO> findAllAccounts(Integer skip, Integer limit) {
         try {
             Iterable<Account> allAccounts = accountRepository.findAll();
-            if (allAccounts == null)
-                throw new ServiceException("Failed to retrieve accounts");
+//            if (allAccounts == null)
+//                throw new ServiceException("Failed to retrieve accounts");
 
             List<Account> accountList = new ArrayList<>();
             allAccounts.forEach(accountList::add);
@@ -92,6 +94,8 @@ public class AccountService {
                 Account account = accountList.get(i);
                 AccountDTO accountDTO = mapToAccountDTO(account);
                 accountDTOs.add(accountDTO);
+
+                //System.out.println("Account: " + accountDTO.getUser().getFirstName());
             }
             return accountDTOs;
         }catch (Exception ex){
@@ -103,7 +107,7 @@ public class AccountService {
     private AccountDTO mapToAccountDTO(Account account) {
         AccountDTO accountDTO = new AccountDTO();
         accountDTO.setIban(account.getIban());
-        accountDTO.setUser(account.getUser());
+        accountDTO.setUser(mapToUserDTO2(account.getUser()));
         accountDTO.setAccountType(account.getAccountType());
         accountDTO.setCardUUID(account.getCardUUID());
         accountDTO.setPin(account.getPin());
@@ -150,5 +154,16 @@ public class AccountService {
 
     public void deleteAccount(String iban) {
         accountRepository.deleteById(iban);
+    }
+
+    private UserDTO2 mapToUserDTO2(User user) {
+        UserDTO2 userDTO = new UserDTO2();
+        userDTO.setId(user.getId());
+        userDTO.setFirstName(user.getFirstName());
+        userDTO.setLastName(user.getLastName());
+        userDTO.setEmail(user.getEmail());
+        userDTO.setPhoneNumber(user.getPhoneNumber());
+
+        return userDTO;
     }
 }

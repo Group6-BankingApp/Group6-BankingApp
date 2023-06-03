@@ -9,6 +9,8 @@ public class UserDTO2 {
     private String email;
     private String phoneNumber;
 
+    public UserDTO2(){}
+
     public UserDTO2(User user) {
         this.id = user.getId();
         this.firstName =  user.getFirstName();
@@ -35,5 +37,25 @@ public class UserDTO2 {
 
     public String getPhoneNumber() {
         return phoneNumber;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
+    }
+
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public void setPhoneNumber(String phoneNumber) {
+        this.phoneNumber = phoneNumber;
     }
 }

@@ -1,5 +1,6 @@
 package Group6.BankingApp.Models;
 
+import Group6.BankingApp.Models.dto.UserDTO2;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
@@ -23,9 +24,8 @@ public class Account {
     @OneToOne
     private DebitCard debitCard;
 
-    public Account(String iban, User user, String accountType, String cardUUID, String pin, double dailyLimit, double balance, double absoluteLimit, boolean status, DebitCard debitCard) {
+    public Account(String iban, String accountType, String cardUUID, String pin, double dailyLimit, double balance, double absoluteLimit, boolean status, DebitCard debitCard) {
         this.iban = iban;
-        this.user = user;
         this.accountType = accountType;
         this.cardUUID = cardUUID;
         this.pin = pin;
@@ -36,9 +36,22 @@ public class Account {
         this.debitCard = debitCard;
     }
 
-    public Account(String iban, User user, String accountType, String cardUUID, String pin, double dailyLimit, double balance, double absoluteLimit, boolean status) {
+    public Account(String iban, UserDTO2 userDTO2, String accountType, String cardUUID, String pin, double dailyLimit, double balance, double absoluteLimit, boolean status, DebitCard debitCard) {
         this.iban = iban;
-        this.user = user;
+        this.user = mapToUser(userDTO2);
+        this.accountType = accountType;
+        this.cardUUID = cardUUID;
+        this.pin = pin;
+        this.dailyLimit = dailyLimit;
+        this.balance = balance;
+        this.absoluteLimit = absoluteLimit;
+        this.status = status;
+        this.debitCard = debitCard;
+    }
+
+    public Account(String iban, UserDTO2 userDTO2, String accountType, String cardUUID, String pin, double dailyLimit, double balance, double absoluteLimit, boolean status) {
+        this.iban = iban;
+        this.user = mapToUser(userDTO2);
         this.accountType = accountType;
         this.cardUUID = cardUUID;
         this.pin = pin;
@@ -129,5 +142,15 @@ public class Account {
 
     public void setDebitCard(DebitCard debitCard) {
         this.debitCard = debitCard;
+    }
+
+    private User mapToUser(UserDTO2 userDTO2) {
+        User user = new User();
+        user.setId(userDTO2.getId());
+        user.setFirstName(userDTO2.getFirstName());
+        user.setLastName(userDTO2.getLastName());
+        user.setEmail(userDTO2.getEmail());
+        user.setPhoneNumber(userDTO2.getPhoneNumber());
+        return user;
     }
 }
