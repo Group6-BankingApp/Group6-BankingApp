@@ -3,18 +3,18 @@ package Group6.BankingApp.Services;
 import Group6.BankingApp.DAL.TransactionRepository;
 import Group6.BankingApp.Models.Transaction;
 import Group6.BankingApp.Services.AccountService;
-import Group6.BankingApp.Models.User;
 import Group6.BankingApp.Models.Account;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import jakarta.persistence.EntityNotFoundException;
 import org.hibernate.service.spi.ServiceException;
 import java.util.List;
-
 @Service
 public class TransactionService {
     @Autowired
     AccountService accountService;
+    @Autowired
+    UserService userService;
     @Autowired
     private TransactionRepository transactionRepository;
     
@@ -79,6 +79,9 @@ public class TransactionService {
         } catch (Exception ex) {
             throw new ServiceException("Failed to add account", ex);
         }
+    }
+    public void TransferMoney(String senderIban, String recieverIban, double amount) {
+        //TODO: add transfer money logic
     }
     public boolean CheckSufficientFunds(Transaction transaction) {
         try {
