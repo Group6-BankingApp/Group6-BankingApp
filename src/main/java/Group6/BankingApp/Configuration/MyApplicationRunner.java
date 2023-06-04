@@ -3,10 +3,12 @@ package Group6.BankingApp.Configuration;
 import Group6.BankingApp.DAL.AccountRepository;
 import Group6.BankingApp.DAL.DebitCardRepository;
 import Group6.BankingApp.DAL.UserRepository;
+import Group6.BankingApp.DAL.TransactionRepository;
 import Group6.BankingApp.Models.Account;
 import Group6.BankingApp.Models.DebitCard;
 import Group6.BankingApp.Models.Role;
 import Group6.BankingApp.Models.User;
+import Group6.BankingApp.Models.Transaction;
 import Group6.BankingApp.Models.dto.UserDTO2;
 import Group6.BankingApp.Services.AccountService;
 import jakarta.persistence.Entity;
@@ -27,12 +29,14 @@ public class MyApplicationRunner implements ApplicationRunner {
     private UserRepository userRepository;
     private AccountRepository accountRepository;
     private DebitCardRepository debitCardRepository;
+    private TransactionRepository transactionRrepository;
 
     @Autowired
-    public MyApplicationRunner(UserRepository userRepository, AccountRepository accountRepository, DebitCardRepository debitCardRepository) {
+    public MyApplicationRunner(UserRepository userRepository, AccountRepository accountRepository, DebitCardRepository debitCardRepository, TransactionRepository transactionRrepository) {
         this.userRepository = userRepository;
         this.accountRepository = accountRepository;
         this.debitCardRepository = debitCardRepository;
+        this.transactionRrepository = transactionRrepository;
     }
     @Override
     public void run(ApplicationArguments args) throws Exception {
