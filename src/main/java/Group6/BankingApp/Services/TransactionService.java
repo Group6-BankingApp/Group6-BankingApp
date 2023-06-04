@@ -59,9 +59,9 @@ public class TransactionService {
                     "deposit transaction"
             );
             return transactionRepository.save(newtransaction);
-        }
-        else {
-            throw new ServiceException("Insufficient funds");
+            }
+            else {
+                throw new ServiceException("Insufficient funds");
         }
         } catch (Exception ex) {
             throw new ServiceException("Failed to add account", ex);
@@ -81,7 +81,6 @@ public class TransactionService {
         }
     }
     public boolean CheckSufficientFunds(Transaction transaction) {
-        //throw new ServiceException(accountService.getAccountByIban(transaction.getSenderIban()).getBalance()+"");
         try {
             if (transaction.getAmount() > accountService.getAccountByIban(transaction.getSenderIban()).getBalance()) {
                 return false;
