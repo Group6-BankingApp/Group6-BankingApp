@@ -57,7 +57,7 @@ public class MyApplicationRunner implements ApplicationRunner {
         debitCardRepository.save(debitCard2);
 
         // Create and save Accounts
-        Account account1 = new Account("NL01INHO9501054837","Savings", null, null, 1000.0, 0.0, 5000.0, true, null);
+        Account account1 = new Account("NL01INHO9501054837","Savings", null, null, 1000.0, 1000.0, 5000.0, true, null);
         account1.setDebitCard(debitCard1);
         account1.setUser(users.get(0));
         accountRepository.save(account1);
