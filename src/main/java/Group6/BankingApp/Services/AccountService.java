@@ -5,23 +5,19 @@ import Group6.BankingApp.DAL.UserRepository;
 import Group6.BankingApp.Models.Account;
 import Group6.BankingApp.Models.DebitCard;
 import Group6.BankingApp.Models.User;
-import Group6.BankingApp.Models.dto.AccountDTO;
-import Group6.BankingApp.Models.dto.DebitCardDTO;
-import Group6.BankingApp.Models.dto.UserDTO;
-import Group6.BankingApp.Models.dto.UserDTO2;
+import Group6.BankingApp.Models.dto.*;
 import jakarta.persistence.EntityNotFoundException;
 import org.hibernate.service.spi.ServiceException;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.data.domain.Pageable;
 
+import javax.security.auth.login.AccountNotFoundException;
 import java.io.Console;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -30,6 +26,12 @@ public class AccountService {
     @Autowired
     private AccountRepository accountRepository;
 
+    @Autowired
+    private UserService userService;
+
+    private ModelMapper modelMapper;
+
+
     public AccountService() {
     }
 
@@ -37,26 +39,47 @@ public class AccountService {
         return (List<Account>) accountRepository.findAll();
     }
 
-    public Account getAccountByIban(String iban) {
-        return accountRepository.findById(iban).orElse(null);
+    public AccountDTO getAccountByIban(String iban) {
+        Optional<Account> accountOptional = accountRepository.findById(iban);
+        if (!accountOptional.isPresent())
+            throw new ServiceException("Account not found");
+
+        Account account = accountOptional.get();
+        AccountDTO accountDTO = new AccountDTO();
+        accountDTO.setIban(account.getIban());
+        accountDTO.setUser(mapToUserDTO2(account.getUser()));
+        accountDTO.setAccountType(account.getAccountType());
+        accountDTO.setCardUUID(account.getCardUUID());
+        accountDTO.setPin(account.getPin());
+        accountDTO.setDailyLimit(account.getDailyLimit());
+        return accountDTO;
     }
 
-    public Account addAccount(AccountDTO accountDTO)
-    {
+    public AccountDTO addAccount(NewAccountDTO newAccountDTO) {
         try {
-            Account account = new Account(
-                    accountDTO.getIban(),
-                    accountDTO.getUser(),
-                    accountDTO.getAccountType(),
-                    accountDTO.getCardUUID(),
-                    accountDTO.getPin(),
-                    accountDTO.getDailyLimit(),
-                    0.0,
-                    0.0,
-                    true,
-                    null
-            );
-            return accountRepository.save(account);
+            String iban = generateIban();
+            Long userId = newAccountDTO.getUserId();
+            UserDTO2 userDTO2 = userService.getUserById(userId);
+            if (userDTO2 == null)
+                throw new ServiceException("User with ID " + userId + " does not exist.");
+
+            String accountType = newAccountDTO.getAccountType();
+            String cardUUID = generateCardUUID();
+            String pin = newAccountDTO.getPin();
+            double dailyLimit = newAccountDTO.getDailyLimit();
+
+            Account account = new Account(iban, userDTO2, accountType, cardUUID, pin, dailyLimit, 0.0, 0.0, true);
+            accountRepository.save(account);
+
+            AccountDTO accountDTO = new AccountDTO();
+            accountDTO.setIban(account.getIban());
+            accountDTO.setUser(userDTO2);
+            accountDTO.setAccountType(account.getAccountType());
+            accountDTO.setCardUUID(account.getCardUUID());
+            accountDTO.setPin(account.getPin());
+            accountDTO.setDailyLimit(account.getDailyLimit());
+
+            return accountDTO;
         } catch (Exception ex) {
             throw new ServiceException("Failed to add account", ex);
         }
@@ -77,8 +100,8 @@ public class AccountService {
     public List<AccountDTO> findAllAccounts(Integer skip, Integer limit) {
         try {
             Iterable<Account> allAccounts = accountRepository.findAll();
-//            if (allAccounts == null)
-//                throw new ServiceException("Failed to retrieve accounts");
+            if (allAccounts == null)
+                throw new ServiceException("Failed to retrieve accounts");
 
             List<Account> accountList = new ArrayList<>();
             allAccounts.forEach(accountList::add);
@@ -94,34 +117,10 @@ public class AccountService {
                 Account account = accountList.get(i);
                 AccountDTO accountDTO = mapToAccountDTO(account);
                 accountDTOs.add(accountDTO);
-
-                //System.out.println("Account: " + accountDTO.getUser().getFirstName());
             }
             return accountDTOs;
         }catch (Exception ex){
-            //return Collections.emptyList();
             throw new ServiceException("Failed to retrieve accounts", ex);
-        }
-    }
-
-    protected AccountDTO mapToAccountDTO(Account account) {
-        AccountDTO accountDTO = new AccountDTO();
-        accountDTO.setIban(account.getIban());
-        accountDTO.setUser(mapToUserDTO2(account.getUser()));
-        accountDTO.setAccountType(account.getAccountType());
-        accountDTO.setCardUUID(account.getCardUUID());
-        accountDTO.setPin(account.getPin());
-        accountDTO.setDailyLimit(account.getDailyLimit());
-        return accountDTO;
-    }
-
-    public void deactivateAccount(String iban, DebitCardDTO debitCardDTO) {
-        Account account = accountRepository.findByIban(iban);
-        if (account != null && account.getDebitCard() != null && account.getDebitCard().getCardNumber().equals(debitCardDTO.getCardNumber())) {
-            account.setStatus(false);
-            accountRepository.save(account);
-        } else {
-            throw new EntityNotFoundException("Invalid account or debit card");
         }
     }
 
@@ -156,6 +155,17 @@ public class AccountService {
         accountRepository.deleteById(iban);
     }
 
+    protected AccountDTO mapToAccountDTO(Account account) {
+        AccountDTO accountDTO = new AccountDTO();
+        accountDTO.setIban(account.getIban());
+        accountDTO.setUser(mapToUserDTO2(account.getUser()));
+        accountDTO.setAccountType(account.getAccountType());
+        accountDTO.setCardUUID(account.getCardUUID());
+        accountDTO.setPin(account.getPin());
+        accountDTO.setDailyLimit(account.getDailyLimit());
+        return accountDTO;
+    }
+
     private UserDTO2 mapToUserDTO2(User user) {
         UserDTO2 userDTO = new UserDTO2();
         userDTO.setId(user.getId());
@@ -165,5 +175,25 @@ public class AccountService {
         userDTO.setPhoneNumber(user.getPhoneNumber());
 
         return userDTO;
+    }
+
+    private static final String IBAN_PREFIX = "NL01INHO";
+
+    private String generateIban() {
+        StringBuilder ibanBuilder = new StringBuilder(IBAN_PREFIX);
+
+        // Generate random digits for the remaining part of the IBAN
+        Random random = new Random();
+        for (int i = 0; i < 10; i++) {
+            int randomDigit = random.nextInt(10);
+            ibanBuilder.append(randomDigit);
+        }
+        return ibanBuilder.toString();
+    }
+
+    public String generateCardUUID() {
+        // Generate a random UUID for the card
+        UUID uuid = UUID.randomUUID();
+        return uuid.toString();
     }
 }

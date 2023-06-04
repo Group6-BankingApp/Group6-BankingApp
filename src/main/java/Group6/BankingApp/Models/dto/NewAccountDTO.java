@@ -13,6 +13,13 @@ public class NewAccountDTO {
     public NewAccountDTO() {
     }
 
+    public NewAccountDTO(Account account) {
+        this.userId = account.getUser().getId();
+        this.accountType = account.getAccountType();
+        this.pin = account.getPin();
+        this.dailyLimit = account.getDailyLimit();
+    }
+
     public NewAccountDTO(Long userId, String accountType, String pin) {
         this.userId = userId;
         this.accountType = accountType;
