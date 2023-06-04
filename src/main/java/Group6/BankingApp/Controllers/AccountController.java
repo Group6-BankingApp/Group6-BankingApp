@@ -3,6 +3,7 @@ package Group6.BankingApp.Controllers;
 import Group6.BankingApp.Models.Account;
 import Group6.BankingApp.Models.dto.AccountDTO;
 import Group6.BankingApp.Models.dto.DebitCardDTO;
+import Group6.BankingApp.Models.dto.NewAccountDTO;
 import Group6.BankingApp.Services.AccountService;
 import Group6.BankingApp.Services.UserService;
 import org.springframework.data.domain.PageRequest;
@@ -59,42 +60,19 @@ public class AccountController {
     }
 
     @PostMapping
-    public ResponseEntity<Account> createAccount(@RequestBody AccountDTO newAccount) {
+    public ResponseEntity<AccountDTO> createAccount(@RequestBody NewAccountDTO newAccountDTO) {
         try {
-            if (newAccount == null) {
-                return ResponseEntity.<AccountDTO>badRequest().build();
-            }
-
-            String generatedIban = generateIban();
-            newAccount.setIban(generatedIban);
-            Account createdAccount = accountService.addAccount(newAccount);
-            return ResponseEntity.status(HttpStatus.CREATED).body(createdAccount);
-        } catch (Exception e) {
-            return ResponseEntity.<Account>badRequest().build();
+            AccountDTO accountDTO = accountService.addAccount(newAccountDTO);
+            return ResponseEntity.status(HttpStatus.CREATED).body(accountDTO);
+        }catch (Exception ex) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new AccountDTO());
         }
     }
 
-
-
-    private static final String IBAN_PREFIX = "NL01INHO";
-
-    private String generateIban() {
-        StringBuilder ibanBuilder = new StringBuilder(IBAN_PREFIX);
-
-        // Generate random digits for the remaining part of the IBAN
-        Random random = new Random();
-        for (int i = 0; i < 10; i++) {
-            int randomDigit = random.nextInt(10);
-            ibanBuilder.append(randomDigit);
-        }
-
-        return ibanBuilder.toString();
-    }
-
-    @GetMapping("/{Iban}")
-    public ResponseEntity<Account> getAccountByIban(@PathVariable("Iban") String Iban) {
+    @GetMapping("/{iban}")
+    public ResponseEntity<AccountDTO> getAccountByIban(@PathVariable("iban") String iban) {
         try {
-            Account account = accountService.getAccountByIban(Iban);
+            AccountDTO account = accountService.getAccountByIban(iban);
 
             if (account != null) {
                 return ResponseEntity.<Account>ok().body(account);
@@ -102,7 +80,7 @@ public class AccountController {
                 return ResponseEntity.<Account>notFound().build();
             }
         } catch (Exception e) {
-            return ResponseEntity.<Account>notFound().build();
+            return ResponseEntity.notFound().build();
         }
     }
 
@@ -146,26 +124,6 @@ public class AccountController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
-
-//    @GetMapping("/accounts/balance")
-//    public ResponseEntity<Map<String, Double>> getAccountBalance(
-//            @RequestParam("Iban") String Iban,
-//            @RequestParam("pin") String pin
-//    ) {
-//        try {
-//            double balance = accountService.getAccountBalance(Iban, pin);
-//
-//            if (balance >= 0) {
-//                Map<String, Double> responseBody = new HashMap<>();
-//                responseBody.put("balance", balance);
-//                return ResponseEntity.ok().body(responseBody);
-//            } else {
-//                return ResponseEntity.notFound().build();
-//            }
-//        } catch (Exception e) {
-//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-//        }
-//    }
 
     @GetMapping("/balance")
     public double getAccountBalance(@RequestParam("iban") String iban, @RequestParam("pin") String pin) {
