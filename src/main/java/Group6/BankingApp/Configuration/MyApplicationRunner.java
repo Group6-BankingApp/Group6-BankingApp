@@ -77,5 +77,13 @@ public class MyApplicationRunner implements ApplicationRunner {
 //        account6.setDebitCard(debitCard2);
 //        account6.setUser(users.get(2));
 //        accountRepository.save(account6);
+
+        // Create and save Transactions
+        Transaction transaction1 = new Transaction("NL67INGB2131241242", "NL67INGB213214124", 200.0, "withdraw");
+        transactionRrepository.save(transaction1);
+        Transaction transaction2 = new Transaction("NL67INGB12345678", "NL67INGB87654321", 155.0, "deposit");
+        transactionRrepository.save(transaction2);
+        Transaction transaction3 = new Transaction("NL67INGB12348765", "NL67INGB87655555", 100.0, "regular");
+        transactionRrepository.save(transaction3);
     }
 }
