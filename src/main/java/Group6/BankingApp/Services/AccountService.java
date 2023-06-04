@@ -104,7 +104,7 @@ public class AccountService {
         }
     }
 
-    private AccountDTO mapToAccountDTO(Account account) {
+    protected AccountDTO mapToAccountDTO(Account account) {
         AccountDTO accountDTO = new AccountDTO();
         accountDTO.setIban(account.getIban());
         accountDTO.setUser(mapToUserDTO2(account.getUser()));
