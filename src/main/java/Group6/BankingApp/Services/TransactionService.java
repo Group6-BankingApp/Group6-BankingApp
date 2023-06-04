@@ -33,7 +33,7 @@ public class TransactionService {
     public Transaction addTransaction(Transaction transaction) {
         try {
             if(CheckSufficientFunds(transaction)){
-
+                TransferMoney(transaction);
                 Transaction newtransaction = new Transaction(
                     transaction.getSenderIban(),
                     transaction.getRecieverIban(),
@@ -80,9 +80,19 @@ public class TransactionService {
             throw new ServiceException("Failed to add account", ex);
         }
     }
-    public void TransferMoney(String senderIban, String recieverIban, double amount) {
+    public void TransferMoney(Transaction transaction) {
         //TODO: add transfer money logic
+        Account senderAccount = accountService.getAccountByIban(transaction.getSenderIban());
+        Account receiverAccount = accountService.getAccountByIban(transaction.getRecieverIban());
+
+        senderAccount.setBalance(senderAccount.getBalance() - transaction.getAmount());
+        receiverAccount.setBalance(receiverAccount.getBalance() + transaction.getAmount());
+
+        // accountService.updateAccount(senderAccount);
+        // accountService.updateAccount(receiverAccount);
     }
+
+
     public boolean CheckSufficientFunds(Transaction transaction) {
         try {
             if (transaction.getAmount() > accountService.getAccountByIban(transaction.getSenderIban()).getBalance()) {
