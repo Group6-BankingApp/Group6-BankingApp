@@ -27,6 +27,9 @@ public class AccountService {
     private AccountRepository accountRepository;
 
     @Autowired
+    private UserRepository userRepository;
+
+    @Autowired
     private UserService userService;
 
     private ModelMapper modelMapper;
@@ -85,16 +88,36 @@ public class AccountService {
         }
     }
 
-    public Account updateAccountByIban(String iban,AccountDTO accountDTO) {
-        try {
-            Account accountToUpdate = accountRepository.findById(iban).orElse(null);
-            accountToUpdate.setAccountType(accountDTO.getAccountType());
-            accountToUpdate.setDailyLimit(accountDTO.getDailyLimit());
-            accountToUpdate.setPin(accountDTO.getPin());
-            return accountRepository.save(accountToUpdate);
-        }catch (Exception ex){
-            throw new EntityNotFoundException("Account not found");
-        }
+//    public Account updateAccountByIban(String iban,AccountDTO accountDTO) {
+//        try {
+//            Account accountToUpdate = accountRepository.findById(iban).orElse(null);
+//            accountToUpdate.setAccountType(accountDTO.getAccountType());
+//            accountToUpdate.setDailyLimit(accountDTO.getDailyLimit());
+//            accountToUpdate.setPin(accountDTO.getPin());
+//            return accountRepository.save(accountToUpdate);
+//        }catch (Exception ex){
+//            throw new EntityNotFoundException("Account not found");
+//        }
+//    }
+
+    public NewAccountDTO updateAccountByIban(String iban, AccountDTO accountDTO) {
+        Account account = accountRepository.findById(iban)
+                .orElse(null);
+
+        Long userId = accountDTO.getUser().getId();
+        User user = userRepository.findById(userId)
+                .orElse(null);
+
+        // Update the account from accountDTO
+        account.setIban(accountDTO.getIban());
+        account.setUser(user);
+        account.setAccountType(accountDTO.getAccountType());
+        account.setCardUUID(accountDTO.getCardUUID());
+        account.setPin(accountDTO.getPin());
+        account.setDailyLimit(accountDTO.getDailyLimit());
+
+        Account updatedAccount = accountRepository.save(account);
+        return new NewAccountDTO(updatedAccount);
     }
 
     public List<AccountDTO> findAllAccounts(Integer skip, Integer limit) {
@@ -149,6 +172,17 @@ public class AccountService {
         }catch (Exception ex){
             throw new ServiceException("Failed to retrieve account balance", ex);
         }
+    }
+
+    public NewAccountDTO updatePin(String iban, AccountDTO accountDTO) {
+        Account account = accountRepository.findById(iban)
+                .orElseThrow(null);
+
+        // Update the account's pin
+        account.setPin(accountDTO.getPin());
+
+        Account updatedAccount = accountRepository.save(account);
+        return new NewAccountDTO(updatedAccount);
     }
 
     public void deleteAccount(String iban) {

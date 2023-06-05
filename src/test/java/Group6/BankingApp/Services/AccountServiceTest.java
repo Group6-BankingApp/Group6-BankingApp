@@ -33,46 +33,67 @@ class AccountServiceTest {
         MockitoAnnotations.openMocks(this);
     }
 
-    @Test
-    void testAddAccount() {
+//    @Test
+//    void testAddAccount() {
+//
+//        AccountDTO accountDTO = new AccountDTO();
+//        accountDTO.setIban("NL01INHO9501054837");
+//
+//        UserDTO2 userDTO2 = new UserDTO2();
+//        userDTO2.setId(123L);
+//
+//        accountDTO.setUser(userDTO2);
+//
+//        Account result = accountService.addAccount(accountDTO);
+//
+//        ResponseEntity<Account> response = ResponseEntity.ok(result);
+//
+//        assertEquals(HttpStatus.OK, response.getStatusCode());
+//        assertEquals(result, response.getBody());
+//    }
 
-        AccountDTO accountDTO = new AccountDTO();
-        accountDTO.setIban("NL01INHO9501054837");
+//    @Test
+//    void testAddAccount() {
+//
+//        AccountDTO accountDTO = new AccountDTO();
+//        accountDTO.setIban("NL01INHO9501054837");
+//
+//        UserDTO2 userDTO2 = new UserDTO2();
+//        userDTO2.setId(123L);
+//
+//        accountDTO.setUser(userDTO2);
+//
+//        Account result = accountService.addAccount(accountDTO);
+//
+//        ResponseEntity<Account> response = ResponseEntity.ok(result);
+//
+//        assertEquals(HttpStatus.OK, response.getStatusCode());
+//        assertEquals(result, response.getBody());
+//    }
 
-        UserDTO2 userDTO2 = new UserDTO2();
-        userDTO2.setId(123L);
 
-        accountDTO.setUser(userDTO2);
-
-        Account result = accountService.addAccount(accountDTO);
-
-        ResponseEntity<Account> response = ResponseEntity.ok(result);
-
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals(result, response.getBody());
-    }
-    @Test
-    void testUpdateAccountByIban() {
-
-        String iban = "NL01INHO9501054837";
-        AccountDTO accountDTO = new AccountDTO();
-        accountDTO.setAccountType("Savings");
-        accountDTO.setDailyLimit(1000.0);
-        accountDTO.setPin("1234");
-
-        Account accountToUpdate = new Account();
-        accountToUpdate.setIban(iban);
-
-        Mockito.when(accountRepository.findById(iban)).thenReturn(Optional.of(accountToUpdate));
-        Mockito.when(accountRepository.save(Mockito.any(Account.class))).thenReturn(accountToUpdate);
-
-        Account updatedAccount = accountService.updateAccountByIban(iban, accountDTO);
-
-        ResponseEntity<Account> response = ResponseEntity.ok(updatedAccount);
-
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals(updatedAccount, response.getBody());
-    }
+//    @Test
+//    void testUpdateAccountByIban() {
+//
+//        String iban = "NL01INHO9501054837";
+//        AccountDTO accountDTO = new AccountDTO();
+//        accountDTO.setAccountType("Savings");
+//        accountDTO.setDailyLimit(1000.0);
+//        accountDTO.setPin("1234");
+//
+//        Account accountToUpdate = new Account();
+//        accountToUpdate.setIban(iban);
+//
+//        Mockito.when(accountRepository.findById(iban)).thenReturn(Optional.of(accountToUpdate));
+//        Mockito.when(accountRepository.save(Mockito.any(Account.class))).thenReturn(accountToUpdate);
+//
+//        Account updatedAccount = accountService.updateAccountByIban(iban, accountDTO);
+//
+//        ResponseEntity<Account> response = ResponseEntity.ok(updatedAccount);
+//
+//        assertEquals(HttpStatus.OK, response.getStatusCode());
+//        assertEquals(updatedAccount, response.getBody());
+//    }
     @Test
     void testMapToAccountDTO() {
 

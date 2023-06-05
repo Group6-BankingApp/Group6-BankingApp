@@ -4,22 +4,20 @@ import Group6.BankingApp.Models.Account;
 import Group6.BankingApp.Models.dto.AccountDTO;
 import Group6.BankingApp.Models.dto.DebitCardDTO;
 import Group6.BankingApp.Models.dto.NewAccountDTO;
+import Group6.BankingApp.Models.dto.ExceptionDTO;
 import Group6.BankingApp.Services.AccountService;
 import Group6.BankingApp.Services.UserService;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-//import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
-import org.springframework.data.domain.Pageable;
 
 import java.util.HashMap;
 import java.util.Map;
 
 import java.util.List;
-import java.util.Random;
 
 @RestController
 @RequestMapping(value="/accounts", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -84,40 +82,16 @@ public class AccountController {
         }
     }
 
-    @PutMapping("/{Iban}")
-    public ResponseEntity<Account> updateAccountByIban(
-            @PathVariable("Iban") String Iban,
-            @RequestBody AccountDTO updatedAccount
-    ) {
-        try {
-            if (updatedAccount == null) {
-                return ResponseEntity.badRequest().build();
-            }
-//            boolean isUpdated = accountService.updateAccountByIban(Iban, updatedAccount);
-//
-//            if (isUpdated) {
-//                return ResponseEntity.ok().build();
-//            } else {
-//                return ResponseEntity.notFound().build();
-//            }
-            Account account = accountService.updateAccountByIban(Iban, updatedAccount);
-            return ResponseEntity.ok().body(account);
-        } catch (Exception e) {
-            return ResponseEntity.notFound().build();
-        }
+    @PutMapping("/{iban}")
+    public ResponseEntity<NewAccountDTO> updateAccountByIban(@PathVariable("iban") String iban,
+                                                             @RequestBody AccountDTO accountDTO) {
+        NewAccountDTO updatedAccountDTO = accountService.updateAccountByIban(iban, accountDTO);
+        return ResponseEntity.ok().body(updatedAccountDTO);
     }
 
     @DeleteMapping("/{Iban}")
     public ResponseEntity<Void> deleteAccountByIban(@PathVariable("Iban") String Iban) {
         try {
-
-//            boolean isDeleted = accountService.deleteAccountByIban(Iban);
-//
-//            if (isDeleted) {
-//                return ResponseEntity.ok().build();
-//            } else {
-//                return ResponseEntity.notFound().build();
-//            }
             accountService.deleteAccount(Iban);
             return ResponseEntity.ok().build();
         } catch (Exception e) {
@@ -160,28 +134,11 @@ public class AccountController {
         }
     }
 
-    @PutMapping("/{Iban}/pin")
-    public ResponseEntity<Account> updatePIN(
-            @PathVariable("Iban") String Iban,
-            @RequestBody AccountDTO accountDTO
-    ) {
-        try {
-            if (accountDTO == null) {
-                return ResponseEntity.badRequest().build();
-            }
-
-//            boolean isUpdated = accountService.updateAccount(accountDTO);
-//
-//            if (isUpdated) {
-//                return ResponseEntity.status(HttpStatus.CREATED).build();
-//            } else {
-//                return ResponseEntity.badRequest().build();
-//            }
-            Account account = accountService.updateAccountByIban(Iban, accountDTO);
-            return ResponseEntity.ok().body(account);
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-        }
+    @PutMapping("/{iban}/pin")
+    public ResponseEntity<NewAccountDTO> updatePin(@PathVariable("iban") String iban,
+                                                   @RequestBody AccountDTO accountDTO) {
+        NewAccountDTO updatedAccountDTO = accountService.updatePin(iban, accountDTO);
+        return ResponseEntity.ok().body(updatedAccountDTO);
     }
 
 }
