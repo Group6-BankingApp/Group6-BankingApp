@@ -216,7 +216,6 @@ public class AccountService {
     private String generateIban() {
         StringBuilder ibanBuilder = new StringBuilder(IBAN_PREFIX);
 
-        // Generate random digits for the remaining part of the IBAN
         Random random = new Random();
         for (int i = 0; i < 10; i++) {
             int randomDigit = random.nextInt(10);
@@ -226,7 +225,7 @@ public class AccountService {
     }
 
     public String generateCardUUID() {
-        // Generate a random UUID for the card
+        // Generate a random UUID
         UUID uuid = UUID.randomUUID();
         return uuid.toString();
     }
