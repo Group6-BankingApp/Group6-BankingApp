@@ -3,13 +3,17 @@ package Group6.BankingApp.Configuration;
 import Group6.BankingApp.DAL.AccountRepository;
 import Group6.BankingApp.DAL.DebitCardRepository;
 import Group6.BankingApp.DAL.UserRepository;
+import Group6.BankingApp.DAL.TransactionRepository;
 import Group6.BankingApp.Models.Account;
+import Group6.BankingApp.Models.Transaction;
 import Group6.BankingApp.Models.DebitCard;
 import Group6.BankingApp.Models.Role;
 import Group6.BankingApp.Models.User;
 import Group6.BankingApp.Models.dto.UserDTO2;
 import Group6.BankingApp.Services.AccountService;
 import jakarta.persistence.Entity;
+
+import org.hibernate.dialect.function.TransactSQLStrFunction;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
@@ -28,6 +32,7 @@ public class MyApplicationRunner implements ApplicationRunner {
     private AccountRepository accountRepository;
     private DebitCardRepository debitCardRepository;
     private AccountService accountService;
+    private TransactionRepository transactionRepository;
 
     @Autowired
     public MyApplicationRunner(UserRepository userRepository, AccountRepository accountRepository, DebitCardRepository debitCardRepository, AccountService accountService) {
@@ -79,5 +84,12 @@ public class MyApplicationRunner implements ApplicationRunner {
 //        account6.setDebitCard(debitCard2);
 //        account6.setUser(users.get(2));
 //        accountRepository.save(account6);
+            // Create and save Transactions
+            Transaction transaction1 = new Transaction("NL67INGB2131241242", "NL67INGB213214124", 200.0, "withdraw");
+            transactionRepository.save(transaction1);
+            Transaction transaction2 = new Transaction("NL67INGB12345678", "NL67INGB87654321", 155.0, "deposit");
+            transactionRepository.save(transaction2);
+            Transaction transaction3 = new Transaction("NL67INGB12348765", "NL67INGB87655555", 100.0, "regular");
+            transactionRepository.save(transaction3);
     }
 }
