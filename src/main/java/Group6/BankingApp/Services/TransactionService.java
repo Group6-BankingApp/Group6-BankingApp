@@ -3,6 +3,7 @@ package Group6.BankingApp.Services;
 import Group6.BankingApp.DAL.TransactionRepository;
 import Group6.BankingApp.Models.Transaction;
 import Group6.BankingApp.Services.AccountService;
+import Group6.BankingApp.Models.dto.AccountDTO;
 import Group6.BankingApp.Models.Account;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -32,7 +33,7 @@ public class TransactionService {
 
     public Transaction addTransaction(Transaction transaction) {
         try {
-            if(CheckSufficientFunds(transaction)){
+            if(CheckSufficientFunds(transaction, "1234")){
                 TransferMoney(transaction);
                 Transaction newtransaction = new Transaction(
                     transaction.getSenderIban(),
@@ -51,7 +52,8 @@ public class TransactionService {
     }
     public Transaction addTransactionDeposit(Transaction transaction) {
         try {
-            if(CheckSufficientFunds(transaction)){
+            //TODO: add pin to transfer
+            if(CheckSufficientFunds(transaction, "1234")){
             Transaction newtransaction = new Transaction(
                     transaction.getSenderIban(),
                     transaction.getRecieverIban(),
@@ -82,20 +84,20 @@ public class TransactionService {
     }
     public void TransferMoney(Transaction transaction) {
         //TODO: add transfer money logic
-        Account senderAccount = accountService.getAccountByIban(transaction.getSenderIban());
-        Account receiverAccount = accountService.getAccountByIban(transaction.getRecieverIban());
+        // AccountDTO senderAccount = accountService.getAccountByIban(transaction.getSenderIban());
+        // AccountDTO receiverAccount = accountService.getAccountByIban(transaction.getRecieverIban());
 
-        senderAccount.setBalance(senderAccount.getBalance() - transaction.getAmount());
-        receiverAccount.setBalance(receiverAccount.getBalance() + transaction.getAmount());
+        // senderAccount.setBalance(senderAccount.getBalance() - transaction.getAmount());
+        // receiverAccount.setBalance(receiverAccount.getBalance() + transaction.getAmount());
 
         // accountService.updateAccount(senderAccount);
         // accountService.updateAccount(receiverAccount);
     }
 
 
-    public boolean CheckSufficientFunds(Transaction transaction) {
+    public boolean CheckSufficientFunds(Transaction transaction, String pin) {
         try {
-            if (transaction.getAmount() > accountService.getAccountByIban(transaction.getSenderIban()).getBalance()) {
+            if (transaction.getAmount() > accountService.getAccountBalance(transaction.getSenderIban(), pin)) {
                 return false;
             } else {
                 return true;

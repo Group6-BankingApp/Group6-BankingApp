@@ -11,7 +11,6 @@ public class Transaction {
     @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "transactionId", updatable = false, nullable = false)
     private String transactionId;
-    private Long userId;
     private LocalDate timeCreated;
     private String senderIban;
     private String recieverIban;
@@ -41,14 +40,6 @@ public class Transaction {
 
     public String getTransactionId() {
         return transactionId;
-    }
-
-    public Long getUserId() {
-        return userId;
-    }
-
-    public  void setUserId(Long userId) {
-        this.userId = userId;
     }
 
     public LocalDate getTimeCreated() {
