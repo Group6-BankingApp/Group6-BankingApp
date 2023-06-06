@@ -35,11 +35,12 @@ public class MyApplicationRunner implements ApplicationRunner {
     private TransactionRepository transactionRepository;
 
     @Autowired
-    public MyApplicationRunner(UserRepository userRepository, AccountRepository accountRepository, DebitCardRepository debitCardRepository, AccountService accountService) {
+    public MyApplicationRunner(UserRepository userRepository, AccountRepository accountRepository, DebitCardRepository debitCardRepository, AccountService accountService, TransactionRepository transactionRepository) {
         this.userRepository = userRepository;
         this.accountRepository = accountRepository;
         this.debitCardRepository = debitCardRepository;
         this.accountService = accountService;
+        this.transactionRepository = transactionRepository;
     }
     @Override
     public void run(ApplicationArguments args) throws Exception {
