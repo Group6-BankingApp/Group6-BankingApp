@@ -61,14 +61,19 @@ public class MyApplicationRunner implements ApplicationRunner {
         debitCardRepository.save(debitCard2);
 
         // Create and save Accounts
-        Account account1 = new Account("NL01INHO9501054837","Savings", accountService.generateCardUUID(), "1234", 1000.0, 600.0, 5000.0, true, debitCard1);
+        Account account1 = new Account("NL01INHO9501054837","Savings", accountService.generateCardUUID(), "1234", 1000.0, 600.0, 0, true, debitCard1);
         //account1.setDebitCard(debitCard1);
         account1.setUser(users.get(0));
         accountRepository.save(account1);
-        Account account2 = new Account("NL01INHO2371458805", "Current", accountService.generateCardUUID(), "5678", 2000.0, 950.0, 10000.0, true, debitCard2);
+        Account account2 = new Account("NL01INHO2371458805", "Current", accountService.generateCardUUID(), "5678", 2000.0, 950.0, 0, true, debitCard2);
         //account2.setDebitCard(debitCard2);
         account2.setUser(users.get(1));
         accountRepository.save(account2);
+
+        Account account3 = new Account("NL01INH1234567890", "Current", accountService.generateCardUUID(), "5678", 2000.0, 950.0, -100, true, debitCard2);
+        //account2.setDebitCard(debitCard2);
+        account3.setUser(users.get(1));
+        accountRepository.save(account3);
 //        Account account3 = new Account("NL01INHO5808504708", "Savings", accountService.generateCardUUID(), "1357", 1000.0, 0.0, 5000.0, true, null);
 //        account3.setDebitCard(debitCard1);
 //        account3.setUser(users.get(2));

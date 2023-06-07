@@ -2,16 +2,16 @@ package Group6.BankingApp.Models.dto;
 
 public class TransactionDTO{
     private double amount;
-    private String recieverIban;
+    private String receiverIban;
     private String senderIban;
     private String description;
 
     public TransactionDTO() {
     }
 
-    public TransactionDTO(double amount, String recieverIban, String senderIban, String description) {
+    public TransactionDTO(double amount, String receiverIban, String senderIban, String description) {
         this.amount = amount;
-        this.recieverIban = recieverIban;
+        this.receiverIban = receiverIban;
         this.senderIban = senderIban;
         this.description = description;
     }
@@ -20,8 +20,8 @@ public class TransactionDTO{
         return amount;
     }
 
-    public String getRecieverIban() {
-        return recieverIban;
+    public String getreceiverIban() {
+        return receiverIban;
     }
 
     public String getSenderIban() {

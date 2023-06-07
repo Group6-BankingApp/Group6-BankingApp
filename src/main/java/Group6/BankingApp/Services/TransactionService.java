@@ -37,14 +37,14 @@ public class TransactionService {
                 TransferMoney(transaction);
                 Transaction newtransaction = new Transaction(
                     transaction.getSenderIban(),
-                    transaction.getRecieverIban(),
+                    transaction.getreceiverIban(),
                     transaction.getAmount(),
                     "regular transaction"
                     );
                     return transactionRepository.save(newtransaction);
                 }
                 else {
-                    throw new ServiceException("Insufficient funds");
+                    throw new ServiceException("Transaction Failed");
                 }
         } catch (Exception ex) {
             throw new ServiceException("Failed to add account", ex);
@@ -53,57 +53,89 @@ public class TransactionService {
     public Transaction addTransactionDeposit(Transaction transaction) {
         try {
             //TODO: add pin to transfer
-            if(CheckSufficientFunds(transaction, "1234")){
+            DespositMoney(transaction);
             Transaction newtransaction = new Transaction(
-                    transaction.getSenderIban(),
-                    transaction.getRecieverIban(),
+                    "cash",
+                    transaction.getreceiverIban(),
                     transaction.getAmount(),
                     "deposit transaction"
             );
             return transactionRepository.save(newtransaction);
-            }
-            else {
-                throw new ServiceException("Insufficient funds");
-        }
         } catch (Exception ex) {
             throw new ServiceException("Failed to add account", ex);
         }
     }
     public Transaction addTransactionWithdraw(Transaction transaction) {
         try {
+            if(CheckSufficientFunds(transaction, "1234")){
+            WithdrawMoney(transaction);
             Transaction newtransaction = new Transaction(
                     transaction.getSenderIban(),
-                    transaction.getRecieverIban(),
+                    "cash",
                     transaction.getAmount(),
                     "withdraw transaction"
             );
             return transactionRepository.save(newtransaction);
+            }
+            else {
+                    throw new ServiceException("Transaction Failed");
+            }
         } catch (Exception ex) {
             throw new ServiceException("Failed to add account", ex);
         }
     }
     public void TransferMoney(Transaction transaction) {
         //TODO: add transfer money logic
-        // AccountDTO senderAccount = accountService.getAccountByIban(transaction.getSenderIban());
-        // AccountDTO receiverAccount = accountService.getAccountByIban(transaction.getRecieverIban());
+        AccountDTO senderAccount = accountService.getAccountByIban(transaction.getSenderIban());
+        AccountDTO receiverAccount = accountService.getAccountByIban(transaction.getreceiverIban());
+        if(senderAccount.getAccountType() == "Current" && receiverAccount.getAccountType() == "Current")    {
+            senderAccount.setBalance(senderAccount.getBalance() - transaction.getAmount());
+            receiverAccount.setBalance(receiverAccount.getBalance() + transaction.getAmount());
+            accountService.updateAccountByIban(transaction.getSenderIban(), senderAccount);
+            accountService.updateAccountByIban(transaction.getreceiverIban(), receiverAccount);
+        }
+        else{
+            throw new ServiceException("Invalid Account for Transfer");
+        }
+    }
 
-        // senderAccount.setBalance(senderAccount.getBalance() - transaction.getAmount());
-        // receiverAccount.setBalance(receiverAccount.getBalance() + transaction.getAmount());
-
-        // accountService.updateAccount(senderAccount);
-        // accountService.updateAccount(receiverAccount);
+    public void DespositMoney(Transaction transaction) {
+        //TODO: add transfer money logic
+        AccountDTO receiverAccount = accountService.getAccountByIban(transaction.getreceiverIban());
+        if(receiverAccount.getAccountType() == "Current")    {
+            receiverAccount.setBalance(receiverAccount.getBalance() + transaction.getAmount());
+            accountService.updateAccountByIban(transaction.getreceiverIban(), receiverAccount);
+        }
+        else{
+            throw new ServiceException("Invalid Account for Transfer");
+        }
+    }
+    public void WithdrawMoney(Transaction transaction) {
+        AccountDTO senderAccount = accountService.getAccountByIban(transaction.getSenderIban());
+        if(senderAccount.getAccountType() == "Current")    {
+            senderAccount.setBalance(senderAccount.getBalance() - transaction.getAmount());
+            accountService.updateAccountByIban(transaction.getSenderIban(), senderAccount);
+        }
+        else{
+            throw new ServiceException("Invalid Account for Transfer");
+        }
     }
 
 
     public boolean CheckSufficientFunds(Transaction transaction, String pin) {
         try {
-            if (transaction.getAmount() > accountService.getAccountBalance(transaction.getSenderIban(), pin)) {
-                return false;
-            } else {
+            if ((accountService.getAccountBalance(transaction.getSenderIban(), pin) - transaction.getAmount()) >= accountService.getAccountByIban(transaction.getSenderIban()).getAbsoluteLimit()) {
                 return true;
+            } else {
+                return false;
             }
         } catch (Exception ex) {
-            throw new ServiceException("Failed to add account", ex);
+            throw new ServiceException("Transaction Failed", ex);
         }
+    }
+
+    public boolean CheckDailyLimit(Account account, Transaction transaction){
+        //TODO: check if user has reached their limit for the day (maybe do this in check sufficient funds?)
+        return true;
     }
 }

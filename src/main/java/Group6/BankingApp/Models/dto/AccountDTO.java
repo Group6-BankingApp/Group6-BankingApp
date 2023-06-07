@@ -12,16 +12,20 @@ public class AccountDTO {
     private String cardUUID;
     private String pin;
     private double dailyLimit;
+    private double balance;
+    private double absoluteLimit;
 
     public AccountDTO(){}
 
-    public AccountDTO(String iban, UserDTO2 user, String accountType, String cardUUID, String pin, double dailyLimit) {
+    public AccountDTO(String iban, UserDTO2 user, String accountType, String cardUUID, String pin, double dailyLimit, double balance, double absoluteLimit) {
         this.iban = iban;
         this.user = user;
         this.accountType = accountType;
         this.cardUUID = cardUUID;
         this.pin = pin;
         this.dailyLimit = dailyLimit;
+        this.balance = balance;
+        this.absoluteLimit = absoluteLimit;
     }
 
     public String getIban() {
@@ -70,5 +74,21 @@ public class AccountDTO {
 
     public void setDailyLimit(double dailyLimit) {
         this.dailyLimit = dailyLimit;
+    }
+
+    public double getBalance() {
+        return balance;
+    }
+
+    public void setBalance(double balance) {
+        this.balance = balance;
+    }
+
+    public double getAbsoluteLimit() {
+        return absoluteLimit;
+    }
+
+    public void setAbsoluteLimit(double absoluteLimit) {
+        this.absoluteLimit = absoluteLimit;
     }
 }
