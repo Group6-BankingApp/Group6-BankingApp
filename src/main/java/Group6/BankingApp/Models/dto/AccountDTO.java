@@ -3,7 +3,9 @@ package Group6.BankingApp.Models.dto;
 import Group6.BankingApp.Models.Account;
 import Group6.BankingApp.Models.User;
 import jakarta.persistence.OneToOne;
+import org.springframework.stereotype.Component;
 
+@Component
 public class AccountDTO {
 
     private String iban;

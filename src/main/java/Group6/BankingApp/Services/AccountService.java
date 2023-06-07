@@ -3,6 +3,7 @@ package Group6.BankingApp.Services;
 import Group6.BankingApp.DAL.AccountRepository;
 import Group6.BankingApp.DAL.UserRepository;
 import Group6.BankingApp.Models.Account;
+import Group6.BankingApp.Models.dto.AccountDTO;
 import Group6.BankingApp.Models.DebitCard;
 import Group6.BankingApp.Models.User;
 import Group6.BankingApp.Models.dto.*;
@@ -32,10 +33,12 @@ public class AccountService {
     @Autowired
     private UserService userService;
 
-    private ModelMapper modelMapper;
+    @Autowired
+    private AccountDTO accountDTO;
 
 
     public AccountService() {
+        this.accountDTO = new AccountDTO();
     }
 
     public List<Account> getAllAccounts() {
@@ -48,7 +51,6 @@ public class AccountService {
             throw new ServiceException("Account not found");
 
         Account account = accountOptional.get();
-        AccountDTO accountDTO = new AccountDTO();
         accountDTO.setIban(account.getIban());
         accountDTO.setUser(mapToUserDTO2(account.getUser()));
         accountDTO.setAccountType(account.getAccountType());
@@ -91,18 +93,6 @@ public class AccountService {
             throw new ServiceException("Failed to add account", ex);
         }
     }
-
-//    public Account updateAccountByIban(String iban,AccountDTO accountDTO) {
-//        try {
-//            Account accountToUpdate = accountRepository.findById(iban).orElse(null);
-//            accountToUpdate.setAccountType(accountDTO.getAccountType());
-//            accountToUpdate.setDailyLimit(accountDTO.getDailyLimit());
-//            accountToUpdate.setPin(accountDTO.getPin());
-//            return accountRepository.save(accountToUpdate);
-//        }catch (Exception ex){
-//            throw new EntityNotFoundException("Account not found");
-//        }
-//    }
 
     public NewAccountDTO updateAccountByIban(String iban, AccountDTO accountDTO) {
         Account account = accountRepository.findById(iban)
@@ -196,7 +186,6 @@ public class AccountService {
     }
 
     protected AccountDTO mapToAccountDTO(Account account) {
-        AccountDTO accountDTO = new AccountDTO();
         accountDTO.setIban(account.getIban());
         accountDTO.setUser(mapToUserDTO2(account.getUser()));
         accountDTO.setAccountType(account.getAccountType());
@@ -225,7 +214,6 @@ public class AccountService {
     private String generateIban() {
         StringBuilder ibanBuilder = new StringBuilder(IBAN_PREFIX);
 
-        // Generate random digits for the remaining part of the IBAN
         Random random = new Random();
         for (int i = 0; i < 10; i++) {
             int randomDigit = random.nextInt(10);
@@ -235,7 +223,7 @@ public class AccountService {
     }
 
     public String generateCardUUID() {
-        // Generate a random UUID for the card
+        // Generate a random UUID
         UUID uuid = UUID.randomUUID();
         return uuid.toString();
     }
