@@ -1,9 +1,8 @@
 package Group6.BankingApp.Controllers;
 
-import Group6.BankingApp.Models.dto.ExceptionDTO;
-import Group6.BankingApp.Models.dto.UserDTO;
-import Group6.BankingApp.Models.dto.UserDTO2;
+import Group6.BankingApp.Models.dto.*;
 import Group6.BankingApp.Services.UserService;
+import Group6.BankingApp.util.JwtUtil;
 import lombok.extern.java.Log;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -11,10 +10,12 @@ import org.springframework.http.ResponseEntity;
 //import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import javax.naming.AuthenticationException;
 import java.util.List;
 
 @RestController
 @RequestMapping(value="/users", produces = MediaType.APPLICATION_JSON_VALUE)
+@CrossOrigin(origins = "http://localhost:5173")
 @Log
 public class UserController {
 
@@ -23,6 +24,11 @@ public class UserController {
 
     public UserController(UserService userService) {
         this.userService = userService;
+    }
+
+    @PostMapping(value = "/login")
+    public ResponseEntity<Login2DTO> login(@RequestBody LoginDTO loginDTO) throws AuthenticationException {
+        return ResponseEntity.ok(userService.login(loginDTO));
     }
 
     @GetMapping(value = "/withAccount")
@@ -55,10 +61,5 @@ public class UserController {
     public ResponseEntity deleteUser(@PathVariable Long id) {
         userService.deleteUser(id);
         return ResponseEntity.ok().build();
-    }
-
-    private ResponseEntity<Object> handleException(int status, Exception ex) {
-        ExceptionDTO exceptionDTO = new ExceptionDTO(status, ex.getClass().getName(), ex.getMessage());
-        return ResponseEntity.status(status).body(exceptionDTO);
     }
 }
