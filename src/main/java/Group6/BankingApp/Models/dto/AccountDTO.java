@@ -3,43 +3,31 @@ package Group6.BankingApp.Models.dto;
 import Group6.BankingApp.Models.Account;
 import Group6.BankingApp.Models.User;
 import jakarta.persistence.OneToOne;
+import org.springframework.stereotype.Component;
 
+@Component
 public class AccountDTO {
 
     private String iban;
-    private User user;
+    private UserDTO2 user;
     private String accountType;
     private String cardUUID;
     private String pin;
     private double dailyLimit;
+    private double balance;
+    private double absoluteLimit;
 
-    public AccountDTO(String iban, User user, String accountType, String cardUUID, String pin, double dailyLimit) {
+    public AccountDTO(){}
+
+    public AccountDTO(String iban, UserDTO2 user, String accountType, String cardUUID, String pin, double dailyLimit, double balance, double absoluteLimit) {
         this.iban = iban;
         this.user = user;
         this.accountType = accountType;
         this.cardUUID = cardUUID;
         this.pin = pin;
         this.dailyLimit = dailyLimit;
-    }
-
-    public AccountDTO(Account account){
-        this.iban = account.getIban();
-        this.user = account.getUser();
-        this.accountType = account.getAccountType();
-        this.cardUUID = account.getCardUUID();
-        this.pin = account.getPin();
-        this.dailyLimit = account.getDailyLimit();
-    }
-
-    public AccountDTO() {
-    }
-
-    public String getAccountType() {
-        return accountType;
-    }
-
-    public void setAccountType(String accountType) {
-        this.accountType = accountType;
+        this.balance = balance;
+        this.absoluteLimit = absoluteLimit;
     }
 
     public String getIban() {
@@ -50,12 +38,20 @@ public class AccountDTO {
         this.iban = iban;
     }
 
-    public User getUser() {
+    public UserDTO2 getUser() {
         return user;
     }
 
-    public void setUser(User user) {
+    public void setUser(UserDTO2 user) {
         this.user = user;
+    }
+
+    public String getAccountType() {
+        return accountType;
+    }
+
+    public void setAccountType(String accountType) {
+        this.accountType = accountType;
     }
 
     public String getCardUUID() {
@@ -80,5 +76,21 @@ public class AccountDTO {
 
     public void setDailyLimit(double dailyLimit) {
         this.dailyLimit = dailyLimit;
+    }
+
+    public double getBalance() {
+        return balance;
+    }
+
+    public void setBalance(double balance) {
+        this.balance = balance;
+    }
+
+    public double getAbsoluteLimit() {
+        return absoluteLimit;
+    }
+
+    public void setAbsoluteLimit(double absoluteLimit) {
+        this.absoluteLimit = absoluteLimit;
     }
 }

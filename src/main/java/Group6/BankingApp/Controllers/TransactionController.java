@@ -47,23 +47,22 @@ public class TransactionController {
             return ResponseEntity.internalServerError().body(e.getCause().getMessage());
         }
     }
-/*
-    @PostMapping
+    @PostMapping(value = "/deposit")
     public ResponseEntity Deposit(@RequestBody Transaction transaction) {
         try{
-            Transaction newTransaction=transactionService.Deposit(transaction);
+            Transaction newTransaction=transactionService.addTransactionDeposit(transaction);
             return ResponseEntity.status(201).body(newTransaction);
         }catch (Exception e){
             return ResponseEntity.internalServerError().body(e.getCause().getMessage());
         }
-    }*/
-    /*@PostMapping(value = "/withdraw")
+    }
+    @PostMapping(value = "/withdraw")
     public ResponseEntity Withdraw(@RequestBody Transaction transaction) {
         try{
-            Transaction newTransaction=transactionService.Withdraw(transaction);
+            Transaction newTransaction=transactionService.addTransactionWithdraw(transaction);
             return ResponseEntity.status(201).body(newTransaction);
         }catch (Exception e){
             return ResponseEntity.internalServerError().body(e.getCause().getMessage());
         }
-    }*/
+    }
 }

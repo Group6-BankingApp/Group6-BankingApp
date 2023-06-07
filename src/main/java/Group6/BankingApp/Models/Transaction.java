@@ -11,20 +11,19 @@ public class Transaction {
     @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "transactionId", updatable = false, nullable = false)
     private String transactionId;
-    private Long userId;
     private LocalDate timeCreated;
     private String senderIban;
-    private String recieverIban;
+    private String receiverIban;
     private double amount;
     private String description;
 
     public Transaction() {
     }
 
-    public Transaction(LocalDate timeCreated, String senderIban, String recieverIban, double amount, String description) {
-        this.timeCreated = timeCreated;
+    public Transaction(String senderIban, String receiverIban, double amount, String description) {
+        this.timeCreated = LocalDate.now();
         this.senderIban = senderIban;
-        this.recieverIban = recieverIban;
+        this.receiverIban = receiverIban;
         this.amount = amount;
         this.description = description;
     }
@@ -33,7 +32,7 @@ public class Transaction {
     public Transaction(TransactionDTO transactionDTO) {
         this.timeCreated = LocalDate.now();
         this.senderIban = transactionDTO.getSenderIban();
-        this.recieverIban = transactionDTO.getRecieverIban();
+        this.receiverIban = transactionDTO.getreceiverIban();
         this.amount = transactionDTO.getAmount();
         this.description = transactionDTO.getDescription();
     }
@@ -41,14 +40,6 @@ public class Transaction {
 
     public String getTransactionId() {
         return transactionId;
-    }
-
-    public Long getUserId() {
-        return userId;
-    }
-
-    public  void setUserId(Long userId) {
-        this.userId = userId;
     }
 
     public LocalDate getTimeCreated() {
@@ -59,12 +50,12 @@ public class Transaction {
         this.timeCreated = timeCreated;
     }
 
-    public String getRecieverIban() {
-        return recieverIban;
+    public String getreceiverIban() {
+        return receiverIban;
     }
 
-    public  void setRecieverIban(String recieverIban) {
-        this.recieverIban = recieverIban;
+    public  void setreceiverIban(String receiverIban) {
+        this.receiverIban = receiverIban;
     }
 
     public String getSenderIban() {
