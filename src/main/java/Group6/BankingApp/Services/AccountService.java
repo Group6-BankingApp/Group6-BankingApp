@@ -57,6 +57,8 @@ public class AccountService {
         accountDTO.setCardUUID(account.getCardUUID());
         accountDTO.setPin(account.getPin());
         accountDTO.setDailyLimit(account.getDailyLimit());
+        accountDTO.setBalance(account.getBalance());
+        accountDTO.setAbsoluteLimit(account.getAbsoluteLimit());
         return accountDTO;
     }
 
@@ -83,6 +85,8 @@ public class AccountService {
             accountDTO.setCardUUID(account.getCardUUID());
             accountDTO.setPin(account.getPin());
             accountDTO.setDailyLimit(account.getDailyLimit());
+            accountDTO.setBalance(account.getBalance());
+            accountDTO.setAbsoluteLimit(account.getAbsoluteLimit());
 
             return accountDTO;
         } catch (Exception ex) {
@@ -105,6 +109,8 @@ public class AccountService {
         account.setCardUUID(accountDTO.getCardUUID());
         account.setPin(accountDTO.getPin());
         account.setDailyLimit(accountDTO.getDailyLimit());
+        account.setBalance(accountDTO.getBalance());
+        account.setAbsoluteLimit(accountDTO.getAbsoluteLimit());
 
         Account updatedAccount = accountRepository.save(account);
         return new NewAccountDTO(updatedAccount);
@@ -186,6 +192,9 @@ public class AccountService {
         accountDTO.setCardUUID(account.getCardUUID());
         accountDTO.setPin(account.getPin());
         accountDTO.setDailyLimit(account.getDailyLimit());
+        accountDTO.setBalance(account.getBalance());
+        accountDTO.setAbsoluteLimit(account.getAbsoluteLimit());
+
         return accountDTO;
     }
 

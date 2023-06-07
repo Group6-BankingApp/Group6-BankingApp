@@ -3,9 +3,7 @@ package Group6.BankingApp.Models.dto;
 import Group6.BankingApp.Models.Account;
 import Group6.BankingApp.Models.User;
 import jakarta.persistence.OneToOne;
-import org.springframework.stereotype.Component;
 
-@Component
 public class AccountDTO {
 
     private String iban;
@@ -15,10 +13,11 @@ public class AccountDTO {
     private String pin;
     private double dailyLimit;
     private double balance;
+    private double absoluteLimit;
 
     public AccountDTO(){}
 
-    public AccountDTO(String iban, UserDTO2 user, String accountType, String cardUUID, String pin, double dailyLimit, double balance) {
+    public AccountDTO(String iban, UserDTO2 user, String accountType, String cardUUID, String pin, double dailyLimit, double balance, double absoluteLimit) {
         this.iban = iban;
         this.user = user;
         this.accountType = accountType;
@@ -26,6 +25,7 @@ public class AccountDTO {
         this.pin = pin;
         this.dailyLimit = dailyLimit;
         this.balance = balance;
+        this.absoluteLimit = absoluteLimit;
     }
 
     public String getIban() {
@@ -82,5 +82,13 @@ public class AccountDTO {
 
     public void setBalance(double balance) {
         this.balance = balance;
+    }
+
+    public double getAbsoluteLimit() {
+        return absoluteLimit;
+    }
+
+    public void setAbsoluteLimit(double absoluteLimit) {
+        this.absoluteLimit = absoluteLimit;
     }
 }
