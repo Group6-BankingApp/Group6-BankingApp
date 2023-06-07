@@ -33,13 +33,8 @@ public class AccountService {
     @Autowired
     private UserService userService;
 
-    @Autowired
-    private AccountDTO accountDTO;
 
-
-    public AccountService() {
-        this.accountDTO = new AccountDTO();
-    }
+    public AccountService() {}
 
     public List<Account> getAllAccounts() {
         return (List<Account>) accountRepository.findAll();
@@ -51,6 +46,7 @@ public class AccountService {
             throw new ServiceException("Account not found");
 
         Account account = accountOptional.get();
+        AccountDTO accountDTO = new AccountDTO();
         accountDTO.setIban(account.getIban());
         accountDTO.setUser(mapToUserDTO2(account.getUser()));
         accountDTO.setAccountType(account.getAccountType());
@@ -186,6 +182,7 @@ public class AccountService {
     }
 
     protected AccountDTO mapToAccountDTO(Account account) {
+        AccountDTO accountDTO = new AccountDTO();
         accountDTO.setIban(account.getIban());
         accountDTO.setUser(mapToUserDTO2(account.getUser()));
         accountDTO.setAccountType(account.getAccountType());
