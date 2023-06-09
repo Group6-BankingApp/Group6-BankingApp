@@ -39,16 +39,7 @@ public class AccountService {
             throw new ServiceException("Account not found");
 
         Account account = accountOptional.get();
-        AccountDTO accountDTO = new AccountDTO();
-        accountDTO.setIban(account.getIban());
-        accountDTO.setUser(mapToUserDTO2(account.getUser()));
-        accountDTO.setAccountType(account.getAccountType());
-        accountDTO.setCardUUID(account.getCardUUID());
-        accountDTO.setPin(account.getPin());
-        accountDTO.setDailyLimit(account.getDailyLimit());
-        accountDTO.setBalance(account.getBalance());
-        accountDTO.setAbsoluteLimit(account.getAbsoluteLimit());
-        return accountDTO;
+        return new AccountDTO(account);
     }
 
     public AccountDTO addAccount(NewAccountDTO newAccountDTO) {
