@@ -46,9 +46,12 @@ public class AccountService {
         try {
             String iban = generateIban();
             Long userId = newAccountDTO.getUserId();
-            UserDTO2 userDTO2 = userService.getUserById(userId);
-            if (userDTO2 == null)
-                throw new ServiceException("User with ID " + userId + " does not exist.");
+
+            User user = userService.getFullUserById(userId);
+            UserDTO2 userDTO2 = new UserDTO2(user);
+
+            user.setHasAccount(true);
+            userRepository.save(user);
 
             String accountType = newAccountDTO.getAccountType();
             String cardUUID = generateCardUUID();
