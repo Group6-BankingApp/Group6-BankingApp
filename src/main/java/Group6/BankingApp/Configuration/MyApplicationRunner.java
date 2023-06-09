@@ -47,32 +47,57 @@ public class MyApplicationRunner implements ApplicationRunner {
 
         List<User> users=
                 Arrays.asList(
+                        new User("InHolland", "Bank", "inholland@gmail.com", "123456", "123456789", Role.EMPLOYEE,true),
                         new User("John", "Doe", "john.doe@gmail.com", "123456", "123456789", Role.CUSTOMER,true),
-                        new User("Jane", "Doe", "jane.doe@gmail.com", "123456", "123456789", Role.CUSTOMER,false),
+                        new User("Emily", "Doe", "emily.doe@gmail.com", "123456", "123456789", Role.CUSTOMER,false),
                         new User("Adam", "Adey", "ad.ad@gmail.com", "123456", "123456789", Role.CUSTOMER,false)
                         );
 
         userRepository.saveAll(users);
 
+
         // Create and save DebitCards
-        DebitCard debitCard1 = new DebitCard("1111222233334444", LocalDate.now().plusYears(3), "123", "John Doe", true, "UUID1");
+        DebitCard bankDebitCard = new DebitCard("1111222233334444",
+                LocalDate.now().plusYears(3),
+                "123",
+                users.get(0).getFirstName() + " "  + users.get(0).getLastName(),
+                true,
+                accountService.generateCardUUID());
+        debitCardRepository.save(bankDebitCard);
+        DebitCard debitCard1 = new DebitCard("5555666677778888",
+                LocalDate.now().plusYears(2),
+                "456",
+                users.get(1).getFirstName() + " "  + users.get(1).getLastName(),
+                true,
+                accountService.generateCardUUID());
         debitCardRepository.save(debitCard1);
-        DebitCard debitCard2 = new DebitCard("5555666677778888", LocalDate.now().plusYears(2), "456", "Jane Smith", true, "UUID2");
+        DebitCard debitCard2 = new DebitCard("5555666677778888",
+                LocalDate.now().plusYears(2),
+                "456",
+                users.get(2).getFirstName() + " "  + users.get(2).getLastName(),
+                true,
+                accountService.generateCardUUID());
         debitCardRepository.save(debitCard2);
+        DebitCard debitCard3 = new DebitCard("6666777788889999",
+                LocalDate.now().plusYears(10),
+                "789",
+                users.get(3).getFirstName() + " "  + users.get(3).getLastName(),
+                true,
+                accountService.generateCardUUID());
+        debitCardRepository.save(debitCard3);
 
         // Create and save Accounts
+        Account inHollandAccount = new Account("NL01INHO0000000001","Current", accountService.generateCardUUID(), "1234", 1000000.0, 1000000.0, 1000000, true, bankDebitCard);
+        inHollandAccount.setUser(users.get(0));
+        accountRepository.save(inHollandAccount);
         Account account1 = new Account("NL01INHO9501054837","Savings", accountService.generateCardUUID(), "1234", 1000.0, 600.0, 0, true, debitCard1);
-        //account1.setDebitCard(debitCard1);
-        account1.setUser(users.get(0));
+        account1.setUser(users.get(1));
         accountRepository.save(account1);
         Account account2 = new Account("NL01INHO2371458805", "Current", accountService.generateCardUUID(), "5678", 2000.0, 950.0, 0, true, debitCard2);
-        //account2.setDebitCard(debitCard2);
-        account2.setUser(users.get(1));
+        account2.setUser(users.get(2));
         accountRepository.save(account2);
-
         Account account3 = new Account("NL01INH1234567890", "Current", accountService.generateCardUUID(), "5678", 2000.0, 950.0, -100, true, debitCard2);
-        //account2.setDebitCard(debitCard2);
-        account3.setUser(users.get(1));
+        account3.setUser(users.get(3));
         accountRepository.save(account3);
 //        Account account3 = new Account("NL01INHO5808504708", "Savings", accountService.generateCardUUID(), "1357", 1000.0, 0.0, 5000.0, true, null);
 //        account3.setDebitCard(debitCard1);
