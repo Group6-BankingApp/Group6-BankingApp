@@ -92,7 +92,7 @@ public class MyApplicationRunner implements ApplicationRunner {
         Account account1 = new Account("NL01INHO9501054837","Savings", accountService.generateCardUUID(), "1234", 1000.0, 600.0, 0, true, debitCard1);
         account1.setUser(users.get(1));
         accountRepository.save(account1);
-        Account account2 = new Account("NL01INHO2371458805", "Current", accountService.generateCardUUID(), "5678", 2000.0, 950.0, 0, true, debitCard2);
+        Account account2 = new Account("NL01INHO2371458805", "Current", accountService.generateCardUUID(), "5678", 110.0, 950.0, 0, true, debitCard2);
         account2.setUser(users.get(2));
         accountRepository.save(account2);
         Account account3 = new Account("NL01INH1234567890", "Current", accountService.generateCardUUID(), "5678", 2000.0, 950.0, -100, true, debitCard2);
@@ -115,11 +115,13 @@ public class MyApplicationRunner implements ApplicationRunner {
 //        account6.setUser(users.get(2));
 //        accountRepository.save(account6);
             // Create and save Transactions
-            Transaction transaction1 = new Transaction("NL67INGB2131241242", "NL67INGB213214124", 200.0, "withdraw");
+            Transaction transaction1 = new Transaction("NL67INGB1234567890", "NL67INGB213214124", 200.0, "example");
             transactionRepository.save(transaction1);
             Transaction transaction2 = new Transaction("NL67INGB12345678", "NL67INGB87654321", 155.0, "deposit");
             transactionRepository.save(transaction2);
-            Transaction transaction3 = new Transaction("NL67INGB12348765", "NL67INGB87655555", 100.0, "regular");
+            Transaction transaction3 = new Transaction("NL01INHO2371458805", "NL67INGB87655555", 100.0, "regular");
             transactionRepository.save(transaction3);
+            Transaction transaction4 = new Transaction("NL67INGB87655555", "cash", 20.0, "withdraw");
+            transactionRepository.save(transaction4);
     }
 }

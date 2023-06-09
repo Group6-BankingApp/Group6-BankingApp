@@ -8,6 +8,8 @@ import Group6.BankingApp.Models.Account;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import jakarta.persistence.EntityNotFoundException;
+
+import org.hibernate.annotations.Check;
 import org.hibernate.service.spi.ServiceException;
 import java.util.List;
 import java.util.*;
@@ -33,9 +35,9 @@ public class TransactionService {
         return transactionRepository.findById(id).orElse(null);
     }
 
-    public Transaction addTransaction(Transaction transaction) {
+    public Transaction addTransaction(Transaction transaction, String pin) {
         try {
-            if(CheckSufficientFunds(transaction, "1234")){
+            if((CheckSufficientFunds(transaction, pin)) && (CheckDailyLimit(accountService.getAccountByIban(transaction.getSenderIban()), transaction))){
                 TransferMoney(transaction);
                 Transaction newtransaction = new Transaction(
                     transaction.getSenderIban(),
@@ -54,7 +56,6 @@ public class TransactionService {
     }
     public Transaction addTransactionDeposit(Transaction transaction) {
         try {
-            //TODO: add pin to transfer
             DespositMoney(transaction);
             Transaction newtransaction = new Transaction(
                     "cash",
@@ -67,9 +68,9 @@ public class TransactionService {
             throw new ServiceException("Failed to add account", ex);
         }
     }
-    public Transaction addTransactionWithdraw(Transaction transaction) {
+    public Transaction addTransactionWithdraw(Transaction transaction, String pin) {
         try {
-            if(CheckSufficientFunds(transaction, "1234")){
+            if(CheckSufficientFunds(transaction, pin)){
             WithdrawMoney(transaction);
             Transaction newtransaction = new Transaction(
                     transaction.getSenderIban(),
@@ -136,12 +137,22 @@ public class TransactionService {
         }
     }
 
-    public boolean CheckDailyLimit(Account account, Transaction transaction){
-        //TODO: check if user has reached their limit for the day (maybe do this in check sufficient funds?)
-        return true;
+    public boolean CheckDailyLimit(AccountDTO account, Transaction transaction){
+        List<Transaction> dailyTransactions = findAllTransactions(0, 50, LocalDate.now().toString(), LocalDate.now().toString(), account.getIban(), account.getPin());
+        //check if the sum of the transaction and the daily transactions is less than the daily limit
+        double sum = transaction.getAmount();
+        for(Transaction t : dailyTransactions){
+            sum += t.getAmount();
+        }
+        if(sum > account.getDailyLimit()){
+            return false;
+        }
+        else{
+            return true;
+        }
     }
 
-    public List<Transaction> findAllTransactions(Integer skip, Integer limit, String dateFrom, String dateTo) {
+    public List<Transaction> findAllTransactions(Integer skip, Integer limit, String dateFrom, String dateTo, String iban, String pin) {
     try {
         Iterable<Transaction> allTransactions = transactionRepository.findAll();
         if (allTransactions == null)
@@ -157,10 +168,10 @@ public class TransactionService {
         List<Transaction> transactionsResult = new ArrayList<>();
         for (Transaction transaction : transactionsList) {
             LocalDate transactionDate = transaction.getTimeCreated();
-            if (transactionDate.isAfter(fromDate) || transactionDate.isEqual(fromDate)) {
-                if (transactionDate.isBefore(toDate) || transactionDate.isEqual(toDate)) {
+            String senderIban = transaction.getSenderIban();
+            if ((transactionDate.isAfter(fromDate) || transactionDate.isEqual(fromDate)) && 
+            ((transactionDate.isBefore(toDate) || transactionDate.isEqual(toDate))) && (senderIban.equals(iban))) {
                     transactionsResult.add(transaction);
-                }
             }
         }
 
