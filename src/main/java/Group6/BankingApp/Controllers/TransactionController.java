@@ -26,12 +26,12 @@ public class TransactionController {
     public ResponseEntity<List<Transaction>> getAllTransactions(
             @RequestParam(defaultValue = "0") Integer skip,
             @RequestParam(defaultValue = "40") Integer limit,
-            @RequestParam(defaultValue = "2023-06-09") String dateFrom,
+            @RequestParam(defaultValue = "") String dateFrom,
             @RequestParam(defaultValue = "") String dateTo
     ) {
         try {
-            if (dateFrom == "") {
-                LocalDate oneYearAgo = LocalDate.now();
+            if (dateTo.isEmpty()) {
+                LocalDate oneYearAgo = LocalDate.now().minusYears(1);
                 dateFrom = oneYearAgo.toString();
             }
 
