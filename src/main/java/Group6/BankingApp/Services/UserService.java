@@ -122,4 +122,12 @@ public class UserService {
         List<UserDTO2>userDTO2s= convertToUserDTO2(users);
         return userDTO2s;
     }
+
+    public User getFullUserById(Long userId) {
+        User user = userRepository.findById(userId).orElse(null);
+        if(user ==null){
+            throw new EntityNotFoundException("User not found");
+        }
+        return user;
+    }
 }
