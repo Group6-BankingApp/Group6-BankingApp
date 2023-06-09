@@ -3,12 +3,17 @@ package Group6.BankingApp.Services;
 import Group6.BankingApp.DAL.UserRepository;
 import Group6.BankingApp.Models.Role;
 import Group6.BankingApp.Models.User;
+import Group6.BankingApp.Models.dto.Login2DTO;
+import Group6.BankingApp.Models.dto.LoginDTO;
 import Group6.BankingApp.Models.dto.UserDTO;
 import Group6.BankingApp.Models.dto.UserDTO2;
+import Group6.BankingApp.util.JwtUtil;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+
+import javax.naming.AuthenticationException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -17,6 +22,7 @@ public class UserService {
 
     @Autowired
     private UserRepository userRepository;
+    private JwtUtil jwtUtil;
 
     public UserService() {
     }
@@ -75,5 +81,17 @@ public class UserService {
             userDTO2s.add(new UserDTO2(user));
         }
         return userDTO2s;
+    }
+
+    public Login2DTO login(LoginDTO loginDTO) throws AuthenticationException {
+        User user = userRepository.findByEmail(loginDTO.getUsername());
+        if (user == null) {
+            throw new EntityNotFoundException("User not found");
+        }
+        if (!user.getPassword().equals(loginDTO.getPassword())) {
+            throw new AuthenticationException("Wrong password");
+        }
+        Login2DTO login2DTO = new Login2DTO(user);
+        return login2DTO;
     }
 }
