@@ -29,6 +29,8 @@ public class WebSecurityConfig {
         httpSecurity.authorizeHttpRequests()
                 .requestMatchers("/users").permitAll()
                 .requestMatchers("/users/login").permitAll()
+                .requestMatchers("/users/withAccount").authenticated()
+                .requestMatchers("/users/withoutAccount").authenticated()
                 .requestMatchers("/accounts").authenticated()
                 .requestMatchers("/transactions").permitAll();
 

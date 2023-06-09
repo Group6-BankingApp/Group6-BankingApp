@@ -45,7 +45,7 @@ public class MyApplicationRunner implements ApplicationRunner {
         user1.setPassword("123456");
         user1.setPhoneNumber("0612345678");
         user1.setHasAccount(true);
-        user1.setRoles(List.of(Role.ROLE_USER));
+        user1.setRoles(List.of(Role.ROLE_ADMIN));
 
         User user2 = new User();
         user2.setFirstName("Jane");

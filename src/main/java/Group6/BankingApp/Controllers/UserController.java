@@ -1,6 +1,7 @@
 package Group6.BankingApp.Controllers;
 
 import Group6.BankingApp.Models.Role;
+import Group6.BankingApp.Models.User;
 import Group6.BankingApp.Models.dto.*;
 import Group6.BankingApp.Services.UserService;
 import lombok.extern.java.Log;
@@ -29,7 +30,8 @@ public class UserController {
 
     @PostMapping(value = "/login")
     public Object login(@RequestBody LoginDTO loginDTO) throws Exception {
-        return new TokenDTO(userService.login(loginDTO));
+        User user = userService.getUserByEmail(loginDTO.getUsername());
+        return new TokenDTO(user.getFirstName(),userService.login(loginDTO));
     }
 
     @GetMapping(value = "/withAccount")
