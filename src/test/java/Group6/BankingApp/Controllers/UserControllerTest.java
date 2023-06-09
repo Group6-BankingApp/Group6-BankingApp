@@ -1,6 +1,6 @@
 package Group6.BankingApp.Controllers;
 
-import Group6.BankingApp.Models.Customer;
+import Group6.BankingApp.Models.User;
 import Group6.BankingApp.Models.Role;
 import Group6.BankingApp.Models.dto.UserDTO;
 import Group6.BankingApp.Models.dto.UserDTO2;
@@ -41,15 +41,15 @@ class UserControllerTest {
 
     @BeforeEach
     void setUp() {
-        Customer customer1 = new Customer();
-        customer1.setFirstName("John");
-        customer1.setLastName("Doe");
-        customer1.setEmail("john.doe@gmail.com");
-        customer1.setPassword("123456");
-        customer1.setPhoneNumber("0612345678");
-        customer1.setHasAccount(true);
-        customer1.setRoles(List.of(Role.ROLE_USER));
-        userDTO2 = new UserDTO2(customer1);
+        User user1 = new User();
+        user1.setFirstName("John");
+        user1.setLastName("Doe");
+        user1.setEmail("john.doe@gmail.com");
+        user1.setPassword("123456");
+        user1.setPhoneNumber("0612345678");
+        user1.setHasAccount(true);
+        user1.setRoles(List.of(Role.ROLE_USER));
+        userDTO2 = new UserDTO2(user1);
     }
 
     @Test

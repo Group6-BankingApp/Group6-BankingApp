@@ -1,14 +1,13 @@
 package Group6.BankingApp.Services;
 
 import Group6.BankingApp.DAL.UserRepository;
-import Group6.BankingApp.Models.Customer;
+import Group6.BankingApp.Models.User;
 import Group6.BankingApp.Models.Role;
 import Group6.BankingApp.Models.dto.LoginDTO;
 import Group6.BankingApp.Models.dto.UserDTO;
 import Group6.BankingApp.Models.dto.UserDTO2;
 import Group6.BankingApp.util.JwtTokenProvider;
 import jakarta.persistence.EntityNotFoundException;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -16,7 +15,6 @@ import org.springframework.stereotype.Service;
 import javax.naming.AuthenticationException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class UserService {
@@ -32,39 +30,39 @@ public class UserService {
     }
 
     public List<UserDTO2> getAllUsers() {
-        List<Customer> customers = (List<Customer>) userRepository.findAll();
-        List<UserDTO2>userDTO2s= convertToUserDTO2(customers);
+        List<User> users = (List<User>) userRepository.findAll();
+        List<UserDTO2>userDTO2s= convertToUserDTO2(users);
         return userDTO2s;
     }
 
     public List<UserDTO2> getAllUsersWithAccount() {
-        List<Customer> customers = (List<Customer>) userRepository.findAllByHasAccountIsTrue();
-        List<UserDTO2>userDTO2s= convertToUserDTO2(customers);
+        List<User> users = (List<User>) userRepository.findAllByHasAccountIsTrue();
+        List<UserDTO2>userDTO2s= convertToUserDTO2(users);
         return userDTO2s;
     }
 
     public UserDTO2 getUserById(Long id) {
 
-        Customer customer = userRepository.findById(id).orElse(null);
-        if(customer ==null){
+        User user = userRepository.findById(id).orElse(null);
+        if(user ==null){
             throw new EntityNotFoundException("User not found");
         }
-        UserDTO2 userdto = new UserDTO2(customer);
+        UserDTO2 userdto = new UserDTO2(user);
         return userdto;
     }
 
     public UserDTO2 addUser(UserDTO userDTO) {
         if(userRepository.findByEmail(userDTO.getEmail()).isEmpty()){
             //String password = bCryptPasswordEncoder.encode(userDTO.getPassword());
-            Customer customer = new Customer();
-            customer.setFirstName(userDTO.getFirstName());
-            customer.setLastName(userDTO.getLastName());
-            customer.setEmail(userDTO.getEmail());
-            customer.setPassword(userDTO.getPassword());
-            customer.setPhoneNumber(userDTO.getPhoneNumber());
-            customer.setRoles(List.of(Role.ROLE_USER));
-            customer.setHasAccount(false);
-            UserDTO2 userdto = new UserDTO2(userRepository.save(customer));
+            User user = new User();
+            user.setFirstName(userDTO.getFirstName());
+            user.setLastName(userDTO.getLastName());
+            user.setEmail(userDTO.getEmail());
+            user.setPassword(userDTO.getPassword());
+            user.setPhoneNumber(userDTO.getPhoneNumber());
+            user.setRoles(List.of(Role.ROLE_USER));
+            user.setHasAccount(false);
+            UserDTO2 userdto = new UserDTO2(userRepository.save(user));
             return userdto;
         }
        throw new IllegalArgumentException("Email is already taken");
@@ -72,14 +70,14 @@ public class UserService {
 
     public UserDTO2 updateUser(Long id,UserDTO user) {
         try{
-            Customer customerToUpdate =userRepository.findById(id).orElse(null);
-            customerToUpdate.setFirstName(user.getFirstName());
-            customerToUpdate.setLastName(user.getLastName());
-            customerToUpdate.setEmail(user.getEmail());
-            customerToUpdate.setPassword(user.getPassword());
-            customerToUpdate.setPhoneNumber(user.getPhoneNumber());
-            userRepository.save(customerToUpdate);
-            UserDTO2 userdto = new UserDTO2(customerToUpdate);
+            User userToUpdate =userRepository.findById(id).orElse(null);
+            userToUpdate.setFirstName(user.getFirstName());
+            userToUpdate.setLastName(user.getLastName());
+            userToUpdate.setEmail(user.getEmail());
+            userToUpdate.setPassword(user.getPassword());
+            userToUpdate.setPhoneNumber(user.getPhoneNumber());
+            userRepository.save(userToUpdate);
+            UserDTO2 userdto = new UserDTO2(userToUpdate);
             return userdto;
         }catch (Exception e){
             throw new EntityNotFoundException("User not found");
@@ -90,20 +88,20 @@ public class UserService {
         userRepository.deleteById(id);
     }
 
-    private List<UserDTO2> convertToUserDTO2(List<Customer> customers) {
+    private List<UserDTO2> convertToUserDTO2(List<User> users) {
         List<UserDTO2> userDTO2s = new ArrayList<>();
-        for (Customer customer : customers) {
-            userDTO2s.add(new UserDTO2(customer));
+        for (User user : users) {
+            userDTO2s.add(new UserDTO2(user));
         }
         return userDTO2s;
     }
 
     public String login(LoginDTO loginDTO) throws Exception {
-        Customer customer = userRepository.findByEmail(loginDTO.getUsername())
+        User user = userRepository.findByEmail(loginDTO.getUsername())
                 .orElseThrow(() -> new AuthenticationException("User not found"));
 
-        if (loginDTO.getPassword().equals(customer.getPassword())) {
-            String token = jwtTokenProvider.createToken(loginDTO.getUsername(), customer.getRoles());
+        if (loginDTO.getPassword().equals(user.getPassword())) {
+            String token = jwtTokenProvider.createToken(loginDTO.getUsername(), user.getRoles());
             return token;
         } else {
             throw new AuthenticationException("Incorrect username/password");
@@ -120,8 +118,8 @@ public class UserService {
     }
 
     public List<UserDTO2> getAllUsersWithoutAccount() {
-        List<Customer> customers = (List<Customer>) userRepository.findAllByHasAccountIsFalse();
-        List<UserDTO2>userDTO2s= convertToUserDTO2(customers);
+        List<User> users = (List<User>) userRepository.findAllByHasAccountIsFalse();
+        List<UserDTO2>userDTO2s= convertToUserDTO2(users);
         return userDTO2s;
     }
 }

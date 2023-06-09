@@ -5,10 +5,9 @@ import Group6.BankingApp.DAL.DebitCardRepository;
 import Group6.BankingApp.DAL.UserRepository;
 import Group6.BankingApp.DAL.TransactionRepository;
 import Group6.BankingApp.Models.*;
-import Group6.BankingApp.Models.Customer;
+import Group6.BankingApp.Models.User;
 import Group6.BankingApp.Services.AccountService;
 
-import Group6.BankingApp.Services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
@@ -39,26 +38,26 @@ public class MyApplicationRunner implements ApplicationRunner {
     public void run(ApplicationArguments args) throws Exception {
 
         // Create and save Customers
-        Customer customer1 = new Customer();
-        customer1.setFirstName("John");
-        customer1.setLastName("Doe");
-        customer1.setEmail("john.doe@gmail.com");
-        customer1.setPassword("123456");
-        customer1.setPhoneNumber("0612345678");
-        customer1.setHasAccount(true);
-        customer1.setRoles(List.of(Role.ROLE_USER));
+        User user1 = new User();
+        user1.setFirstName("John");
+        user1.setLastName("Doe");
+        user1.setEmail("john.doe@gmail.com");
+        user1.setPassword("123456");
+        user1.setPhoneNumber("0612345678");
+        user1.setHasAccount(true);
+        user1.setRoles(List.of(Role.ROLE_USER));
 
-        Customer customer2 = new Customer();
-        customer2.setFirstName("Jane");
-        customer2.setLastName("Smith");
-        customer2.setEmail("jane.smith@gmail.com");
-        customer2.setPassword("123456");
-        customer2.setPhoneNumber("0612345678");
-        customer2.setHasAccount(true);
-        customer2.setRoles(List.of(Role.ROLE_USER));
+        User user2 = new User();
+        user2.setFirstName("Jane");
+        user2.setLastName("Smith");
+        user2.setEmail("jane.smith@gmail.com");
+        user2.setPassword("123456");
+        user2.setPhoneNumber("0612345678");
+        user2.setHasAccount(true);
+        user2.setRoles(List.of(Role.ROLE_USER));
 
-        List<Customer> customers = Arrays.asList(customer1, customer2);
-        userRepository.saveAll(customers);
+        List<User> users = Arrays.asList(user1, user2);
+        userRepository.saveAll(users);
 
         // Create and save DebitCards
         DebitCard debitCard1 = new DebitCard("1111222233334444", LocalDate.now().plusYears(3), "123", "John Doe", true, "UUID1");
@@ -69,16 +68,16 @@ public class MyApplicationRunner implements ApplicationRunner {
         // Create and save Accounts
         Account account1 = new Account("NL01INHO9501054837","Savings", accountService.generateCardUUID(), "1234", 1000.0, 600.0, 0, true, debitCard1);
         //account1.setDebitCard(debitCard1);
-        account1.setUser(customers.get(0));
+        account1.setUser(users.get(0));
         accountRepository.save(account1);
         Account account2 = new Account("NL01INHO2371458805", "Current", accountService.generateCardUUID(), "5678", 2000.0, 950.0, 0, true, debitCard2);
         //account2.setDebitCard(debitCard2);
-        account2.setUser(customers.get(1));
+        account2.setUser(users.get(1));
         accountRepository.save(account2);
 
         Account account3 = new Account("NL01INH1234567890", "Current", accountService.generateCardUUID(), "5678", 2000.0, 950.0, -100, true, debitCard2);
         //account2.setDebitCard(debitCard2);
-        account3.setUser(customers.get(1));
+        account3.setUser(users.get(1));
         accountRepository.save(account3);
 //        Account account3 = new Account("NL01INHO5808504708", "Savings", accountService.generateCardUUID(), "1357", 1000.0, 0.0, 5000.0, true, null);
 //        account3.setDebitCard(debitCard1);

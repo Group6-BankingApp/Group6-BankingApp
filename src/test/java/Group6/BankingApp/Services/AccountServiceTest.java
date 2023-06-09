@@ -2,7 +2,7 @@ package Group6.BankingApp.Services;
 
 import Group6.BankingApp.DAL.AccountRepository;
 import Group6.BankingApp.Models.Account;
-import Group6.BankingApp.Models.Customer;
+import Group6.BankingApp.Models.User;
 import Group6.BankingApp.Models.DebitCard;
 import Group6.BankingApp.Models.dto.AccountDTO;
 import Group6.BankingApp.Models.dto.DebitCardDTO;
@@ -97,16 +97,16 @@ class AccountServiceTest {
         Account account = new Account();
         account.setIban("NL01INHO9501054837");
 
-        Customer customer = new Customer();
-        customer.setId(123L);
+        User user = new User();
+        user.setId(123L);
 
-        account.setUser(customer);
+        account.setUser(user);
 
         AccountDTO accountDTO = accountService.mapToAccountDTO(account);
 
 
         assertEquals(account.getIban(), accountDTO.getIban());
-        assertEquals(customer.getId(), accountDTO.getUser().getId());
+        assertEquals(user.getId(), accountDTO.getUser().getId());
         assertEquals(account.getAccountType(), accountDTO.getAccountType());
         assertEquals(account.getCardUUID(), accountDTO.getCardUUID());
         assertEquals(account.getPin(), accountDTO.getPin());

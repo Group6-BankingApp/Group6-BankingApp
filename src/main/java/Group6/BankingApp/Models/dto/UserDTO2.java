@@ -1,6 +1,6 @@
 package Group6.BankingApp.Models.dto;
 
-import Group6.BankingApp.Models.Customer;
+import Group6.BankingApp.Models.User;
 
 public class UserDTO2 {
     private Long id;
@@ -11,12 +11,12 @@ public class UserDTO2 {
 
     public UserDTO2(){}
 
-    public UserDTO2(Customer customer) {
-        this.id = customer.getId();
-        this.firstName =  customer.getFirstName();
-        this.lastName = customer.getLastName();
-        this.email = customer.getEmail();
-        this.phoneNumber = customer.getPhoneNumber();
+    public UserDTO2(User user) {
+        this.id = user.getId();
+        this.firstName =  user.getFirstName();
+        this.lastName = user.getLastName();
+        this.email = user.getEmail();
+        this.phoneNumber = user.getPhoneNumber();
     }
 
     public Long getId() {
