@@ -56,10 +56,15 @@ public class AccountController {
 
     @PostMapping
     public ResponseEntity<AccountDTO> createAccount(@RequestBody NewAccountDTO newAccountDTO) {
+        if (newAccountDTO == null) {
+            // Return a BAD_REQUEST response if the newAccountDTO is empty
+            return ResponseEntity.badRequest().build();
+        }
+
         try {
             AccountDTO accountDTO = accountService.addAccount(newAccountDTO);
             return ResponseEntity.status(HttpStatus.CREATED).body(accountDTO);
-        }catch (Exception ex) {
+        } catch (Exception ex) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new AccountDTO());
         }
     }

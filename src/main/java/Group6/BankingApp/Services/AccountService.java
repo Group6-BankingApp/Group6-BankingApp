@@ -67,17 +67,7 @@ public class AccountService {
             Account account = new Account(iban, userDTO2, accountType, cardUUID, pin, dailyLimit, 0.0, 0.0, true);
             accountRepository.save(account);
 
-            AccountDTO accountDTO = new AccountDTO();
-            accountDTO.setIban(account.getIban());
-            accountDTO.setUser(userDTO2);
-            accountDTO.setAccountType(account.getAccountType());
-            accountDTO.setCardUUID(account.getCardUUID());
-            accountDTO.setPin(account.getPin());
-            accountDTO.setDailyLimit(account.getDailyLimit());
-            accountDTO.setBalance(account.getBalance());
-            accountDTO.setAbsoluteLimit(account.getAbsoluteLimit());
-
-            return accountDTO;
+            return new AccountDTO(account);
         } catch (Exception ex) {
             throw new ServiceException("Failed to add account", ex);
         }
@@ -201,7 +191,7 @@ public class AccountService {
 
     private static final String IBAN_PREFIX = "NL01INHO";
 
-    private String generateIban() {
+    public static String generateIban() {
         StringBuilder ibanBuilder = new StringBuilder(IBAN_PREFIX);
 
         Random random = new Random();
@@ -212,8 +202,8 @@ public class AccountService {
         return ibanBuilder.toString();
     }
 
-    public String generateCardUUID() {
-        // Generate a random UUID
+    public static String generateCardUUID() {
+        // Generate a random UUID for the card
         UUID uuid = UUID.randomUUID();
         return uuid.toString();
     }
