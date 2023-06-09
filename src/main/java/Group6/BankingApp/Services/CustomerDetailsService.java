@@ -1,8 +1,7 @@
 package Group6.BankingApp.Services;
 
 import Group6.BankingApp.DAL.UserRepository;
-import Group6.BankingApp.Models.Customer;
-import org.springframework.security.core.userdetails.User;
+import Group6.BankingApp.Models.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -19,13 +18,13 @@ public class CustomerDetailsService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        final Customer customer = userRepository.findByEmail(username)
+        final User user = userRepository.findByEmail(username)
                 .orElseThrow(() -> new UsernameNotFoundException("User " + username + " not found"));
 
-        return User
+        return org.springframework.security.core.userdetails.User
                 .withUsername(username)
-                .password(customer.getPassword())
-                .authorities(customer.getRoles())
+                .password(user.getPassword())
+                .authorities(user.getRoles())
                 .build();
     }
 }

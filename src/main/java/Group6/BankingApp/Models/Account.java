@@ -13,7 +13,7 @@ public class Account {
     @Column(unique = true)
     private String iban;
     @OneToOne
-    private Customer customer;
+    private User user;
     private String accountType;
     private String cardUUID;
     private String pin;
@@ -38,7 +38,7 @@ public class Account {
 
     public Account(String iban, UserDTO2 userDTO2, String accountType, String cardUUID, String pin, double dailyLimit, double balance, double absoluteLimit, boolean status, DebitCard debitCard) {
         this.iban = iban;
-        this.customer = mapToUser(userDTO2);
+        this.user = mapToUser(userDTO2);
         this.accountType = accountType;
         this.cardUUID = cardUUID;
         this.pin = pin;
@@ -51,7 +51,7 @@ public class Account {
 
     public Account(String iban, UserDTO2 userDTO2, String accountType, String cardUUID, String pin, double dailyLimit, double balance, double absoluteLimit, boolean status) {
         this.iban = iban;
-        this.customer = mapToUser(userDTO2);
+        this.user = mapToUser(userDTO2);
         this.accountType = accountType;
         this.cardUUID = cardUUID;
         this.pin = pin;
@@ -72,12 +72,12 @@ public class Account {
         this.iban = iban;
     }
 
-    public Customer getUser() {
-        return customer;
+    public User getUser() {
+        return user;
     }
 
-    public void setUser(Customer customer) {
-        this.customer = customer;
+    public void setUser(User user) {
+        this.user = user;
     }
 
     public String getCardUUID() {
@@ -144,13 +144,13 @@ public class Account {
         this.debitCard = debitCard;
     }
 
-    private Customer mapToUser(UserDTO2 userDTO2) {
-        Customer customer = new Customer();
-        customer.setId(userDTO2.getId());
-        customer.setFirstName(userDTO2.getFirstName());
-        customer.setLastName(userDTO2.getLastName());
-        customer.setEmail(userDTO2.getEmail());
-        customer.setPhoneNumber(userDTO2.getPhoneNumber());
-        return customer;
+    private User mapToUser(UserDTO2 userDTO2) {
+        User user = new User();
+        user.setId(userDTO2.getId());
+        user.setFirstName(userDTO2.getFirstName());
+        user.setLastName(userDTO2.getLastName());
+        user.setEmail(userDTO2.getEmail());
+        user.setPhoneNumber(userDTO2.getPhoneNumber());
+        return user;
     }
 }
