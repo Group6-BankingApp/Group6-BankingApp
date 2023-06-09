@@ -1,26 +1,19 @@
-package Group6.BankingApp.Configuration;
+package Group6.BankingApp;
 
 import Group6.BankingApp.DAL.AccountRepository;
 import Group6.BankingApp.DAL.DebitCardRepository;
 import Group6.BankingApp.DAL.UserRepository;
 import Group6.BankingApp.DAL.TransactionRepository;
-import Group6.BankingApp.Models.Account;
-import Group6.BankingApp.Models.Transaction;
-import Group6.BankingApp.Models.DebitCard;
-import Group6.BankingApp.Models.Role;
-import Group6.BankingApp.Models.User;
-import Group6.BankingApp.Models.dto.UserDTO2;
+import Group6.BankingApp.Models.*;
+import Group6.BankingApp.Models.Customer;
 import Group6.BankingApp.Services.AccountService;
-import jakarta.persistence.Entity;
 
-import org.hibernate.dialect.function.TransactSQLStrFunction;
+import Group6.BankingApp.Services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
-import java.lang.reflect.Array;
 import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
@@ -45,14 +38,27 @@ public class MyApplicationRunner implements ApplicationRunner {
     @Override
     public void run(ApplicationArguments args) throws Exception {
 
-        List<User> users=
-                Arrays.asList(
-                        new User("John", "Doe", "john.doe@gmail.com", "123456", "123456789", Role.EMPLOYEE,true),
-                        new User("Jane", "Doe", "jane.doe@gmail.com", "123456", "123456789", Role.CUSTOMER,false),
-                        new User("Adam", "Adey", "ad.ad@gmail.com", "123456", "123456789", Role.CUSTOMER,false)
-                        );
+        // Create and save Customers
+        Customer customer1 = new Customer();
+        customer1.setFirstName("John");
+        customer1.setLastName("Doe");
+        customer1.setEmail("john.doe@gmail.com");
+        customer1.setPassword("123456");
+        customer1.setPhoneNumber("0612345678");
+        customer1.setHasAccount(true);
+        customer1.setRoles(List.of(Role.ROLE_USER));
 
-        userRepository.saveAll(users);
+        Customer customer2 = new Customer();
+        customer2.setFirstName("Jane");
+        customer2.setLastName("Smith");
+        customer2.setEmail("jane.smith@gmail.com");
+        customer2.setPassword("123456");
+        customer2.setPhoneNumber("0612345678");
+        customer2.setHasAccount(true);
+        customer2.setRoles(List.of(Role.ROLE_USER));
+
+        List<Customer> customers = Arrays.asList(customer1, customer2);
+        userRepository.saveAll(customers);
 
         // Create and save DebitCards
         DebitCard debitCard1 = new DebitCard("1111222233334444", LocalDate.now().plusYears(3), "123", "John Doe", true, "UUID1");
@@ -63,16 +69,16 @@ public class MyApplicationRunner implements ApplicationRunner {
         // Create and save Accounts
         Account account1 = new Account("NL01INHO9501054837","Savings", accountService.generateCardUUID(), "1234", 1000.0, 600.0, 0, true, debitCard1);
         //account1.setDebitCard(debitCard1);
-        account1.setUser(users.get(0));
+        account1.setUser(customers.get(0));
         accountRepository.save(account1);
         Account account2 = new Account("NL01INHO2371458805", "Current", accountService.generateCardUUID(), "5678", 2000.0, 950.0, 0, true, debitCard2);
         //account2.setDebitCard(debitCard2);
-        account2.setUser(users.get(1));
+        account2.setUser(customers.get(1));
         accountRepository.save(account2);
 
         Account account3 = new Account("NL01INH1234567890", "Current", accountService.generateCardUUID(), "5678", 2000.0, 950.0, -100, true, debitCard2);
         //account2.setDebitCard(debitCard2);
-        account3.setUser(users.get(1));
+        account3.setUser(customers.get(1));
         accountRepository.save(account3);
 //        Account account3 = new Account("NL01INHO5808504708", "Savings", accountService.generateCardUUID(), "1357", 1000.0, 0.0, 5000.0, true, null);
 //        account3.setDebitCard(debitCard1);

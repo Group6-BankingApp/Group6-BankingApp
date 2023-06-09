@@ -5,21 +5,14 @@ import Group6.BankingApp.DAL.UserRepository;
 import Group6.BankingApp.Models.Account;
 import Group6.BankingApp.Models.dto.AccountDTO;
 import Group6.BankingApp.Models.DebitCard;
-import Group6.BankingApp.Models.User;
+import Group6.BankingApp.Models.Customer;
 import Group6.BankingApp.Models.dto.*;
 import jakarta.persistence.EntityNotFoundException;
 import org.hibernate.service.spi.ServiceException;
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
-import org.springframework.data.domain.Pageable;
 
-import javax.security.auth.login.AccountNotFoundException;
-import java.io.Console;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
 public class AccountService {
@@ -95,12 +88,12 @@ public class AccountService {
                 .orElse(null);
 
         Long userId = accountDTO.getUser().getId();
-        User user = userRepository.findById(userId)
+        Customer customer = userRepository.findById(userId)
                 .orElse(null);
 
         // Update the account from accountDTO
         account.setIban(accountDTO.getIban());
-        account.setUser(user);
+        account.setUser(customer);
         account.setAccountType(accountDTO.getAccountType());
         account.setCardUUID(accountDTO.getCardUUID());
         account.setPin(accountDTO.getPin());
@@ -195,13 +188,13 @@ public class AccountService {
         return accountDTO;
     }
 
-    private UserDTO2 mapToUserDTO2(User user) {
+    private UserDTO2 mapToUserDTO2(Customer customer) {
         UserDTO2 userDTO = new UserDTO2();
-        userDTO.setId(user.getId());
-        userDTO.setFirstName(user.getFirstName());
-        userDTO.setLastName(user.getLastName());
-        userDTO.setEmail(user.getEmail());
-        userDTO.setPhoneNumber(user.getPhoneNumber());
+        userDTO.setId(customer.getId());
+        userDTO.setFirstName(customer.getFirstName());
+        userDTO.setLastName(customer.getLastName());
+        userDTO.setEmail(customer.getEmail());
+        userDTO.setPhoneNumber(customer.getPhoneNumber());
 
         return userDTO;
     }
