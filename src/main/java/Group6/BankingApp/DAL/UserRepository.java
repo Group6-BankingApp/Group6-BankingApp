@@ -1,27 +1,29 @@
 package Group6.BankingApp.DAL;
 
-import Group6.BankingApp.Models.User;
+import Group6.BankingApp.Models.Customer;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
 
 @Repository
-public interface UserRepository extends CrudRepository<User, Long> {
+public interface UserRepository extends CrudRepository<Customer, Long> {
 
     @Override
-    Iterable<User> findAll();
+    Iterable<Customer> findAll();
 
-    Iterable<User>findAllByHasAccountIsTrue();
-
-    @Override
-    Optional<User> findById(Long aLong);
+    Iterable<Customer>findAllByHasAccountIsTrue();
 
     @Override
-    <S extends User> S save(S entity);
+    Optional<Customer> findById(Long aLong);
+
+    @Override
+    <S extends Customer> S save(S entity);
 
     @Override
     void deleteById(Long aLong);
 
-    User findByEmail(String username);
+    Optional<Customer> findByEmail(String username);
+
+    Iterable<Customer> findAllByHasAccountIsFalse();
 }

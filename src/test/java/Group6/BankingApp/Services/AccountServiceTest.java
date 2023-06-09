@@ -2,11 +2,10 @@ package Group6.BankingApp.Services;
 
 import Group6.BankingApp.DAL.AccountRepository;
 import Group6.BankingApp.Models.Account;
+import Group6.BankingApp.Models.Customer;
 import Group6.BankingApp.Models.DebitCard;
-import Group6.BankingApp.Models.User;
 import Group6.BankingApp.Models.dto.AccountDTO;
 import Group6.BankingApp.Models.dto.DebitCardDTO;
-import Group6.BankingApp.Models.dto.UserDTO2;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -15,8 +14,6 @@ import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.HttpStatus;
-
-import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -100,16 +97,16 @@ class AccountServiceTest {
         Account account = new Account();
         account.setIban("NL01INHO9501054837");
 
-        User user = new User();
-        user.setId(123L);
+        Customer customer = new Customer();
+        customer.setId(123L);
 
-        account.setUser(user);
+        account.setUser(customer);
 
         AccountDTO accountDTO = accountService.mapToAccountDTO(account);
 
 
         assertEquals(account.getIban(), accountDTO.getIban());
-        assertEquals(user.getId(), accountDTO.getUser().getId());
+        assertEquals(customer.getId(), accountDTO.getUser().getId());
         assertEquals(account.getAccountType(), accountDTO.getAccountType());
         assertEquals(account.getCardUUID(), accountDTO.getCardUUID());
         assertEquals(account.getPin(), accountDTO.getPin());

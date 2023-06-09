@@ -1,7 +1,6 @@
 package Group6.BankingApp.Models.dto;
 
 import Group6.BankingApp.Models.Account;
-import Group6.BankingApp.Models.User;
 
 public class NewAccountDTO {
 

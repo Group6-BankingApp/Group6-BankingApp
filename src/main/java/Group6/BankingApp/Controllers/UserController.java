@@ -1,13 +1,14 @@
 package Group6.BankingApp.Controllers;
 
+import Group6.BankingApp.Models.Role;
 import Group6.BankingApp.Models.dto.*;
 import Group6.BankingApp.Services.UserService;
-import Group6.BankingApp.util.JwtUtil;
 import lombok.extern.java.Log;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 //import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.naming.AuthenticationException;
@@ -27,8 +28,8 @@ public class UserController {
     }
 
     @PostMapping(value = "/login")
-    public ResponseEntity<Login2DTO> login(@RequestBody LoginDTO loginDTO) throws AuthenticationException {
-        return ResponseEntity.ok(userService.login(loginDTO));
+    public Object login(@RequestBody LoginDTO loginDTO) throws Exception {
+        return new TokenDTO(userService.login(loginDTO));
     }
 
     @GetMapping(value = "/withAccount")
@@ -36,6 +37,12 @@ public class UserController {
         return ResponseEntity.ok(userService.getAllUsersWithAccount());
     }
 
+    @GetMapping(value = "/withoutAccount")
+    public ResponseEntity<List<UserDTO2>> getAllUsersWithoutAccount() {
+        return ResponseEntity.ok(userService.getAllUsersWithoutAccount());
+    }
+
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @GetMapping
     public ResponseEntity<List<UserDTO2>> getAllUsers() {
         return ResponseEntity.ok(userService.getAllUsers());
