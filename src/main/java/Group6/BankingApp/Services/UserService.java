@@ -130,4 +130,12 @@ public class UserService {
         }
         return user;
     }
+
+    public User getUserByEmail(String username) {
+        User user = userRepository.findByEmail(username).orElse(null);
+        if(user ==null){
+            throw new EntityNotFoundException("User not found");
+        }
+        return user;
+    }
 }
