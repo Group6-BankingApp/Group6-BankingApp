@@ -45,8 +45,17 @@ public class UserService {
         if(user==null){
             throw new EntityNotFoundException("User not found");
         }
-        UserDTO2 userdto = new UserDTO2(user);
-        return userdto;
+        return new UserDTO2(user);
+    }
+
+    public User getFullUserById(Long id) {
+
+        User user= userRepository.findById(id).orElse(null);
+        if(user==null){
+            throw new EntityNotFoundException("User not found");
+        }
+
+        return user;
     }
 
     public UserDTO2 addUser(UserDTO userDTO) {
