@@ -21,9 +21,9 @@ import org.springframework.web.server.ResponseStatusException;
 import java.util.Collections;
 import java.util.List;
 
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertThrows;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 class BankingAppApplicationTests {
@@ -96,7 +96,7 @@ class BankingAppApplicationTests {
 	@Test
 	public void testCreateAccount_Success() {
 		NewAccountDTO newAccount = new NewAccountDTO();
-		AccountDTO expectedAccount = new AccountDTO(newAccount, userService.getUserById(newAccount.getUserId()));
+		AccountDTO expectedAccount = new AccountDTO();
 		Mockito.when(accountService.addAccount(newAccount)).thenReturn(expectedAccount);
 
 

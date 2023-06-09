@@ -27,7 +27,7 @@ public class WebSecurityConfig {
         httpSecurity.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 
         httpSecurity.authorizeHttpRequests()
-                .requestMatchers("/users").authenticated()
+                .requestMatchers("/users").permitAll()
                 .requestMatchers("/users/login").permitAll()
                 .requestMatchers("/accounts").authenticated()
                 .requestMatchers("/transactions").permitAll();
