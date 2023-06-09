@@ -10,6 +10,8 @@ import org.springframework.stereotype.Service;
 import jakarta.persistence.EntityNotFoundException;
 import org.hibernate.service.spi.ServiceException;
 import java.util.List;
+import java.util.*;
+import java.time.LocalDate;
 @Service
 public class TransactionService {
     @Autowired
@@ -138,4 +140,40 @@ public class TransactionService {
         //TODO: check if user has reached their limit for the day (maybe do this in check sufficient funds?)
         return true;
     }
+
+    public List<Transaction> findAllTransactions(Integer skip, Integer limit, String dateFrom, String dateTo) {
+    try {
+        Iterable<Transaction> allTransactions = transactionRepository.findAll();
+        if (allTransactions == null)
+            throw new ServiceException("Failed to retrieve accounts");
+
+        List<Transaction> transactionsList = new ArrayList<>();
+        allTransactions.forEach(transactionsList::add);
+
+        // Convert dateFrom and dateTo strings to LocalDate objects
+        LocalDate fromDate = LocalDate.parse(dateFrom);
+        LocalDate toDate = LocalDate.parse(dateTo);
+
+        List<Transaction> transactionsResult = new ArrayList<>();
+        for (Transaction transaction : transactionsList) {
+            LocalDate transactionDate = transaction.getTimeCreated();
+            if (transactionDate.isAfter(fromDate) || transactionDate.isEqual(fromDate)) {
+                if (transactionDate.isBefore(toDate) || transactionDate.isEqual(toDate)) {
+                    transactionsResult.add(transaction);
+                }
+            }
+        }
+
+        int totalTransactions = transactionsResult.size();
+
+        if (skip >= totalTransactions)
+            return new ArrayList<>();
+
+        int end = Math.min(skip + limit, totalTransactions);
+        return transactionsResult.subList(skip, end);
+    } catch (Exception ex) {
+        throw new ServiceException("Failed to retrieve transactions here", ex);
+    }
+}
+
 }
