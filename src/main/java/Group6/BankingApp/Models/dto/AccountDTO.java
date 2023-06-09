@@ -1,13 +1,6 @@
 package Group6.BankingApp.Models.dto;
 
-import Group6.BankingApp.Models.Account;
-import Group6.BankingApp.Models.User;
-import Group6.BankingApp.Services.AccountService;
-import Group6.BankingApp.Services.UserService;
-import jakarta.persistence.OneToOne;
 import org.springframework.stereotype.Component;
-import org.hibernate.service.spi.ServiceException;
-
 
 @Component
 public class AccountDTO {
@@ -22,38 +15,6 @@ public class AccountDTO {
     private double absoluteLimit;
 
     public AccountDTO(){}
-
-    public AccountDTO(NewAccountDTO newAccountDTO, UserDTO2 usr){
-        this.iban = AccountService.generateIban();
-        this.user = usr;
-        this.accountType = newAccountDTO.getAccountType();
-        this.cardUUID = AccountService.generateCardUUID();
-        this.pin = newAccountDTO.getPin();
-        this.dailyLimit = newAccountDTO.getDailyLimit();
-    }
-
-    public AccountDTO(Account account)
-    {
-        if (account == null) {
-            throw new IllegalArgumentException("Account cannot be null");
-        }
-
-        User user = account.getUser();
-        if (user == null) {
-            throw new IllegalArgumentException("User cannot be null");
-        }
-
-        // Perform similar null checks for other required fields
-
-        this.iban = account.getIban();
-        this.user = new UserDTO2(user);
-        this.accountType = account.getAccountType();
-        this.cardUUID = account.getCardUUID();
-        this.pin = account.getPin();
-        this.dailyLimit = account.getDailyLimit();
-        this.balance = account.getBalance();
-        this.absoluteLimit = account.getAbsoluteLimit();
-    }
 
     public AccountDTO(String iban, UserDTO2 user, String accountType, String cardUUID, String pin, double dailyLimit, double balance, double absoluteLimit) {
         this.iban = iban;
