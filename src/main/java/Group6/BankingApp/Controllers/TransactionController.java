@@ -1,6 +1,7 @@
 package Group6.BankingApp.Controllers;
 
 import Group6.BankingApp.Models.Transaction;
+import Group6.BankingApp.Services.AccountService;
 import Group6.BankingApp.Services.TransactionService;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -24,10 +25,12 @@ public class TransactionController {
 
     @GetMapping
     public ResponseEntity<List<Transaction>> getAllTransactions(
+            @RequestParam(defaultValue = "NL67INGB1234567890") String iban,
             @RequestParam(defaultValue = "0") Integer skip,
             @RequestParam(defaultValue = "40") Integer limit,
             @RequestParam(defaultValue = "") String dateFrom,
-            @RequestParam(defaultValue = "") String dateTo
+            @RequestParam(defaultValue = "") String dateTo,
+            @RequestParam(defaultValue = "") String pin
     ) {
         try {
             if (dateTo.isEmpty()) {
@@ -38,6 +41,10 @@ public class TransactionController {
             if (dateTo.isEmpty()) {
                 LocalDate today = LocalDate.now();
                 dateTo = today.toString();
+            }
+
+            if (pin.isEmpty()) {
+                // pin = "invalid";
             }
 
             if (skip != null && skip < 0) {
@@ -52,7 +59,7 @@ public class TransactionController {
             }
             List<Transaction> transactions = null;
             try {
-                transactions = transactionService.findAllTransactions(skip, limit, dateFrom, dateTo);
+                transactions = transactionService.findAllTransactions(skip, limit, dateFrom, dateTo, iban, pin);
                 return ResponseEntity.ok(transactions);
             }catch (Exception e){
                 throw e;
@@ -72,9 +79,9 @@ public class TransactionController {
     }
 
     @PostMapping
-    public ResponseEntity addTransaction(@RequestBody Transaction transaction) {
+    public ResponseEntity addTransaction(@RequestBody Transaction transaction, @RequestParam(defaultValue = "0000") String pin) {
         try{
-            Transaction newTransaction=transactionService.addTransaction(transaction);
+            Transaction newTransaction=transactionService.addTransaction(transaction, pin);
             return ResponseEntity.status(201).body(newTransaction);
         }catch (Exception e){
             return ResponseEntity.internalServerError().body(e.getCause().getMessage());
@@ -90,9 +97,9 @@ public class TransactionController {
         }
     }
     @PostMapping(value = "/withdraw")
-    public ResponseEntity Withdraw(@RequestBody Transaction transaction) {
+    public ResponseEntity Withdraw(@RequestBody Transaction transaction, @RequestParam(defaultValue = "0000") String pin) {
         try{
-            Transaction newTransaction=transactionService.addTransactionWithdraw(transaction);
+            Transaction newTransaction=transactionService.addTransactionWithdraw(transaction, pin);
             return ResponseEntity.status(201).body(newTransaction);
         }catch (Exception e){
             return ResponseEntity.internalServerError().body(e.getCause().getMessage());
