@@ -29,7 +29,7 @@ public class TransactionController {
 
     @GetMapping
     public ResponseEntity<List<Transaction>> getAllTransactions(
-            @RequestHeader("Authorization") String token,
+            //@RequestHeader("Authorization") String token,
             @RequestParam(defaultValue = "NL67INGB1234567890") String iban,
             @RequestParam(defaultValue = "0") Integer skip,
             @RequestParam(defaultValue = "40") Integer limit,
