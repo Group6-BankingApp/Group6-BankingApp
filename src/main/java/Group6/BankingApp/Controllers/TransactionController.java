@@ -6,7 +6,10 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 //import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-
+import org.springframework.http.HttpStatus;
+import org.springframework.web.server.ResponseStatusException;
+import org.hibernate.service.spi.ServiceException;
+import java.time.LocalDate;
 import java.util.List;
 
 @RestController
@@ -15,17 +18,47 @@ public class TransactionController {
 
     private  final TransactionService transactionService;
 
-
     public TransactionController(TransactionService transactionService) {
         this.transactionService = transactionService;
     }
 
     @GetMapping
-    public ResponseEntity<List<Transaction>> getAllTransactions() {
-        try{
-            return ResponseEntity.ok().body(transactionService.getAllTransactions());
+    public ResponseEntity<List<Transaction>> getAllTransactions(
+            @RequestParam(defaultValue = "0") Integer skip,
+            @RequestParam(defaultValue = "40") Integer limit,
+            @RequestParam(defaultValue = "2023-06-09") String dateFrom,
+            @RequestParam(defaultValue = "") String dateTo
+    ) {
+        try {
+            if (dateFrom == "") {
+                LocalDate oneYearAgo = LocalDate.now();
+                dateFrom = oneYearAgo.toString();
+            }
+
+            if (dateTo.isEmpty()) {
+                LocalDate today = LocalDate.now();
+                dateTo = today.toString();
+            }
+
+            if (skip != null && skip < 0) {
+                return ResponseEntity.badRequest().build();
+            } else if (skip == null) {
+                skip = 0;
+            }
+            if (limit != null && (limit < 0 || limit > 50)) {
+                return ResponseEntity.badRequest().build();
+            } else if (limit == null) {
+                limit = 0;
+            }
+            List<Transaction> transactions = null;
+            try {
+                transactions = transactionService.findAllTransactions(skip, limit, dateFrom, dateTo);
+                return ResponseEntity.ok(transactions);
+            }catch (Exception e){
+                throw e;
+            }
         }catch (Exception e){
-            return ResponseEntity.notFound().build();
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to retrieve transactions", e);
         }
     }
 
