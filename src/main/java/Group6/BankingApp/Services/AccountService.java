@@ -42,6 +42,7 @@ public class AccountService {
         return new AccountDTO(account);
     }
 
+
     public AccountDTO addAccount(NewAccountDTO newAccountDTO) {
         try {
             String iban = generateIban();
