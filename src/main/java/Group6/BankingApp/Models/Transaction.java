@@ -41,7 +41,9 @@ public class Transaction {
     public String getTransactionId() {
         return transactionId;
     }
-
+    public  void setTransactionId(String transactionId) {
+        this.transactionId = transactionId;
+    }
     public LocalDate getTimeCreated() {
         return timeCreated;
     }
