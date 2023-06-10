@@ -1,7 +1,6 @@
 package Group6.BankingApp;
 
 import Group6.BankingApp.Controllers.AccountController;
-import Group6.BankingApp.Models.Account;
 import Group6.BankingApp.Models.dto.AccountDTO;
 import Group6.BankingApp.Models.dto.DebitCardDTO;
 import Group6.BankingApp.Models.dto.NewAccountDTO;
@@ -13,9 +12,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.ResponseEntity;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Collections;
@@ -196,9 +193,9 @@ class BankingAppApplicationTests {
 		String iban = "123456789"; // Sample IBAN
 		DebitCardDTO debitCardDTO = new DebitCardDTO();
 
-		Mockito.doNothing().when(accountService).deactivateDebitCard(iban, debitCardDTO);
+		Mockito.doNothing().when(accountService).editDebitCard(iban, debitCardDTO, false);
 
-		ResponseEntity<Void> response = accountController.deactivateDebitCard(iban, debitCardDTO);
+		ResponseEntity<Void> response = accountController.editDebitCard(iban, debitCardDTO, false);
 
 		assertEquals(HttpStatus.OK, response.getStatusCode());
 		assertNull(response.getBody());
@@ -209,7 +206,7 @@ class BankingAppApplicationTests {
 		String iban = "123456789";
 		DebitCardDTO debitCardDTO = null;
 
-		ResponseEntity<Void> response = accountController.deactivateDebitCard(iban, debitCardDTO);
+		ResponseEntity<Void> response = accountController.editDebitCard(iban, debitCardDTO, false);
 
 		assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
 		assertNull(response.getBody());

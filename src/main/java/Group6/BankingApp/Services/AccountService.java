@@ -26,7 +26,6 @@ public class AccountService {
     @Autowired
     private UserService userService;
 
-
     public AccountService() {}
 
     public List<Account> getAllAccounts() {
@@ -116,7 +115,7 @@ public class AccountService {
         }
     }
 
-    public void deactivateDebitCard(String iban, DebitCardDTO debitCardDTO){
+    public void editDebitCard(String iban, DebitCardDTO debitCardDTO, boolean active){
         try {
             Account account = accountRepository.findByIban(iban);
             if(account == null)
@@ -125,7 +124,7 @@ public class AccountService {
             DebitCard debitCard = account.getDebitCard();
             if (debitCard == null && debitCard.getCardNumber() != debitCardDTO.getCardNumber())
                 throw new ServiceException("Invalid debit card details");
-            debitCard.setActive(false);
+            debitCard.setActive(active);
             accountRepository.save(account);
         }catch (Exception ex){
             throw new ServiceException("Failed to deactivate debit card", ex);

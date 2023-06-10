@@ -11,9 +11,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import java.util.List;
 
 @RestController
@@ -110,29 +107,22 @@ public class AccountController {
         }
     }
 
-    @PutMapping("/{Iban}/DebitCard")
-    public ResponseEntity<Void> deactivateDebitCard(
+    @PutMapping("/{Iban}/debitcard")
+    public ResponseEntity<Void> editDebitCard(
             @PathVariable("Iban") String Iban,
-            @RequestBody DebitCardDTO debitCardDTO
+            @RequestBody DebitCardDTO debitCardDTO,
+            @RequestBody Boolean active
     ) {
         try {
             if (debitCardDTO == null) {
                 return ResponseEntity.notFound().build();
             }
-
-//          boolean isDeactivated = accountService.deactivateAccount(Iban, debitCardDTO);
             else {
-                accountService.deactivateDebitCard(Iban, debitCardDTO);
+                accountService.editDebitCard(Iban, debitCardDTO, active);
                 return ResponseEntity.ok().build();
             }
-//            if (isDeactivated) {
-//                return ResponseEntity.ok().build();
-//            } else {
-//                return ResponseEntity.notFound().build();
-//            }
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-//            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to deactivate account", e);
         }
     }
 
