@@ -21,10 +21,11 @@ public class Account {
     private double balance;
     private double absoluteLimit;
     private boolean status;
+    private String debitCardNumber;
     @OneToOne
     private DebitCard debitCard;
 
-    public Account(String iban, String accountType, String cardUUID, String pin, double dailyLimit, double balance, double absoluteLimit, boolean status, DebitCard debitCard) {
+    public Account(String iban, String accountType, String cardUUID, String pin, double dailyLimit, double balance, double absoluteLimit, boolean status, String debitCardNumber) {
         this.iban = iban;
         this.accountType = accountType;
         this.cardUUID = cardUUID;
@@ -33,10 +34,10 @@ public class Account {
         this.balance = balance;
         this.absoluteLimit = absoluteLimit;
         this.status = status;
-        this.debitCard = debitCard;
+        this.debitCardNumber = debitCardNumber;
     }
 
-    public Account(String iban, UserDTO2 userDTO2, String accountType, String cardUUID, String pin, double dailyLimit, double balance, double absoluteLimit, boolean status, DebitCard debitCard) {
+    public Account(String iban, UserDTO2 userDTO2, String accountType, String cardUUID, String pin, double dailyLimit, double balance, double absoluteLimit, boolean status, String debitCardNumber) {
         this.iban = iban;
         this.user = mapToUser(userDTO2);
         this.accountType = accountType;
@@ -46,7 +47,7 @@ public class Account {
         this.balance = balance;
         this.absoluteLimit = absoluteLimit;
         this.status = status;
-        this.debitCard = debitCard;
+        this.debitCardNumber = debitCardNumber;
     }
 
     public Account(String iban, UserDTO2 userDTO2, String accountType, String cardUUID, String pin, double dailyLimit, double balance, double absoluteLimit, boolean status) {
@@ -134,6 +135,14 @@ public class Account {
 
     public void setStatus(boolean status) {
         this.status = status;
+    }
+
+    public String getDebitCardNumber() {
+        return debitCardNumber;
+    }
+
+    public void setDebitCardNumber(String debitCardNumber) {
+        this.debitCardNumber = debitCardNumber;
     }
 
     public DebitCard getDebitCard() {

@@ -1,9 +1,6 @@
 package Group6.BankingApp.Models;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.OneToOne;
+import jakarta.persistence.*;
 
 import java.time.LocalDate;
 
@@ -11,35 +8,41 @@ import java.time.LocalDate;
 public class DebitCard {
 
     @Id
-    private String cardNumber;
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private Long id;
+
+    private String debitCardNumber;
     private LocalDate expirationDate;
-    private String cvv;
-    private String cardHolderName;
     private boolean isActive;
     private String uuid;
+
     @OneToOne
-    @JoinColumn(name = "iban")
     private Account account;
 
     public DebitCard() {
     }
 
-    public DebitCard(String cardNumber, LocalDate expirationDate, String cvv, String cardHolderName,
-                     boolean isActive, String uuid) {
-        this.cardNumber = cardNumber;
+    public DebitCard(String debitCardNumber,LocalDate expirationDate, boolean isActive, String uuid) {
+        this.debitCardNumber = debitCardNumber;
         this.expirationDate = expirationDate;
-        this.cvv = cvv;
-        this.cardHolderName = cardHolderName;
         this.isActive = isActive;
         this.uuid = uuid;
     }
 
-    public String getCardNumber() {
-        return cardNumber;
+    public Long getId() {
+        return id;
     }
 
-    public void setCardNumber(String cardNumber) {
-        this.cardNumber = cardNumber;
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public String getCardNumber() {
+        return debitCardNumber;
+    }
+
+    public void setCardNumber(String debitCardNumber) {
+        this.debitCardNumber = debitCardNumber;
     }
 
     public LocalDate getExpirationDate() {
@@ -48,22 +51,6 @@ public class DebitCard {
 
     public void setExpirationDate(LocalDate expirationDate) {
         this.expirationDate = expirationDate;
-    }
-
-    public String getCvv() {
-        return cvv;
-    }
-
-    public void setCvv(String cvv) {
-        this.cvv = cvv;
-    }
-
-    public String getCardHolderName() {
-        return cardHolderName;
-    }
-
-    public void setCardHolderName(String cardHolderName) {
-        this.cardHolderName = cardHolderName;
     }
 
     public boolean isActive() {
