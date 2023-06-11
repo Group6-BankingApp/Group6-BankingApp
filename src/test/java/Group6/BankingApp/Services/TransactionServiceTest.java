@@ -81,7 +81,7 @@ class TransactionServiceTest {
 
         // You can also assert the specific contents of the returned transaction if needed
         assertEquals(transaction.getSenderIban(), result.getSenderIban());
-        assertEquals(transaction.getreceiverIban(), result.getreceiverIban());
+        assertEquals(transaction.getReceiverIban(), result.getReceiverIban());
         assertEquals(transaction.getAmount(), result.getAmount());
         assertEquals(transaction.getDescription(), result.getDescription());
     }
