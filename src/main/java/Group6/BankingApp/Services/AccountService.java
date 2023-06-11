@@ -56,7 +56,6 @@ public class AccountService {
         return account;
     }
 
-
     public AccountDTO addAccount(NewAccountDTO newAccountDTO) {
         try {
             String iban = generateIban();
@@ -261,20 +260,6 @@ public class AccountService {
         return uuid.toString();
     }
 
-
-    public List<AccountDTO> getAccountsByCustomerId(Long id) {
-        try {
-            List<Account> accounts = accountRepository.findAllByUserId(id);
-            List<AccountDTO> accountDTOs = new ArrayList<>();
-            for (Account account : accounts) {
-                AccountDTO accountDTO = mapToAccountDTO(account);
-                accountDTOs.add(accountDTO);
-            }
-            return accountDTOs;
-        } catch (Exception ex) {
-            throw new ServiceException("Failed to retrieve accounts", ex);
-        }
-
     public String generateDebitCardNumber() {
         Random random = new Random();
 
@@ -293,6 +278,5 @@ public class AccountService {
         DebitCardDTO cardDTO = new DebitCardDTO();
         cardDTO.setCardNumber(card.getCardNumber());
         return cardDTO;
-
     }
 }
