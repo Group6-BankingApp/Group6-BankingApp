@@ -1,18 +1,18 @@
 package Group6.BankingApp.Models;
 
 import Group6.BankingApp.Models.dto.UserDTO2;
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.OneToOne;
 
 @Entity
 public class Account {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long id;
     @Column(unique = true)
     private String iban;
     @OneToOne
-    @JoinColumn(name = "user_id")
     private User user;
     private String accountType;
     private String cardUUID;
@@ -21,13 +21,12 @@ public class Account {
     private double balance;
     private double absoluteLimit;
     private boolean status;
+    private String cardNumber;
     @OneToOne
     private DebitCard debitCard;
 
-
-    public Account(String iban, User user, String accountType, String cardUUID, String pin, double dailyLimit, double balance, double absoluteLimit, boolean status,DebitCard debitCard){
+    public Account(String iban, String accountType, String cardUUID, String pin, double dailyLimit, double balance, double absoluteLimit, boolean status, String cardNumber) {
         this.iban = iban;
-        this.user = user;
         this.accountType = accountType;
         this.cardUUID = cardUUID;
         this.pin = pin;
@@ -35,13 +34,36 @@ public class Account {
         this.balance = balance;
         this.absoluteLimit = absoluteLimit;
         this.status = status;
-        this.debitCard = debitCard;
+        this.cardNumber = cardNumber;
     }
 
+    public Account(String iban, UserDTO2 userDTO2, String accountType, String cardUUID, String pin, double dailyLimit, double balance, double absoluteLimit, boolean status, String cardNumber) {
+        this.iban = iban;
+        this.user = mapToUser(userDTO2);
+        this.accountType = accountType;
+        this.cardUUID = cardUUID;
+        this.pin = pin;
+        this.dailyLimit = dailyLimit;
+        this.balance = balance;
+        this.absoluteLimit = absoluteLimit;
+        this.status = status;
+        this.cardNumber = cardNumber;
+    }
+
+    public Account(String iban, UserDTO2 userDTO2, String accountType, String cardUUID, String pin, double dailyLimit, double balance, double absoluteLimit, boolean status) {
+        this.iban = iban;
+        this.user = mapToUser(userDTO2);
+        this.accountType = accountType;
+        this.cardUUID = cardUUID;
+        this.pin = pin;
+        this.dailyLimit = dailyLimit;
+        this.balance = balance;
+        this.absoluteLimit = absoluteLimit;
+        this.status = status;
+    }
 
     public Account() {
     }
-
 
     public String getIban() {
         return iban;
@@ -113,6 +135,14 @@ public class Account {
 
     public void setStatus(boolean status) {
         this.status = status;
+    }
+
+    public String getCardNumber() {
+        return cardNumber;
+    }
+
+    public void setCardNumber(String cardNumber) {
+        this.cardNumber = cardNumber;
     }
 
     public DebitCard getDebitCard() {
