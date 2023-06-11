@@ -7,6 +7,8 @@ import jakarta.persistence.*;
 public class Account {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private Long id;
     @Column(unique = true)
     private String iban;
     @OneToOne
@@ -19,12 +21,13 @@ public class Account {
     private double balance;
     private double absoluteLimit;
     private boolean status;
-    private String debitCardNumber;
     @OneToOne
     private DebitCard debitCard;
 
-    public Account(String iban, String accountType, String cardUUID, String pin, double dailyLimit, double balance, double absoluteLimit, boolean status, String debitCardNumber) {
+
+    public Account(String iban, User user, String accountType, String cardUUID, String pin, double dailyLimit, double balance, double absoluteLimit, boolean status,DebitCard debitCard){
         this.iban = iban;
+        this.user = user;
         this.accountType = accountType;
         this.cardUUID = cardUUID;
         this.pin = pin;
@@ -32,36 +35,13 @@ public class Account {
         this.balance = balance;
         this.absoluteLimit = absoluteLimit;
         this.status = status;
-        this.debitCardNumber = debitCardNumber;
+        this.debitCard = debitCard;
     }
 
-    public Account(String iban, UserDTO2 userDTO2, String accountType, String cardUUID, String pin, double dailyLimit, double balance, double absoluteLimit, boolean status, String debitCardNumber) {
-        this.iban = iban;
-        this.user = mapToUser(userDTO2);
-        this.accountType = accountType;
-        this.cardUUID = cardUUID;
-        this.pin = pin;
-        this.dailyLimit = dailyLimit;
-        this.balance = balance;
-        this.absoluteLimit = absoluteLimit;
-        this.status = status;
-        this.debitCardNumber = debitCardNumber;
-    }
-
-    public Account(String iban, UserDTO2 userDTO2, String accountType, String cardUUID, String pin, double dailyLimit, double balance, double absoluteLimit, boolean status) {
-        this.iban = iban;
-        this.user = mapToUser(userDTO2);
-        this.accountType = accountType;
-        this.cardUUID = cardUUID;
-        this.pin = pin;
-        this.dailyLimit = dailyLimit;
-        this.balance = balance;
-        this.absoluteLimit = absoluteLimit;
-        this.status = status;
-    }
 
     public Account() {
     }
+
 
     public String getIban() {
         return iban;
@@ -133,14 +113,6 @@ public class Account {
 
     public void setStatus(boolean status) {
         this.status = status;
-    }
-
-    public String getDebitCardNumber() {
-        return debitCardNumber;
-    }
-
-    public void setDebitCardNumber(String debitCardNumber) {
-        this.debitCardNumber = debitCardNumber;
     }
 
     public DebitCard getDebitCard() {
