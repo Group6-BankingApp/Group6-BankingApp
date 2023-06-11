@@ -24,4 +24,6 @@ public interface AccountRepository extends CrudRepository<Account, String> {
     @Override
     void deleteById(String iban);
 
+    @Query("SELECT a FROM Account a WHERE a.user.id = ?1")
+    List<Account> findAllByUserId(Long userId);
 }

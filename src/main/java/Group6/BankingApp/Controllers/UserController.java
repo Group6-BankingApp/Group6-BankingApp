@@ -1,8 +1,10 @@
 package Group6.BankingApp.Controllers;
 
+import Group6.BankingApp.Models.Account;
 import Group6.BankingApp.Models.Role;
 import Group6.BankingApp.Models.User;
 import Group6.BankingApp.Models.dto.*;
+import Group6.BankingApp.Services.AccountService;
 import Group6.BankingApp.Services.UserService;
 import lombok.extern.java.Log;
 import org.springframework.http.HttpStatus;
@@ -22,16 +24,19 @@ import java.util.List;
 public class UserController {
 
     private  final UserService userService;
+    private final AccountService accountService;
 
 
-    public UserController(UserService userService) {
+    public UserController(UserService userService, AccountService accountService) {
+
         this.userService = userService;
+        this.accountService = accountService;
     }
 
     @PostMapping(value = "/login")
     public Object login(@RequestBody LoginDTO loginDTO) throws Exception {
         User user = userService.getUserByEmail(loginDTO.getUsername());
-        return new TokenDTO(user.getFirstName(),userService.login(loginDTO));
+        return new TokenDTO(user.getId(),user.getFirstName(),userService.login(loginDTO));
     }
 
     @GetMapping(value = "/withAccount")

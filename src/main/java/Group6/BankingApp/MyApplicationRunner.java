@@ -1,5 +1,6 @@
 package Group6.BankingApp.Configuration;
 
+import Group6.BankingApp.Controllers.AccountController;
 import Group6.BankingApp.DAL.AccountRepository;
 import Group6.BankingApp.DAL.DebitCardRepository;
 import Group6.BankingApp.DAL.UserRepository;
@@ -9,7 +10,10 @@ import Group6.BankingApp.Models.Transaction;
 import Group6.BankingApp.Models.DebitCard;
 import Group6.BankingApp.Models.Role;
 import Group6.BankingApp.Models.User;
+
+import Group6.BankingApp.Models.dto.AccountDTO;
 import Group6.BankingApp.Models.dto.UserDTO2;
+
 import Group6.BankingApp.Services.AccountService;
 import jakarta.persistence.Entity;
 
@@ -86,5 +90,6 @@ public class MyApplicationRunner implements ApplicationRunner {
             transactionRepository.save(transaction2);
             Transaction transaction3 = new Transaction("NL67INGB12348765", "NL67INGB87655555", 100.0, "regular");
             transactionRepository.save(transaction3);
+//
     }
 }

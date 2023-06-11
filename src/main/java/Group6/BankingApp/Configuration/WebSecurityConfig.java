@@ -27,12 +27,17 @@ public class WebSecurityConfig {
         httpSecurity.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 
         httpSecurity.authorizeHttpRequests()
+                .requestMatchers("/accounts").permitAll()
+                .requestMatchers("/accounts/{id}").permitAll()
+                .requestMatchers("/accounts/customer/{id}").permitAll()
+                .requestMatchers("/accounts/{iban}").permitAll()
+                .requestMatchers("/users/{id}").permitAll()
                 .requestMatchers("/users").permitAll()
                 .requestMatchers("/users/login").permitAll()
                 .requestMatchers("/users/withAccount").authenticated()
                 .requestMatchers("/users/withoutAccount").authenticated()
-                .requestMatchers("/accounts").authenticated()
-                .requestMatchers("/transactions").permitAll();
+                .requestMatchers("/transactions").permitAll()
+                .requestMatchers("/transactions/{id}").permitAll();
 
         httpSecurity.addFilterBefore(jwtTokenFilter, UsernamePasswordAuthenticationFilter.class);
 
