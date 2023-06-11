@@ -39,7 +39,7 @@ public class TransactionController {
         }
     }
 
-    @PostMapping(value = "/transfer")
+    @PostMapping
     public ResponseEntity addTransaction(@RequestBody Transaction transaction) {
         try{
             Transaction newTransaction=transactionService.addTransaction(transaction);
