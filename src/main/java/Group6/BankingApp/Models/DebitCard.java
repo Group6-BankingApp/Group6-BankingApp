@@ -29,6 +29,9 @@ public class DebitCard {
         this.uuid = uuid;
     }
 
+    public DebitCard(String s, LocalDate plusYears, String s1, String john_doe, boolean b, String uuid1) {
+    }
+
     public Long getId() {
         return id;
     }
