@@ -36,7 +36,7 @@ public class UserController {
     @PostMapping(value = "/login")
     public Object login(@RequestBody LoginDTO loginDTO) throws Exception {
         User user = userService.getUserByEmail(loginDTO.getUsername());
-        return new TokenDTO(user.getFirstName(),userService.login(loginDTO));
+        return new TokenDTO(user.getId(),user.getFirstName(),userService.login(loginDTO));
     }
 
     @GetMapping(value = "/withAccount")

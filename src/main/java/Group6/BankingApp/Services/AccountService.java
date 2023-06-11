@@ -202,4 +202,18 @@ public class AccountService {
         UUID uuid = UUID.randomUUID();
         return uuid.toString();
     }
+
+    public List<AccountDTO> getAccountsByCustomerId(Long id) {
+        try {
+            List<Account> accounts = accountRepository.findAllByUserId(id);
+            List<AccountDTO> accountDTOs = new ArrayList<>();
+            for (Account account : accounts) {
+                AccountDTO accountDTO = mapToAccountDTO(account);
+                accountDTOs.add(accountDTO);
+            }
+            return accountDTOs;
+        } catch (Exception ex) {
+            throw new ServiceException("Failed to retrieve accounts", ex);
+        }
+    }
 }
