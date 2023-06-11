@@ -11,6 +11,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping(value="/transactions", produces = MediaType.APPLICATION_JSON_VALUE)
+@CrossOrigin(origins = "http://localhost:5173")
 public class TransactionController {
 
     private  final TransactionService transactionService;
@@ -38,7 +39,7 @@ public class TransactionController {
         }
     }
 
-    @PostMapping
+    @PostMapping(value = "/transfer")
     public ResponseEntity addTransaction(@RequestBody Transaction transaction) {
         try{
             Transaction newTransaction=transactionService.addTransaction(transaction);
