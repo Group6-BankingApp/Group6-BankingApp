@@ -1,8 +1,5 @@
 package Group6.BankingApp.Models.dto;
 
-import Group6.BankingApp.Models.Account;
-import Group6.BankingApp.Models.User;
-import jakarta.persistence.OneToOne;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -16,11 +13,11 @@ public class AccountDTO {
     private double dailyLimit;
     private double balance;
     private double absoluteLimit;
-    private String debitCardNumber;
+    private String cardNumber;
 
     public AccountDTO(){}
 
-    public AccountDTO(String iban, UserDTO2 user, String accountType, String cardUUID, String pin, double dailyLimit, double balance, double absoluteLimit, String debitCardNumber) {
+    public AccountDTO(String iban, UserDTO2 user, String accountType, String cardUUID, String pin, double dailyLimit, double balance, double absoluteLimit, String cardNumber) {
         this.iban = iban;
         this.user = user;
         this.accountType = accountType;
@@ -29,7 +26,7 @@ public class AccountDTO {
         this.dailyLimit = dailyLimit;
         this.balance = balance;
         this.absoluteLimit = absoluteLimit;
-        this.debitCardNumber = debitCardNumber;
+        this.cardNumber = cardNumber;
     }
 
     public String getIban() {
@@ -97,10 +94,10 @@ public class AccountDTO {
     }
 
     public String getDebitCardNumber() {
-        return debitCardNumber;
+        return cardNumber;
     }
 
-    public void setDebitCardNumber(String debitCardNumber) {
-        this.debitCardNumber = debitCardNumber;
+    public void setDebitCardNumber(String cardNumber) {
+        this.cardNumber = cardNumber;
     }
 }

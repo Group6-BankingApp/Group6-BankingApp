@@ -1,6 +1,7 @@
 package Group6.BankingApp.Controllers;
 
 import Group6.BankingApp.Models.Account;
+import Group6.BankingApp.Models.DebitCard;
 import Group6.BankingApp.Models.dto.AccountDTO;
 import Group6.BankingApp.Models.dto.DebitCardDTO;
 import Group6.BankingApp.Models.dto.NewAccountDTO;
@@ -105,7 +106,7 @@ public class AccountController {
         }
     }
 
-    @PostMapping("/{iban}/debitcards")
+    @PostMapping("/{iban}/debitcard")
     public ResponseEntity<DebitCardDTO> createDebitCard(@PathVariable String iban) {
         Account account = accountService.findAccountByIban(iban);
         if (account == null)
@@ -113,7 +114,7 @@ public class AccountController {
         return ResponseEntity.status(HttpStatus.CREATED).body(accountService.createDebitCard(account));
     }
 
-    @PostMapping("/{iban}/debitcards/activate")
+    @PostMapping("/{iban}/debitcard/activate")
     public ResponseEntity<DebitCardDTO> activateDebitCard(@RequestParam("cardUUID") String cardUUID, @RequestParam("pin") String pin) {
         DebitCardDTO activatedCard = accountService.activateDebitCard(cardUUID, pin);
         if (activatedCard == null) {
@@ -123,33 +124,14 @@ public class AccountController {
         }
     }
 
-//    @PutMapping("/{iban}/debit-cards/deactivate")
-//    public ResponseEntity<String> deactivateDebitCard(@PathVariable("iban") String iban, @RequestBody DebitCardDTO debitCardDTO) {
-//        try {
-//            accountService.deactivateDebitCard(iban, debitCardDTO);
-//            return ResponseEntity.ok("Debit card deactivated successfully.");
-//        } catch (Exception ex) {
-//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to deactivate debit card!");
-//        }
-//    }
-
-    @PutMapping("/{iban}/debitcard/deactivate")
-    public ResponseEntity<Void> deactivateDebitCard(
-            @PathVariable("iban") String Iban,
-            @RequestBody DebitCardDTO debitCardDTO,
-            @RequestBody Boolean active
+    @PutMapping("/{iban}/debitcard/{cardNumber}/deactivate")
+    public ResponseEntity<String> deactivateDebitCard(
+            @PathVariable("iban") String iban,
+            @PathVariable String cardNumber,
+            @RequestParam(value = "active") Boolean active
     ) {
-        try {
-            if (debitCardDTO == null) {
-                return ResponseEntity.notFound().build();
-            }
-            else {
-                accountService.deactivateDebitCard(Iban, debitCardDTO, active);
-                return ResponseEntity.ok().build();
-            }
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-        }
+            accountService.deactivateDebitCard(iban, cardNumber, active);
+            return ResponseEntity.ok("Debit card deactivated successfully.");
     }
 
     @PutMapping("/{iban}/pin")

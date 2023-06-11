@@ -29,4 +29,6 @@ public interface DebitCardRepository extends CrudRepository<DebitCard, Long> {
     DebitCard findByAccountAndIsActive(Account account, boolean isActive);
 
     DebitCard findByUuidAndIsActive(String uuid, boolean isActive);
+
+    DebitCard findByAccountAndCardNumber(Account account, String cardNumber);
 }

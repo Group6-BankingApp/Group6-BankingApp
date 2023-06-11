@@ -11,7 +11,7 @@ public class DebitCard {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    private String debitCardNumber;
+    private String cardNumber;
     private LocalDate expirationDate;
     private boolean isActive;
     private String uuid;
@@ -22,8 +22,8 @@ public class DebitCard {
     public DebitCard() {
     }
 
-    public DebitCard(String debitCardNumber,LocalDate expirationDate, boolean isActive, String uuid) {
-        this.debitCardNumber = debitCardNumber;
+    public DebitCard(String cardNumber, LocalDate expirationDate, boolean isActive, String uuid) {
+        this.cardNumber = cardNumber;
         this.expirationDate = expirationDate;
         this.isActive = isActive;
         this.uuid = uuid;
@@ -38,11 +38,11 @@ public class DebitCard {
     }
 
     public String getCardNumber() {
-        return debitCardNumber;
+        return cardNumber;
     }
 
-    public void setCardNumber(String debitCardNumber) {
-        this.debitCardNumber = debitCardNumber;
+    public void setCardNumber(String cardNumber) {
+        this.cardNumber = cardNumber;
     }
 
     public LocalDate getExpirationDate() {

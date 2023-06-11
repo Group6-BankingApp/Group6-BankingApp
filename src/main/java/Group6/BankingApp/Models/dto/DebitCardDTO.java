@@ -1,20 +1,20 @@
 package Group6.BankingApp.Models.dto;
 
 public class DebitCardDTO {
-    private String debitCardNumber;
+    private String cardNumber;
 
     public DebitCardDTO() {
     }
 
-    public DebitCardDTO(String debitCardNumber) {
-        this.debitCardNumber = debitCardNumber;
+    public DebitCardDTO(String cardNumber) {
+        this.cardNumber = cardNumber;
     }
 
     public String getCardNumber() {
-        return debitCardNumber;
+        return cardNumber;
     }
 
-    public void setCardNumber(String debitCardNumber) {
-        this.debitCardNumber = debitCardNumber;
+    public void setCardNumber(String cardNumber) {
+        this.cardNumber = cardNumber;
     }
 }
