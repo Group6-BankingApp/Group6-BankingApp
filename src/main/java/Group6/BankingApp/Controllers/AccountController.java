@@ -4,10 +4,7 @@ import Group6.BankingApp.Models.Account;
 import Group6.BankingApp.Models.dto.AccountDTO;
 import Group6.BankingApp.Models.dto.DebitCardDTO;
 import Group6.BankingApp.Models.dto.NewAccountDTO;
-import Group6.BankingApp.Models.dto.ExceptionDTO;
 import Group6.BankingApp.Services.AccountService;
-import Group6.BankingApp.Services.UserService;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -60,10 +57,15 @@ public class AccountController {
 
     @PostMapping
     public ResponseEntity<AccountDTO> createAccount(@RequestBody NewAccountDTO newAccountDTO) {
+        if (newAccountDTO == null) {
+            // Return a BAD_REQUEST response if the newAccountDTO is empty
+            return ResponseEntity.badRequest().build();
+        }
+
         try {
             AccountDTO accountDTO = accountService.addAccount(newAccountDTO);
             return ResponseEntity.status(HttpStatus.CREATED).body(accountDTO);
-        }catch (Exception ex) {
+        } catch (Exception ex) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new AccountDTO());
         }
     }
@@ -90,7 +92,7 @@ public class AccountController {
         return ResponseEntity.ok().body(updatedAccountDTO);
     }
 
-    @DeleteMapping("/{Iban}")
+    @DeleteMapping("/{iban}")
     public ResponseEntity<Void> deleteAccountByIban(@PathVariable("Iban") String Iban) {
         try {
             accountService.deleteAccount(Iban);
@@ -109,29 +111,50 @@ public class AccountController {
         }
     }
 
-    @PutMapping("/{Iban}/DebitCard")
+    @PostMapping("/{iban}/debitcards")
+    public ResponseEntity<DebitCardDTO> createDebitCard(@PathVariable String iban) {
+        Account account = accountService.findAccountByIban(iban);
+        if (account == null)
+            return ResponseEntity.notFound().build();
+        return ResponseEntity.status(HttpStatus.CREATED).body(accountService.createDebitCard(account));
+    }
+
+    @PostMapping("/{iban}/debitcards/activate")
+    public ResponseEntity<DebitCardDTO> activateDebitCard(@RequestParam("cardUUID") String cardUUID, @RequestParam("pin") String pin) {
+        DebitCardDTO activatedCard = accountService.activateDebitCard(cardUUID, pin);
+        if (activatedCard == null) {
+            return ResponseEntity.notFound().build();
+        } else {
+            return ResponseEntity.ok(activatedCard);
+        }
+    }
+
+//    @PutMapping("/{iban}/debit-cards/deactivate")
+//    public ResponseEntity<String> deactivateDebitCard(@PathVariable("iban") String iban, @RequestBody DebitCardDTO debitCardDTO) {
+//        try {
+//            accountService.deactivateDebitCard(iban, debitCardDTO);
+//            return ResponseEntity.ok("Debit card deactivated successfully.");
+//        } catch (Exception ex) {
+//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to deactivate debit card!");
+//        }
+//    }
+
+    @PutMapping("/{iban}/debitcard/deactivate")
     public ResponseEntity<Void> deactivateDebitCard(
-            @PathVariable("Iban") String Iban,
-            @RequestBody DebitCardDTO debitCardDTO
+            @PathVariable("iban") String Iban,
+            @RequestBody DebitCardDTO debitCardDTO,
+            @RequestBody Boolean active
     ) {
         try {
             if (debitCardDTO == null) {
                 return ResponseEntity.notFound().build();
             }
-
-//          boolean isDeactivated = accountService.deactivateAccount(Iban, debitCardDTO);
             else {
-                accountService.deactivateDebitCard(Iban, debitCardDTO);
+                accountService.deactivateDebitCard(Iban, debitCardDTO, active);
                 return ResponseEntity.ok().build();
             }
-//            if (isDeactivated) {
-//                return ResponseEntity.ok().build();
-//            } else {
-//                return ResponseEntity.notFound().build();
-//            }
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-//            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to deactivate account", e);
         }
     }
 

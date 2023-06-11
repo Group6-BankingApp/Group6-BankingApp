@@ -8,8 +8,12 @@ import Group6.BankingApp.Models.Account;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import jakarta.persistence.EntityNotFoundException;
+
+import org.hibernate.annotations.Check;
 import org.hibernate.service.spi.ServiceException;
 import java.util.List;
+import java.util.*;
+import java.time.LocalDate;
 @Service
 public class TransactionService {
     @Autowired
@@ -31,13 +35,13 @@ public class TransactionService {
         return transactionRepository.findById(id).orElse(null);
     }
 
-    public Transaction addTransaction(Transaction transaction) {
+    public Transaction addTransaction(Transaction transaction, String pin) {
         try {
-            if(CheckSufficientFunds(transaction, "1234")){
+            if((CheckSufficientFunds(transaction, pin)) && (CheckDailyLimit(accountService.getAccountByIban(transaction.getSenderIban()), transaction))){
                 TransferMoney(transaction);
                 Transaction newtransaction = new Transaction(
                     transaction.getSenderIban(),
-                    transaction.getreceiverIban(),
+                    transaction.getReceiverIban(),
                     transaction.getAmount(),
                     "regular transaction"
                     );
@@ -52,11 +56,10 @@ public class TransactionService {
     }
     public Transaction addTransactionDeposit(Transaction transaction) {
         try {
-            //TODO: add pin to transfer
             DespositMoney(transaction);
             Transaction newtransaction = new Transaction(
                     "cash",
-                    transaction.getreceiverIban(),
+                    transaction.getReceiverIban(),
                     transaction.getAmount(),
                     "deposit transaction"
             );
@@ -65,9 +68,9 @@ public class TransactionService {
             throw new ServiceException("Failed to add account", ex);
         }
     }
-    public Transaction addTransactionWithdraw(Transaction transaction) {
+    public Transaction addTransactionWithdraw(Transaction transaction, String pin) {
         try {
-            if(CheckSufficientFunds(transaction, "1234")){
+            if(CheckSufficientFunds(transaction, pin)){
             WithdrawMoney(transaction);
             Transaction newtransaction = new Transaction(
                     transaction.getSenderIban(),
@@ -87,12 +90,12 @@ public class TransactionService {
     public void TransferMoney(Transaction transaction) {
         //TODO: add transfer money logic
         AccountDTO senderAccount = accountService.getAccountByIban(transaction.getSenderIban());
-        AccountDTO receiverAccount = accountService.getAccountByIban(transaction.getreceiverIban());
+        AccountDTO receiverAccount = accountService.getAccountByIban(transaction.getReceiverIban());
         if(senderAccount.getAccountType() == "Current" && receiverAccount.getAccountType() == "Current")    {
             senderAccount.setBalance(senderAccount.getBalance() - transaction.getAmount());
             receiverAccount.setBalance(receiverAccount.getBalance() + transaction.getAmount());
             accountService.updateAccountByIban(transaction.getSenderIban(), senderAccount);
-            accountService.updateAccountByIban(transaction.getreceiverIban(), receiverAccount);
+            accountService.updateAccountByIban(transaction.getReceiverIban(), receiverAccount);
         }
         else{
             throw new ServiceException("Invalid Account for Transfer");
@@ -101,10 +104,10 @@ public class TransactionService {
 
     public void DespositMoney(Transaction transaction) {
         //TODO: add transfer money logic
-        AccountDTO receiverAccount = accountService.getAccountByIban(transaction.getreceiverIban());
+        AccountDTO receiverAccount = accountService.getAccountByIban(transaction.getReceiverIban());
         if(receiverAccount.getAccountType() == "Current")    {
             receiverAccount.setBalance(receiverAccount.getBalance() + transaction.getAmount());
-            accountService.updateAccountByIban(transaction.getreceiverIban(), receiverAccount);
+            accountService.updateAccountByIban(transaction.getReceiverIban(), receiverAccount);
         }
         else{
             throw new ServiceException("Invalid Account for Transfer");
@@ -134,8 +137,54 @@ public class TransactionService {
         }
     }
 
-    public boolean CheckDailyLimit(Account account, Transaction transaction){
-        //TODO: check if user has reached their limit for the day (maybe do this in check sufficient funds?)
-        return true;
+    public boolean CheckDailyLimit(AccountDTO account, Transaction transaction){
+        List<Transaction> dailyTransactions = findAllTransactions(0, 50, LocalDate.now().toString(), LocalDate.now().toString(), account.getIban(), account.getPin());
+        //check if the sum of the transaction and the daily transactions is less than the daily limit
+        double sum = transaction.getAmount();
+        for(Transaction t : dailyTransactions){
+            sum += t.getAmount();
+        }
+        if(sum > account.getDailyLimit()){
+            return false;
+        }
+        else{
+            return true;
+        }
     }
+
+    public List<Transaction> findAllTransactions(Integer skip, Integer limit, String dateFrom, String dateTo, String iban, String pin) {
+    try {
+        Iterable<Transaction> allTransactions = transactionRepository.findAll();
+        if (allTransactions == null)
+            throw new ServiceException("Failed to retrieve accounts");
+
+        List<Transaction> transactionsList = new ArrayList<>();
+        allTransactions.forEach(transactionsList::add);
+
+        // Convert dateFrom and dateTo strings to LocalDate objects
+        LocalDate fromDate = LocalDate.parse(dateFrom);
+        LocalDate toDate = LocalDate.parse(dateTo);
+
+        List<Transaction> transactionsResult = new ArrayList<>();
+        for (Transaction transaction : transactionsList) {
+            LocalDate transactionDate = transaction.getTimeCreated();
+            String senderIban = transaction.getSenderIban();
+            if ((transactionDate.isAfter(fromDate) || transactionDate.isEqual(fromDate)) && 
+            ((transactionDate.isBefore(toDate) || transactionDate.isEqual(toDate))) && (senderIban.equals(iban))) {
+                    transactionsResult.add(transaction);
+            }
+        }
+
+        int totalTransactions = transactionsResult.size();
+
+        if (skip >= totalTransactions)
+            return new ArrayList<>();
+
+        int end = Math.min(skip + limit, totalTransactions);
+        return transactionsResult.subList(skip, end);
+    } catch (Exception ex) {
+        throw new ServiceException("Failed to retrieve transactions here", ex);
+    }
+}
+
 }

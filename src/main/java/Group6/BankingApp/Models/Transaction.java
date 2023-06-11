@@ -32,7 +32,7 @@ public class Transaction {
     public Transaction(TransactionDTO transactionDTO) {
         this.timeCreated = LocalDate.now();
         this.senderIban = transactionDTO.getSenderIban();
-        this.receiverIban = transactionDTO.getreceiverIban();
+        this.receiverIban = transactionDTO.getReceiverIban();
         this.amount = transactionDTO.getAmount();
         this.description = transactionDTO.getDescription();
     }
@@ -41,7 +41,9 @@ public class Transaction {
     public String getTransactionId() {
         return transactionId;
     }
-
+    public  void setTransactionId(String transactionId) {
+        this.transactionId = transactionId;
+    }
     public LocalDate getTimeCreated() {
         return timeCreated;
     }
@@ -50,7 +52,7 @@ public class Transaction {
         this.timeCreated = timeCreated;
     }
 
-    public String getreceiverIban() {
+    public String getReceiverIban() {
         return receiverIban;
     }
 

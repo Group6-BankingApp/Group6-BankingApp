@@ -1,15 +1,14 @@
 package Group6.BankingApp.Services;
 
 import Group6.BankingApp.DAL.UserRepository;
-import Group6.BankingApp.Models.Role;
 import Group6.BankingApp.Models.User;
-import Group6.BankingApp.Models.dto.Login2DTO;
+import Group6.BankingApp.Models.Role;
 import Group6.BankingApp.Models.dto.LoginDTO;
 import Group6.BankingApp.Models.dto.UserDTO;
 import Group6.BankingApp.Models.dto.UserDTO2;
-import Group6.BankingApp.util.JwtUtil;
+import Group6.BankingApp.util.JwtTokenProvider;
 import jakarta.persistence.EntityNotFoundException;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 
@@ -20,11 +19,14 @@ import java.util.List;
 @Service
 public class UserService {
 
-    @Autowired
-    private UserRepository userRepository;
-    private JwtUtil jwtUtil;
+    private final UserRepository userRepository;
+    private final BCryptPasswordEncoder bCryptPasswordEncoder;
+    private final JwtTokenProvider jwtTokenProvider;
 
-    public UserService() {
+    public UserService(UserRepository userRepository, BCryptPasswordEncoder bCryptPasswordEncoder, JwtTokenProvider jwtTokenProvider) {
+        this.userRepository = userRepository;
+        this.bCryptPasswordEncoder = bCryptPasswordEncoder;
+        this.jwtTokenProvider = jwtTokenProvider;
     }
 
     public List<UserDTO2> getAllUsers() {
@@ -41,8 +43,8 @@ public class UserService {
 
     public UserDTO2 getUserById(Long id) {
 
-        User user= userRepository.findById(id).orElse(null);
-        if(user==null){
+        User user = userRepository.findById(id).orElse(null);
+        if(user ==null){
             throw new EntityNotFoundException("User not found");
         }
         UserDTO2 userdto = new UserDTO2(user);
@@ -50,14 +52,25 @@ public class UserService {
     }
 
     public UserDTO2 addUser(UserDTO userDTO) {
-        User user= userRepository.save(new User(userDTO.getFirstName(), userDTO.getLastName(), userDTO.getEmail(), userDTO.getPassword(), userDTO.getPhoneNumber(), Role.CUSTOMER, false));
-        UserDTO2 userdto = new UserDTO2(user);
-        return userdto;
+        if(userRepository.findByEmail(userDTO.getEmail()).isEmpty()){
+            //String password = bCryptPasswordEncoder.encode(userDTO.getPassword());
+            User user = new User();
+            user.setFirstName(userDTO.getFirstName());
+            user.setLastName(userDTO.getLastName());
+            user.setEmail(userDTO.getEmail());
+            user.setPassword(userDTO.getPassword());
+            user.setPhoneNumber(userDTO.getPhoneNumber());
+            user.setRoles(List.of(Role.ROLE_USER));
+            user.setHasAccount(false);
+            UserDTO2 userdto = new UserDTO2(userRepository.save(user));
+            return userdto;
+        }
+       throw new IllegalArgumentException("Email is already taken");
     }
 
     public UserDTO2 updateUser(Long id,UserDTO user) {
         try{
-            User userToUpdate=userRepository.findById(id).orElse(null);
+            User userToUpdate =userRepository.findById(id).orElse(null);
             userToUpdate.setFirstName(user.getFirstName());
             userToUpdate.setLastName(user.getLastName());
             userToUpdate.setEmail(user.getEmail());
@@ -83,15 +96,46 @@ public class UserService {
         return userDTO2s;
     }
 
-    public Login2DTO login(LoginDTO loginDTO) throws AuthenticationException {
-        User user = userRepository.findByEmail(loginDTO.getUsername());
-        if (user == null) {
+    public String login(LoginDTO loginDTO) throws Exception {
+        User user = userRepository.findByEmail(loginDTO.getUsername())
+                .orElseThrow(() -> new AuthenticationException("User not found"));
+
+        if (loginDTO.getPassword().equals(user.getPassword())) {
+            String token = jwtTokenProvider.createToken(loginDTO.getUsername(), user.getRoles());
+            return token;
+        } else {
+            throw new AuthenticationException("Incorrect username/password");
+        }
+
+//        if (bCryptPasswordEncoder.matches(loginDTO.getPassword(), customer.getPassword())) {
+//            String token = jwtTokenProvider.createToken(loginDTO.getUsername(), customer.getRoles());
+//            Login2DTO login2DTO = new Login2DTO(customer.getRoles(),token);
+//            return login2DTO;
+//        } else {
+//            throw new AuthenticationException("Incorrect username/password");
+//        }
+
+    }
+
+    public List<UserDTO2> getAllUsersWithoutAccount() {
+        List<User> users = (List<User>) userRepository.findAllByHasAccountIsFalse();
+        List<UserDTO2>userDTO2s= convertToUserDTO2(users);
+        return userDTO2s;
+    }
+
+    public User getFullUserById(Long userId) {
+        User user = userRepository.findById(userId).orElse(null);
+        if(user ==null){
             throw new EntityNotFoundException("User not found");
         }
-        if (!user.getPassword().equals(loginDTO.getPassword())) {
-            throw new AuthenticationException("Wrong password");
+        return user;
+    }
+
+    public User getUserByEmail(String username) {
+        User user = userRepository.findByEmail(username).orElse(null);
+        if(user ==null){
+            throw new EntityNotFoundException("User not found");
         }
-        Login2DTO login2DTO = new Login2DTO(user);
-        return login2DTO;
+        return user;
     }
 }
