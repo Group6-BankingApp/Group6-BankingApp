@@ -118,6 +118,7 @@ class AccountServiceTest {
     void testDeactivateDebitCard() {
 
         String iban = "NL01INHO9501054837";
+        boolean active = true;
         DebitCardDTO debitCardDTO = new DebitCardDTO();
         debitCardDTO.setCardNumber("123456789");
 
@@ -130,7 +131,7 @@ class AccountServiceTest {
 
         Mockito.when(accountRepository.findByIban(iban)).thenReturn(account);
 
-        accountService.deactivateDebitCard(iban, debitCardDTO);
+        accountService.deactivateDebitCard(iban, debitCardDTO, active);
 
         assertEquals(false, debitCard.isActive());
 

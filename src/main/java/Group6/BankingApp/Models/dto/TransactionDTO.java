@@ -20,7 +20,7 @@ public class TransactionDTO{
         return amount;
     }
 
-    public String getreceiverIban() {
+    public String getReceiverIban() {
         return receiverIban;
     }
 

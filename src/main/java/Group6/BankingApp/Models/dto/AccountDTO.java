@@ -1,6 +1,8 @@
 package Group6.BankingApp.Models.dto;
 
 import Group6.BankingApp.Models.Account;
+import Group6.BankingApp.Models.User;
+import jakarta.persistence.OneToOne;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -14,20 +16,11 @@ public class AccountDTO {
     private double dailyLimit;
     private double balance;
     private double absoluteLimit;
+    private String debitCardNumber;
 
     public AccountDTO(){}
 
-    public AccountDTO(Account account){
-        this.iban = account.getIban();
-        this.user = new UserDTO2(account.getUser());
-        this.accountType = account.getAccountType();
-        this.cardUUID = account.getCardUUID();
-        this.pin = account.getPin();
-        this.dailyLimit = account.getDailyLimit();
-        this.balance = account.getBalance();
-        this.absoluteLimit = account.getAbsoluteLimit();
-    }
-    public AccountDTO(String iban, UserDTO2 user, String accountType, String cardUUID, String pin, double dailyLimit, double balance, double absoluteLimit) {
+    public AccountDTO(String iban, UserDTO2 user, String accountType, String cardUUID, String pin, double dailyLimit, double balance, double absoluteLimit, String debitCardNumber) {
         this.iban = iban;
         this.user = user;
         this.accountType = accountType;
@@ -36,6 +29,7 @@ public class AccountDTO {
         this.dailyLimit = dailyLimit;
         this.balance = balance;
         this.absoluteLimit = absoluteLimit;
+        this.debitCardNumber = debitCardNumber;
     }
 
     public String getIban() {
@@ -100,5 +94,13 @@ public class AccountDTO {
 
     public void setAbsoluteLimit(double absoluteLimit) {
         this.absoluteLimit = absoluteLimit;
+    }
+
+    public String getDebitCardNumber() {
+        return debitCardNumber;
+    }
+
+    public void setDebitCardNumber(String debitCardNumber) {
+        this.debitCardNumber = debitCardNumber;
     }
 }

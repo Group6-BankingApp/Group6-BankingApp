@@ -41,7 +41,7 @@ public class TransactionService {
                 TransferMoney(transaction);
                 Transaction newtransaction = new Transaction(
                     transaction.getSenderIban(),
-                    transaction.getreceiverIban(),
+                    transaction.getReceiverIban(),
                     transaction.getAmount(),
                     "regular transaction"
                     );
@@ -59,7 +59,7 @@ public class TransactionService {
             DespositMoney(transaction);
             Transaction newtransaction = new Transaction(
                     "cash",
-                    transaction.getreceiverIban(),
+                    transaction.getReceiverIban(),
                     transaction.getAmount(),
                     "deposit transaction"
             );
@@ -90,12 +90,12 @@ public class TransactionService {
     public void TransferMoney(Transaction transaction) {
         //TODO: add transfer money logic
         AccountDTO senderAccount = accountService.getAccountByIban(transaction.getSenderIban());
-        AccountDTO receiverAccount = accountService.getAccountByIban(transaction.getreceiverIban());
+        AccountDTO receiverAccount = accountService.getAccountByIban(transaction.getReceiverIban());
         if(senderAccount.getAccountType() == "Current" && receiverAccount.getAccountType() == "Current")    {
             senderAccount.setBalance(senderAccount.getBalance() - transaction.getAmount());
             receiverAccount.setBalance(receiverAccount.getBalance() + transaction.getAmount());
             accountService.updateAccountByIban(transaction.getSenderIban(), senderAccount);
-            accountService.updateAccountByIban(transaction.getreceiverIban(), receiverAccount);
+            accountService.updateAccountByIban(transaction.getReceiverIban(), receiverAccount);
         }
         else{
             throw new ServiceException("Invalid Account for Transfer");
@@ -104,10 +104,10 @@ public class TransactionService {
 
     public void DespositMoney(Transaction transaction) {
         //TODO: add transfer money logic
-        AccountDTO receiverAccount = accountService.getAccountByIban(transaction.getreceiverIban());
+        AccountDTO receiverAccount = accountService.getAccountByIban(transaction.getReceiverIban());
         if(receiverAccount.getAccountType() == "Current")    {
             receiverAccount.setBalance(receiverAccount.getBalance() + transaction.getAmount());
-            accountService.updateAccountByIban(transaction.getreceiverIban(), receiverAccount);
+            accountService.updateAccountByIban(transaction.getReceiverIban(), receiverAccount);
         }
         else{
             throw new ServiceException("Invalid Account for Transfer");

@@ -18,7 +18,7 @@ class TransactionTest {
         
         // Verify the values are set correctly
         assertEquals(senderIban, transaction.getSenderIban());
-        assertEquals(receiverIban, transaction.getreceiverIban());
+        assertEquals(receiverIban, transaction.getReceiverIban());
         assertEquals(amount, transaction.getAmount());
         assertEquals(description, transaction.getDescription());
         
@@ -46,7 +46,7 @@ class TransactionTest {
         
         // Verify the values are set correctly
         assertEquals(senderIban, transaction.getSenderIban());
-        assertEquals(receiverIban, transaction.getreceiverIban());
+        assertEquals(receiverIban, transaction.getReceiverIban());
         assertEquals(amount, transaction.getAmount());
         assertEquals(description, transaction.getDescription());
         assertEquals(timeCreated, transaction.getTimeCreated());
