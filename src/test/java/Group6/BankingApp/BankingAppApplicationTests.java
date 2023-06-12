@@ -194,11 +194,11 @@ class BankingAppApplicationTests {
 	@Test
 	public void testDeactivateDebitCard_Success() {
 		String iban = "123456789"; // Sample IBAN
-		DebitCardDTO debitCardDTO = new DebitCardDTO();
+		String debitCardNum = "123456789";
 
-		Mockito.doNothing().when(accountService).deactivateDebitCard(iban, debitCardDTO, true);
+		Mockito.doNothing().when(accountService).deactivateDebitCard(iban, debitCardNum, true);
 
-		ResponseEntity<Void> response = accountController.deactivateDebitCard(iban, debitCardDTO, true);
+		ResponseEntity<String> response = accountController.deactivateDebitCard(iban, debitCardNum, true);
 
 		assertEquals(HttpStatus.OK, response.getStatusCode());
 		assertNull(response.getBody());
@@ -207,9 +207,9 @@ class BankingAppApplicationTests {
 	@Test
 	public void testDeactivateDebitCard_Failure() {
 		String iban = "123456789";
-		DebitCardDTO debitCardDTO = null;
+		String debitCardNum = "123456789";
 
-		ResponseEntity<Void> response = accountController.deactivateDebitCard(iban, debitCardDTO, true);
+		ResponseEntity<String> response = accountController.deactivateDebitCard(iban, debitCardNum, true);
 
 		assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
 		assertNull(response.getBody());

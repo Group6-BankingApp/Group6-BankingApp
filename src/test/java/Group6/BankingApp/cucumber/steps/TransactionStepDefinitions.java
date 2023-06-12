@@ -1,4 +1,4 @@
-package cucumber.steps;
+package Group6.BankingApp.cucumber.steps;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -9,23 +9,17 @@ import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import Group6.BankingApp.Models.Transaction;
 import Group6.BankingApp.Models.dto.TransactionDTO;
-import Group6.BankingApp.DAL.TransactionRepository;
 import Group6.BankingApp.Services.TransactionService;
 import org.junit.jupiter.api.Assertions;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.web.WebAppConfiguration;
 
-import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 
 public class TransactionStepDefinitions extends BaseStepDefinitions {
 
