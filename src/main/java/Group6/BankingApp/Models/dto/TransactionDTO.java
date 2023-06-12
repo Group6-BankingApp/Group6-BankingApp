@@ -2,6 +2,8 @@ package Group6.BankingApp.Models.dto;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import lombok.Data;
+
 @Data
 public class TransactionDTO{
     private double amount;
