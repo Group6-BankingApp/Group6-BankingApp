@@ -30,7 +30,7 @@ public class DebitCardServiceTest {
     @Test
     public void testCreateDebitCard() {
 
-        
+
         Account account = new Account();
         account.setIban("NL01INHO0000000001");
         account.setCardUUID("some_uuid");
