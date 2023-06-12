@@ -27,13 +27,20 @@ public class AccountService {
 
     @Autowired
     private UserService userService;
+    @Autowired
     private DebitCardRepository debitCardRepository;
 
 
-    @Autowired
-    public AccountService(DebitCardRepository debitCardRepository) {
-        this.debitCardRepository = debitCardRepository;
-    }
+//    @Autowired
+//    public AccountService(DebitCardRepository debitCardRepository) {
+//        this.debitCardRepository = debitCardRepository;
+//    }
+@Autowired
+public AccountService(AccountRepository accountRepository, UserRepository userRepository, DebitCardRepository debitCardRepository) {
+    this.accountRepository = accountRepository;
+    this.userRepository = userRepository;
+    this.debitCardRepository = debitCardRepository;
+}
 
     public List<Account> getAllAccounts() {
         return (List<Account>) accountRepository.findAll();
@@ -201,7 +208,7 @@ public class AccountService {
                 throw new ServiceException("Invalid IBAN");
 
             DebitCard debitCard = account.getDebitCard();
-            if (debitCard == null && debitCard.getCardNumber() != debitCardDTO.getCardNumber())
+            if (debitCard == null || !debitCard.getCardNumber().equals(debitCardDTO.getCardNumber()))
                 throw new ServiceException("Invalid debit card details");
             debitCard.setActive(active);
             accountRepository.save(account);
@@ -215,6 +222,20 @@ public class AccountService {
         return card != null && card.getAccount().getPin().equals(pin);
     }
 
+//    protected AccountDTO mapToAccountDTO(Account account) {
+//        AccountDTO accountDTO = new AccountDTO();
+//        accountDTO.setIban(account.getIban());
+//        accountDTO.setUser(mapToUserDTO2(account.getUser()));
+//        accountDTO.setAccountType(account.getAccountType());
+//        accountDTO.setCardUUID(account.getCardUUID());
+//        accountDTO.setPin(account.getPin());
+//        accountDTO.setDailyLimit(account.getDailyLimit());
+//        accountDTO.setBalance(account.getBalance());
+//        accountDTO.setAbsoluteLimit(account.getAbsoluteLimit());
+//        accountDTO.setDebitCardNumber(account.getDebitCard().getCardNumber());
+//
+//        return accountDTO;
+//    }
     protected AccountDTO mapToAccountDTO(Account account) {
         AccountDTO accountDTO = new AccountDTO();
         accountDTO.setIban(account.getIban());
@@ -225,10 +246,15 @@ public class AccountService {
         accountDTO.setDailyLimit(account.getDailyLimit());
         accountDTO.setBalance(account.getBalance());
         accountDTO.setAbsoluteLimit(account.getAbsoluteLimit());
-        accountDTO.setDebitCardNumber(account.getDebitCard().getCardNumber());
+
+        DebitCard debitCard = account.getDebitCard();
+        if (debitCard != null) {
+            accountDTO.setDebitCardNumber(debitCard.getCardNumber());
+        }
 
         return accountDTO;
     }
+
 
     private UserDTO2 mapToUserDTO2(User user) {
         UserDTO2 userDTO = new UserDTO2();
