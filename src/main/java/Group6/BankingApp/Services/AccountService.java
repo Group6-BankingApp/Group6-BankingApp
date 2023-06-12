@@ -60,8 +60,8 @@ public class AccountService {
         try {
             String iban = generateIban();
             Long userId = newAccountDTO.getUserId();
-            UserDTO2 userDTO2 = userService.getUserById(userId);
-            if (userDTO2 == null)
+            User user = userService.getFullUserById(userId);
+            if (user == null)
                 throw new ServiceException("User with ID " + userId + " does not exist.");
 
             String accountType = newAccountDTO.getAccountType();
@@ -69,7 +69,7 @@ public class AccountService {
             String pin = newAccountDTO.getPin();
             double dailyLimit = newAccountDTO.getDailyLimit();
 
-            Account account = new Account(iban, userDTO2, accountType, cardUUID, pin, dailyLimit, 0.0, 0.0, true, null);
+            Account account = new Account(iban, user, accountType, cardUUID, pin, dailyLimit, 0.0, 0.0, true, null);
             accountRepository.save(account);
 
             AccountDTO accountDTO = mapToAccountDTO(account);
@@ -297,5 +297,14 @@ public class AccountService {
         DebitCardDTO cardDTO = new DebitCardDTO();
         cardDTO.setCardNumber(card.getCardNumber());
         return cardDTO;
+    }
+
+    public List<AccountDTO> getAccountsByCustomerId(Long id) {
+        List<Account> accounts = accountRepository.findAllByUserId(id);
+        List<AccountDTO> accountDTOS = new ArrayList<>();
+        for (Account account : accounts) {
+            accountDTOS.add(mapToAccountDTO(account));
+        }
+        return accountDTOS;
     }
 }

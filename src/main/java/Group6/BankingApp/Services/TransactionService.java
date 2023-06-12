@@ -182,9 +182,17 @@ public class TransactionService {
 
         int end = Math.min(skip + limit, totalTransactions);
         return transactionsResult.subList(skip, end);
-    } catch (Exception ex) {
-        throw new ServiceException("Failed to retrieve transactions here", ex);
+        } catch (Exception ex) {
+            throw new ServiceException("Failed to retrieve transactions here", ex);
+        }
     }
-}
 
+    public  List<Transaction> findAllTransactions(String iban) {
+        try {
+            Iterable<Transaction> allTransactions = transactionRepository.findAllBySenderIbanOrReceiverIban(iban, iban);
+            return (List<Transaction>) allTransactions;
+            } catch (Exception ex) {
+                throw new ServiceException("Failed to retrieve transactions here", ex);
+            }
+        }
 }

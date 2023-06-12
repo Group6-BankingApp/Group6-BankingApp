@@ -10,7 +10,6 @@ import lombok.extern.java.Log;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-//import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
@@ -18,8 +17,8 @@ import javax.naming.AuthenticationException;
 import java.util.List;
 
 @RestController
-@RequestMapping(value="/users", produces = MediaType.APPLICATION_JSON_VALUE)
 @CrossOrigin(origins = "http://localhost:5173")
+@RequestMapping(value="/users", produces = MediaType.APPLICATION_JSON_VALUE)
 @Log
 public class UserController {
 
