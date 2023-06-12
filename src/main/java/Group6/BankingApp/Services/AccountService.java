@@ -60,8 +60,8 @@ public class AccountService {
         try {
             String iban = generateIban();
             Long userId = newAccountDTO.getUserId();
-            User user = userService.getFullUserById(userId);
-            if (user == null)
+            UserDTO2 userDTO2 = userService.getUserById(userId);
+            if (userDTO2 == null)
                 throw new ServiceException("User with ID " + userId + " does not exist.");
 
             String accountType = newAccountDTO.getAccountType();
@@ -69,7 +69,7 @@ public class AccountService {
             String pin = newAccountDTO.getPin();
             double dailyLimit = newAccountDTO.getDailyLimit();
 
-            Account account = new Account(iban, user, accountType, cardUUID, pin, dailyLimit, 0.0, 0.0, true, null);
+            Account account = new Account(iban, userDTO2, accountType, cardUUID, pin, dailyLimit, 0.0, 0.0, true, null);
             accountRepository.save(account);
 
             AccountDTO accountDTO = mapToAccountDTO(account);
@@ -170,7 +170,7 @@ public class AccountService {
         newCard.setAccount(account);
 
         DebitCard savedCard = debitCardRepository.save(newCard);
-        account.setDebitCard(savedCard); // Update debitCardNumber in Account
+        account.setCardNumber(newCard.getCardNumber()); // Update debitCardNumber in Account
         accountRepository.save(account);
         return mapToDebitCardDTO(savedCard);
     }
@@ -194,18 +194,37 @@ public class AccountService {
         return mapToDebitCardDTO(savedCard);
     }
 
-    public void deactivateDebitCard(String iban, DebitCardDTO debitCardDTO, boolean active){
-        try {
-            Account  account = accountRepository.findByIban(iban);
-            if(account == null)
-                throw new ServiceException("Invalid IBAN");
+//    public void deactivateDebitCard(String iban, String cardNumber, boolean active){
+//        try {
+//            Account  account = accountRepository.findByIban(iban);
+//            if(account == null)
+//                throw new ServiceException("Invalid IBAN");
+//
+//            DebitCard debitCard = debitCardRepository.findByAccountAndIsActive(account, active);
+//            if (debitCard == null && !debitCard.getCardNumber().equals(cardNumber))
+//                throw new ServiceException("Invalid debit card details");
+//            debitCard.setActive(active);
+//            accountRepository.save(account);
+//        }catch (Exception ex){
+//            throw new ServiceException("Failed to deactivate debit card", ex);
+//        }
+//    }
 
-            DebitCard debitCard = account.getDebitCard();
-            if (debitCard == null && debitCard.getCardNumber() != debitCardDTO.getCardNumber())
-                throw new ServiceException("Invalid debit card details");
+    public void deactivateDebitCard(String iban, String cardNumber, boolean active) {
+        try {
+            Account account = accountRepository.findByIban(iban);
+            if (account == null) {
+                throw new ServiceException("Invalid IBAN");
+            }
+
+            DebitCard debitCard = debitCardRepository.findByAccountAndCardNumber(account, cardNumber);
+            if (debitCard == null) {
+                throw new ServiceException("Invalid debit card number");
+            }
+
             debitCard.setActive(active);
-            accountRepository.save(account);
-        }catch (Exception ex){
+            debitCardRepository.save(debitCard);
+        } catch (Exception ex) {
             throw new ServiceException("Failed to deactivate debit card", ex);
         }
     }
@@ -225,7 +244,7 @@ public class AccountService {
         accountDTO.setDailyLimit(account.getDailyLimit());
         accountDTO.setBalance(account.getBalance());
         accountDTO.setAbsoluteLimit(account.getAbsoluteLimit());
-        accountDTO.setDebitCardNumber(account.getDebitCard().getCardNumber());
+        accountDTO.setDebitCardNumber(account.getCardNumber());
 
         return accountDTO;
     }
@@ -243,7 +262,7 @@ public class AccountService {
 
     private static final String IBAN_PREFIX = "NL01INHO";
 
-    private String generateIban() {
+    protected String generateIban() {
         StringBuilder ibanBuilder = new StringBuilder(IBAN_PREFIX);
 
         Random random = new Random();
@@ -278,15 +297,5 @@ public class AccountService {
         DebitCardDTO cardDTO = new DebitCardDTO();
         cardDTO.setCardNumber(card.getCardNumber());
         return cardDTO;
-    }
-
-    public List<AccountDTO> getAccountsByCustomerId(Long id) {
-        List<Account> accountList = accountRepository.findAllByUserId(id);
-        List<AccountDTO> accountDTOs = new ArrayList<>();
-        for (Account account : accountList) {
-            AccountDTO accountDTO = mapToAccountDTO(account);
-            accountDTOs.add(accountDTO);
-        }
-        return accountDTOs;
     }
 }
