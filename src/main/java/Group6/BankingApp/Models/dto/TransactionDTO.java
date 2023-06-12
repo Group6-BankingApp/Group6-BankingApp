@@ -1,5 +1,8 @@
 package Group6.BankingApp.Models.dto;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
+@Data
 public class TransactionDTO{
     private double amount;
     private String receiverIban;
