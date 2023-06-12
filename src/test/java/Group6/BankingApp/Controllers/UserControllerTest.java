@@ -1,11 +1,10 @@
 package Group6.BankingApp.Controllers;
 
-import Group6.BankingApp.Models.Role;
 import Group6.BankingApp.Models.User;
+import Group6.BankingApp.Models.Role;
 import Group6.BankingApp.Models.dto.UserDTO;
 import Group6.BankingApp.Models.dto.UserDTO2;
 import Group6.BankingApp.Services.UserService;
-import org.junit.Before;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -18,10 +17,8 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
-import java.util.Arrays;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
@@ -44,8 +41,15 @@ class UserControllerTest {
 
     @BeforeEach
     void setUp() {
-        User user= new User("John", "Doe", "john.doe@gmail.com", "123456", "123456789", Role.CUSTOMER,true);
-        userDTO2 = new UserDTO2(user);
+        User user1 = new User();
+        user1.setFirstName("John");
+        user1.setLastName("Doe");
+        user1.setEmail("john.doe@gmail.com");
+        user1.setPassword("123456");
+        user1.setPhoneNumber("0612345678");
+        user1.setHasAccount(true);
+        user1.setRoles(List.of(Role.ROLE_USER));
+        userDTO2 = new UserDTO2(user1);
     }
 
     @Test

@@ -6,9 +6,11 @@ import Group6.BankingApp.Models.dto.AccountDTO;
 import Group6.BankingApp.Models.dto.DebitCardDTO;
 import Group6.BankingApp.Models.dto.NewAccountDTO;
 import Group6.BankingApp.Services.AccountService;
+import lombok.extern.java.Log;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -19,6 +21,8 @@ import java.util.List;
 
 @RestController
 @RequestMapping(value="/accounts", produces = MediaType.APPLICATION_JSON_VALUE)
+@CrossOrigin(origins = "http://localhost:5173")
+@Log
 public class AccountController {
 
     private final AccountService accountService;
@@ -57,10 +61,15 @@ public class AccountController {
 
     @PostMapping
     public ResponseEntity<AccountDTO> createAccount(@RequestBody NewAccountDTO newAccountDTO) {
+        if (newAccountDTO == null) {
+            // Return a BAD_REQUEST response if the newAccountDTO is empty
+            return ResponseEntity.badRequest().build();
+        }
+
         try {
             AccountDTO accountDTO = accountService.addAccount(newAccountDTO);
             return ResponseEntity.status(HttpStatus.CREATED).body(accountDTO);
-        }catch (Exception ex) {
+        } catch (Exception ex) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new AccountDTO());
         }
     }
@@ -140,6 +149,21 @@ public class AccountController {
         NewAccountDTO updatedAccountDTO = accountService.updatePin(iban, accountDTO);
         return ResponseEntity.ok().body(updatedAccountDTO);
     }
-
+    @GetMapping("/customer")
+    public List<AccountDTO> getAccountsByCustomerId(@RequestBody Map<String, Long> requestBody) {
+        try {
+            return  accountService.getAccountsByCustomerId(requestBody.get("id"));
+        } catch (Exception e) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to retrieve accounts", e);
+        }
+    }
+    @GetMapping("/customer/{id}")
+    public List<AccountDTO> getAccountsByCustomerId(@PathVariable("id") Long id) {
+        try {
+            return  accountService.getAccountsByCustomerId(id);
+        } catch (Exception e) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to retrieve accounts", e);
+        }
+    }
 }
 

@@ -1,13 +1,17 @@
 package Group6.BankingApp.Controllers;
 
+import Group6.BankingApp.Models.Account;
+import Group6.BankingApp.Models.Role;
+import Group6.BankingApp.Models.User;
 import Group6.BankingApp.Models.dto.*;
+import Group6.BankingApp.Services.AccountService;
 import Group6.BankingApp.Services.UserService;
-import Group6.BankingApp.util.JwtUtil;
 import lombok.extern.java.Log;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 //import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.naming.AuthenticationException;
@@ -20,15 +24,19 @@ import java.util.List;
 public class UserController {
 
     private  final UserService userService;
+    private final AccountService accountService;
 
 
-    public UserController(UserService userService) {
+    public UserController(UserService userService, AccountService accountService) {
+
         this.userService = userService;
+        this.accountService = accountService;
     }
 
     @PostMapping(value = "/login")
-    public ResponseEntity<Login2DTO> login(@RequestBody LoginDTO loginDTO) throws AuthenticationException {
-        return ResponseEntity.ok(userService.login(loginDTO));
+    public Object login(@RequestBody LoginDTO loginDTO) throws Exception {
+        User user = userService.getUserByEmail(loginDTO.getUsername());
+        return new TokenDTO(user.getId(),user.getFirstName(),userService.login(loginDTO));
     }
 
     @GetMapping(value = "/withAccount")
@@ -36,6 +44,12 @@ public class UserController {
         return ResponseEntity.ok(userService.getAllUsersWithAccount());
     }
 
+    @GetMapping(value = "/withoutAccount")
+    public ResponseEntity<List<UserDTO2>> getAllUsersWithoutAccount() {
+        return ResponseEntity.ok(userService.getAllUsersWithoutAccount());
+    }
+
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @GetMapping
     public ResponseEntity<List<UserDTO2>> getAllUsers() {
         return ResponseEntity.ok(userService.getAllUsers());

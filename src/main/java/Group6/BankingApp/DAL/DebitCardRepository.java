@@ -2,7 +2,6 @@ package Group6.BankingApp.DAL;
 
 import Group6.BankingApp.Models.Account;
 import Group6.BankingApp.Models.DebitCard;
-import Group6.BankingApp.Models.User;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
