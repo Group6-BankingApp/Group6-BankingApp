@@ -18,6 +18,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 @RestController
+@CrossOrigin(origins = "http://localhost:5173")
 @RequestMapping(value="/transactions", produces = MediaType.APPLICATION_JSON_VALUE)
 public class TransactionController {
     // private static final String SECRET_KEY = "fDKiV3Rq7t";
@@ -86,6 +87,11 @@ public class TransactionController {
         }catch (Exception e){
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to retrieve transactions", e);
         }
+    }
+
+    @GetMapping(value = "/customer/{iban}")
+    public List<Transaction> getTransactionsByIban(@PathVariable String iban) {
+        return transactionService.findAllTransactions(iban);
     }
 
     @GetMapping(value = "/{id}")

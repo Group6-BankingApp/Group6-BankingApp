@@ -14,5 +14,6 @@ public interface TransactionRepository extends CrudRepository<Transaction, Strin
 
     @Override
     Optional<Transaction> findById(UUID aLong);*/
-    
+    // select all where any iban is equal to the given iban and sort by date
+    Iterable<Transaction> findAllBySenderIbanOrReceiverIban(String senderIban, String receiverIban);
 }
