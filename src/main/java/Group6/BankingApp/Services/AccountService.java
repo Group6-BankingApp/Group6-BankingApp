@@ -194,22 +194,6 @@ public class AccountService {
         return mapToDebitCardDTO(savedCard);
     }
 
-//    public void deactivateDebitCard(String iban, String cardNumber, boolean active){
-//        try {
-//            Account  account = accountRepository.findByIban(iban);
-//            if(account == null)
-//                throw new ServiceException("Invalid IBAN");
-//
-//            DebitCard debitCard = debitCardRepository.findByAccountAndIsActive(account, active);
-//            if (debitCard == null && !debitCard.getCardNumber().equals(cardNumber))
-//                throw new ServiceException("Invalid debit card details");
-//            debitCard.setActive(active);
-//            accountRepository.save(account);
-//        }catch (Exception ex){
-//            throw new ServiceException("Failed to deactivate debit card", ex);
-//        }
-//    }
-
     public void deactivateDebitCard(String iban, String cardNumber, boolean active) {
         try {
             Account account = accountRepository.findByIban(iban);
@@ -293,7 +277,7 @@ public class AccountService {
         return sb.toString();
     }
 
-    private DebitCardDTO mapToDebitCardDTO(DebitCard card) {
+    protected DebitCardDTO mapToDebitCardDTO(DebitCard card) {
         DebitCardDTO cardDTO = new DebitCardDTO();
         cardDTO.setCardNumber(card.getCardNumber());
         return cardDTO;
