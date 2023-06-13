@@ -37,9 +37,9 @@ public class Account {
         this.cardNumber = cardNumber;
     }
 
-    public Account(String iban, UserDTO2 userDTO2, String accountType, String cardUUID, String pin, double dailyLimit, double balance, double absoluteLimit, boolean status, String cardNumber) {
+    public Account(String iban, User user, String accountType, String cardUUID, String pin, double dailyLimit, double balance, double absoluteLimit, boolean status, DebitCard debitCard) {
         this.iban = iban;
-        this.user = mapToUser(userDTO2);
+        this.user = user;
         this.accountType = accountType;
         this.cardUUID = cardUUID;
         this.pin = pin;
@@ -47,7 +47,7 @@ public class Account {
         this.balance = balance;
         this.absoluteLimit = absoluteLimit;
         this.status = status;
-        this.cardNumber = cardNumber;
+        this.debitCard = debitCard;
     }
 
     public Account(String iban, UserDTO2 userDTO2, String accountType, String cardUUID, String pin, double dailyLimit, double balance, double absoluteLimit, boolean status) {
