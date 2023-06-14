@@ -87,36 +87,25 @@ class AccountServiceTest {
     //WORKS
     @Test
     void testGetAccountByIban_ValidIban() {
-        // Create a sample Account object with test data
         Account account = new Account();
         account.setIban("NL01INHO9501054837");
         account.setAccountType("Savings");
-        // ... Set other properties as needed
 
-        // Mock the accountRepository to return the sample Account when findById is called
         when(accountRepository.findById("NL01INHO9501054837")).thenReturn(Optional.of(account));
 
-        // Call the getAccountByIban method with a valid iban
         AccountDTO accountDTO = accountService.getAccountByIban("NL01INHO9501054837");
 
-        // Assert that the AccountDTO is not null
         assertNotNull(accountDTO);
 
-        // Assert that the account properties are mapped correctly
         assertEquals("NL01INHO9501054837", accountDTO.getIban());
         assertEquals("Savings", accountDTO.getAccountType());
-        // ... Assert other properties as needed
     }
 
   //works -negative condition
     @Test
     void testGetAccountByIban_NonExistentIban() {
         String nonExistentIban = "NL01INHO9501054837";
-
-        // Create a mock account that represents a non-existent account
         Account nonExistentAccount = null;
-
-        // Mock the accountRepository to return the mock non-existent account when findById is called with the non-existent IBAN
         when(accountRepository.findById(nonExistentIban)).thenReturn(Optional.ofNullable(nonExistentAccount));
 
         ServiceException exception = assertThrows(ServiceException.class, () -> accountService.getAccountByIban(nonExistentIban));
@@ -216,17 +205,13 @@ class AccountServiceTest {
         String testIban = "NL01INHO9501054837";
         Account testAccount = new Account("NL01INHO9501054837", user1, "Savings", accountService.generateCardUUID(), "1234", 1000.0, 600.0, 0, true, debitCard1);
 
-        // Mock the behavior of the account repository
         when(accountRepository.findByIban(testIban)).thenReturn(testAccount);
 
-        // Call the method being tested
         Account result = accountService.findAccountByIban(testIban);
 
-        // Verify the expected behavior
         assertNotNull(result);
         assertEquals(testIban, result.getIban());
 
-        // Verify that the account repository method was called
         verify(accountRepository, times(1)).findByIban(testIban);
     }
 
@@ -258,14 +243,11 @@ class AccountServiceTest {
     @Test
     void testDeleteAccount_NonExistentAccount() {
         String nonExistentIban = "NL99NONEXISTENT";
-
-        // Mock the accountRepository to return an empty Optional when findById is called with the non-existent IBAN
+        
         when(accountRepository.findById(nonExistentIban)).thenReturn(Optional.empty());
 
-        // Call the deleteAccount method with the non-existent IBAN and expect a ServiceException
         ServiceException exception = assertThrows(ServiceException.class, () -> accountService.deleteAccount(nonExistentIban));
 
-        // Verify that the deleteById method of accountRepository was not called
         verify(accountRepository, times(0)).deleteById(nonExistentIban);
 
         assertEquals("Account not found", exception.getMessage());
