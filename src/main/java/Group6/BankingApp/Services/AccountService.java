@@ -19,8 +19,7 @@ import java.util.*;
 @Service
 public class AccountService {
 
-    @Autowired
-    private AccountRepository accountRepository;
+    private final AccountRepository accountRepository;
 
     @Autowired
     private UserRepository userRepository;
@@ -31,8 +30,9 @@ public class AccountService {
 
 
     @Autowired
-    public AccountService(DebitCardRepository debitCardRepository) {
+    public AccountService(DebitCardRepository debitCardRepository, AccountRepository accountRepository) {
         this.debitCardRepository = debitCardRepository;
+        this.accountRepository = accountRepository;
     }
 
     public List<Account> getAllAccounts() {
@@ -84,9 +84,24 @@ public class AccountService {
         Account account = accountRepository.findById(iban)
                 .orElse(null);
 
+        if(account == null)
+            throw new ServiceException("This account does not exist!");
+
+        User user = account.getUser();
+        if(user == null)
+            throw new ServiceException("User does not exist.");
+
         Long userId = accountDTO.getUser().getId();
-        User user = userRepository.findById(userId)
-                .orElse(null);
+        if(userId == null)
+            throw new ServiceException("User ID: " + userId + " does not exist.");
+
+        if(!userId.equals(user.getId()))
+            throw new ServiceException("The user ID in the accountDTO does not match the user ID in the account");
+
+//        User user = userRepository.findById(userId)
+//                .orElse(null);
+//        if(user == null)
+//            throw new ServiceException("User with ID " + userId + " does not exist.");
 
         // Update the account from accountDTO
         account.setIban(accountDTO.getIban());
@@ -142,7 +157,12 @@ public class AccountService {
 
     public NewAccountDTO updatePin(String iban, AccountDTO accountDTO) {
         Account account = accountRepository.findById(iban)
-                .orElseThrow(null);
+                .orElseThrow(() -> new IllegalArgumentException("Account not found"));
+
+        User user = account.getUser();
+        if (user == null) {
+            throw new IllegalArgumentException("User not found in the account");
+        }
 
         // Update the account's pin
         account.setPin(accountDTO.getPin());
@@ -170,8 +190,9 @@ public class AccountService {
         newCard.setAccount(account);
 
         DebitCard savedCard = debitCardRepository.save(newCard);
-        account.setCardNumber(newCard.getCardNumber()); // Update debitCardNumber in Account
+        account.setDebitCard(savedCard);
         accountRepository.save(account);
+
         return mapToDebitCardDTO(savedCard);
     }
 
@@ -193,22 +214,6 @@ public class AccountService {
         DebitCard savedCard = debitCardRepository.save(card);
         return mapToDebitCardDTO(savedCard);
     }
-
-//    public void deactivateDebitCard(String iban, String cardNumber, boolean active){
-//        try {
-//            Account  account = accountRepository.findByIban(iban);
-//            if(account == null)
-//                throw new ServiceException("Invalid IBAN");
-//
-//            DebitCard debitCard = debitCardRepository.findByAccountAndIsActive(account, active);
-//            if (debitCard == null && !debitCard.getCardNumber().equals(cardNumber))
-//                throw new ServiceException("Invalid debit card details");
-//            debitCard.setActive(active);
-//            accountRepository.save(account);
-//        }catch (Exception ex){
-//            throw new ServiceException("Failed to deactivate debit card", ex);
-//        }
-//    }
 
     public void deactivateDebitCard(String iban, String cardNumber, boolean active) {
         try {
@@ -293,7 +298,7 @@ public class AccountService {
         return sb.toString();
     }
 
-    private DebitCardDTO mapToDebitCardDTO(DebitCard card) {
+    protected DebitCardDTO mapToDebitCardDTO(DebitCard card) {
         DebitCardDTO cardDTO = new DebitCardDTO();
         cardDTO.setCardNumber(card.getCardNumber());
         return cardDTO;
