@@ -30,11 +30,11 @@ public class AccountService {
     private DebitCardRepository debitCardRepository;
 
 
-    @Autowired
-    public AccountService(DebitCardRepository debitCardRepository, AccountRepository accountRepository) {
-        this.debitCardRepository = debitCardRepository;
-        this.accountRepository = accountRepository;
-    }
+//    @Autowired
+//    public AccountService(DebitCardRepository debitCardRepository, AccountRepository accountRepository) {
+//        this.debitCardRepository = debitCardRepository;
+//        this.accountRepository = accountRepository;
+//    }
 //    @Autowired
 //    public AccountService(DebitCardRepository debitCardRepository) {
 //        this.debitCardRepository = debitCardRepository;
@@ -249,9 +249,6 @@ public AccountService(AccountRepository accountRepository, UserRepository userRe
                 throw new ServiceException("Invalid debit card number");
             }
 
-            DebitCard debitCard = account.getDebitCard();
-            if (debitCard == null || !debitCard.getCardNumber().equals(debitCardDTO.getCardNumber()))
-                throw new ServiceException("Invalid debit card details");
             debitCard.setActive(active);
             debitCardRepository.save(debitCard);
         } catch (Exception ex) {

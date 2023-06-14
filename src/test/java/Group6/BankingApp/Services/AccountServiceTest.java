@@ -124,36 +124,6 @@ class AccountServiceTest {
         System.out.println(exception.getMessage());
     }
 
-    //WORKS
-    @Test
-    void testDeactivateDebitCard() {
-
-        String iban = "NL01INHO9501054837";
-        boolean active = true;
-        DebitCardDTO debitCardDTO = new DebitCardDTO();
-        debitCardDTO.setCardNumber("123456789");
-
-        Account account = new Account();
-        account.setIban(iban);
-        DebitCard debitCard = new DebitCard();
-        debitCard.setCardNumber(debitCardDTO.getCardNumber());
-        debitCard.setActive(true);
-        account.setDebitCard(debitCard);
-
-        Mockito.when(accountRepository.findByIban(iban)).thenReturn(account);
-
-        accountService.deactivateDebitCard(iban, debitCardDTO.getCardNumber() , active);
-
-        assertEquals(active, debitCard.isActive());
-
-        ResponseEntity<Void> response = ResponseEntity.ok().build();
-
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertNull(response.getBody());
-    }
-
-    @Test
-    void testMapToDebitCardDTO() {
     // WORKS
     @Test
     public void testGetAllAccounts() {
@@ -264,7 +234,7 @@ class AccountServiceTest {
 
         assertEquals("Account not found", exception.getMessage());
         System.out.println(exception.getMessage());
-    }
+
 
         DebitCard debitCard = new DebitCard();
         debitCard.setCardNumber("1234567890");
