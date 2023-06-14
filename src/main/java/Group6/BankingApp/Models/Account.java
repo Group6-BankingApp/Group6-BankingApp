@@ -153,7 +153,7 @@ public class Account {
         this.debitCard = debitCard;
     }
 
-    private User mapToUser(UserDTO2 userDTO2) {
+    protected User mapToUser(UserDTO2 userDTO2) {
         User user = new User();
         user.setId(userDTO2.getId());
         user.setFirstName(userDTO2.getFirstName());
