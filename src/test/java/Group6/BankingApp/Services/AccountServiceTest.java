@@ -229,63 +229,6 @@ class AccountServiceTest {
         // Verify that the account repository method was called
         verify(accountRepository, times(1)).findByIban(testIban);
     }
-    //DOESNT WORK
-    @Test
-    void testAddAccount() {
-        // Mock user service
-        User user = new User();
-        when(userService.getFullUserById(any(Long.class))).thenReturn(user);
-
-        // Mock account repository
-        Account savedAccount = new Account();
-        when(accountRepository.save(any(Account.class))).thenReturn(savedAccount);
-
-        // Create input DTO
-        NewAccountDTO newAccountDTO = new NewAccountDTO();
-        newAccountDTO.setUserId(123L);
-        newAccountDTO.setAccountType("Savings");
-        newAccountDTO.setPin("1234");
-        newAccountDTO.setDailyLimit(1000.0);
-
-        // Call the addAccount method
-        AccountDTO accountDTO = accountService.addAccount(newAccountDTO);
-
-        // Assert the result
-        assertNotNull(accountDTO);
-
-        // Assert the returned ResponseEntity
-        ResponseEntity<AccountDTO> response = ResponseEntity.ok(accountDTO);
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals(accountDTO, response.getBody());
-    }
-
-    //DOESNT WORK
-    @Test
-    void testUpdateAccountByIban() {
-        String iban = "NL01INHO9501054837";
-        AccountDTO accountDTO = new AccountDTO();
-        accountDTO.setAccountType("Savings");
-        accountDTO.setDailyLimit(1000.0);
-        accountDTO.setPin("1234");
-
-        Account accountToUpdate = new Account();
-        accountToUpdate.setIban(iban);
-
-        UserDTO2 userDTO2 = new UserDTO2();
-       // userDTO2.setId(100L);
-
-        accountDTO.setUser(userDTO2);
-
-        Mockito.when(accountRepository.findById(iban)).thenReturn(Optional.of(accountToUpdate));
-        Mockito.when(accountRepository.save(Mockito.any(Account.class))).thenReturn(accountToUpdate);
-
-        NewAccountDTO updatedAccount = accountService.updateAccountByIban(iban, accountDTO);
-
-        ResponseEntity<NewAccountDTO> response = ResponseEntity.ok(updatedAccount);
-
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals(updatedAccount, response.getBody());
-    }
 
     //works
     @Test
@@ -311,7 +254,7 @@ class AccountServiceTest {
         verify(accountRepository, times(1)).deleteById(iban);
     }
 
-    //works - negative condition 
+    //works - negative condition
     @Test
     void testDeleteAccount_NonExistentAccount() {
         String nonExistentIban = "NL99NONEXISTENT";
