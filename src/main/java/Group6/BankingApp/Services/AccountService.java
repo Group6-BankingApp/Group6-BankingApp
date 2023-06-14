@@ -198,11 +198,7 @@ public AccountService(AccountRepository accountRepository, UserRepository userRe
 
 
     public DebitCardDTO createDebitCard(Account account) {
-        DebitCard existingActiveCard = debitCardRepository.findByAccountAndIsActive(account, true);
-        if (existingActiveCard != null) {
-            existingActiveCard.setActive(false);
-            debitCardRepository.save(existingActiveCard);
-        }
+        deactivatePreviousCard(account);
 
         DebitCard newCard = new DebitCard();
         newCard.setCardNumber(generateDebitCardNumber());
@@ -213,7 +209,7 @@ public AccountService(AccountRepository accountRepository, UserRepository userRe
 
         DebitCard savedCard = debitCardRepository.save(newCard);
         account.setDebitCard(savedCard);
-        accountRepository.save(account);
+        Account savedAccount = accountRepository.save(account);
 
         return mapToDebitCardDTO(savedCard);
     }
