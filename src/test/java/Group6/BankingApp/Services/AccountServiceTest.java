@@ -26,6 +26,7 @@ import org.springframework.http.HttpStatus;
 import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -73,6 +74,55 @@ class AccountServiceTest {
         assertEquals(account.getCardUUID(), accountDTO.getCardUUID());
         assertEquals(account.getPin(), accountDTO.getPin());
         assertEquals(account.getDailyLimit(), accountDTO.getDailyLimit());
+    }
+    // wWORKS - negative condition
+    @Test
+    void testMapToAccountDTO_NullAccount() {
+
+        AccountDTO accountDTO = accountService.mapToAccountDTO(null);
+
+        assertNull(accountDTO);
+    }
+
+    //WORKS
+    @Test
+    void testGetAccountByIban_ValidIban() {
+        // Create a sample Account object with test data
+        Account account = new Account();
+        account.setIban("NL01INHO9501054837");
+        account.setAccountType("Savings");
+        // ... Set other properties as needed
+
+        // Mock the accountRepository to return the sample Account when findById is called
+        when(accountRepository.findById("NL01INHO9501054837")).thenReturn(Optional.of(account));
+
+        // Call the getAccountByIban method with a valid iban
+        AccountDTO accountDTO = accountService.getAccountByIban("NL01INHO9501054837");
+
+        // Assert that the AccountDTO is not null
+        assertNotNull(accountDTO);
+
+        // Assert that the account properties are mapped correctly
+        assertEquals("NL01INHO9501054837", accountDTO.getIban());
+        assertEquals("Savings", accountDTO.getAccountType());
+        // ... Assert other properties as needed
+    }
+
+  //works -negative condition
+    @Test
+    void testGetAccountByIban_NonExistentIban() {
+        String nonExistentIban = "NL01INHO9501054837";
+
+        // Create a mock account that represents a non-existent account
+        Account nonExistentAccount = null;
+
+        // Mock the accountRepository to return the mock non-existent account when findById is called with the non-existent IBAN
+        when(accountRepository.findById(nonExistentIban)).thenReturn(Optional.ofNullable(nonExistentAccount));
+
+        ServiceException exception = assertThrows(ServiceException.class, () -> accountService.getAccountByIban(nonExistentIban));
+
+        assertTrue(exception.getMessage().contains("Account not found"));
+        System.out.println(exception.getMessage());
     }
 
     //WORKS
@@ -237,10 +287,46 @@ class AccountServiceTest {
         assertEquals(updatedAccount, response.getBody());
     }
 
+    //works
+    @Test
+    void testMapToDebitCardDTO() {
 
+        DebitCard debitCard = new DebitCard();
+        debitCard.setCardNumber("1234567890");
 
+        DebitCardDTO debitCardDTO = accountService.mapToDebitCardDTO(debitCard);
 
+        assertNotNull(debitCardDTO);
 
+        assertEquals("1234567890", debitCardDTO.getCardNumber());
+    }
 
+    //works
+    @Test
+    void testDeleteAccount() {
+
+        String iban = "NL01INHO9501054837";
+        when(accountRepository.findById(iban)).thenReturn(Optional.of(new Account()));
+        accountService.deleteAccount(iban);
+        verify(accountRepository, times(1)).deleteById(iban);
+    }
+
+    //works - negative condition 
+    @Test
+    void testDeleteAccount_NonExistentAccount() {
+        String nonExistentIban = "NL99NONEXISTENT";
+
+        // Mock the accountRepository to return an empty Optional when findById is called with the non-existent IBAN
+        when(accountRepository.findById(nonExistentIban)).thenReturn(Optional.empty());
+
+        // Call the deleteAccount method with the non-existent IBAN and expect a ServiceException
+        ServiceException exception = assertThrows(ServiceException.class, () -> accountService.deleteAccount(nonExistentIban));
+
+        // Verify that the deleteById method of accountRepository was not called
+        verify(accountRepository, times(0)).deleteById(nonExistentIban);
+
+        assertEquals("Account not found", exception.getMessage());
+        System.out.println(exception.getMessage());
+    }
 
 }

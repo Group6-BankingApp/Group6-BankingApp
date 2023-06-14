@@ -49,7 +49,9 @@ public AccountService(AccountRepository accountRepository, UserRepository userRe
     public AccountDTO getAccountByIban(String iban) {
         Optional<Account> accountOptional = accountRepository.findById(iban);
         if (!accountOptional.isPresent())
+
             throw new ServiceException("Account not found");
+
 
         Account account = accountOptional.get();
         AccountDTO accountDTO = mapToAccountDTO(account);
@@ -158,9 +160,18 @@ public AccountService(AccountRepository accountRepository, UserRepository userRe
         return new NewAccountDTO(updatedAccount);
     }
 
+//    public void deleteAccount(String iban) {
+//        accountRepository.deleteById(iban);
+//    }
     public void deleteAccount(String iban) {
-        accountRepository.deleteById(iban);
+        Optional<Account> accountOptional = accountRepository.findById(iban);
+        if (accountOptional.isPresent()) {
+            accountRepository.deleteById(iban);
+        } else {
+            throw new ServiceException("Account not found");
+        }
     }
+
 
     public DebitCardDTO createDebitCard(Account account) {
         DebitCard existingActiveCard = debitCardRepository.findByAccountAndIsActive(account, true);
@@ -237,6 +248,9 @@ public AccountService(AccountRepository accountRepository, UserRepository userRe
 //        return accountDTO;
 //    }
     protected AccountDTO mapToAccountDTO(Account account) {
+        if (account == null) {
+            return null;
+        }
         AccountDTO accountDTO = new AccountDTO();
         accountDTO.setIban(account.getIban());
         accountDTO.setUser(mapToUserDTO2(account.getUser()));
@@ -257,6 +271,9 @@ public AccountService(AccountRepository accountRepository, UserRepository userRe
 
 
     private UserDTO2 mapToUserDTO2(User user) {
+        if (user == null) {
+            return null;
+        }
         UserDTO2 userDTO = new UserDTO2();
         userDTO.setId(user.getId());
         userDTO.setFirstName(user.getFirstName());
@@ -300,7 +317,7 @@ public AccountService(AccountRepository accountRepository, UserRepository userRe
         return sb.toString();
     }
 
-    private DebitCardDTO mapToDebitCardDTO(DebitCard card) {
+    protected DebitCardDTO mapToDebitCardDTO(DebitCard card) {
         DebitCardDTO cardDTO = new DebitCardDTO();
         cardDTO.setCardNumber(card.getCardNumber());
         return cardDTO;
