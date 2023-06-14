@@ -25,7 +25,7 @@ import java.util.List;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 class AccountServiceTest {
 
@@ -319,5 +319,20 @@ class AccountServiceTest {
         List<AccountDTO> accountDTOs = accountService.getAccountsByCustomerId(customerId);
 
         assertEquals(accounts.size(), accountDTOs.size());
+    }
+
+    @Test
+    public void testDeactivatePreviousCard() {
+        Account account = new Account();
+        DebitCard previousCard = new DebitCard();
+        previousCard.setActive(true);
+        previousCard.setAccount(account);
+
+        when(debitCardRepository.findByAccountAndIsActive(account, true)).thenReturn(previousCard);
+
+        accountService.deactivatePreviousCard(account);
+
+        assertFalse(previousCard.isActive());
+        verify(debitCardRepository, times(1)).save(previousCard);
     }
 }

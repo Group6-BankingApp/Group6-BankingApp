@@ -1,12 +1,10 @@
 package Group6.BankingApp.Models;
 
 import Group6.BankingApp.Models.dto.UserDTO2;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.OneToOne;
+import jakarta.persistence.*;
 
 @Entity
+@Table(name = "accounts")
 public class Account {
 
     @Id
