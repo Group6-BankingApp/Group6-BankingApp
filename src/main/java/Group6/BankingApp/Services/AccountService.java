@@ -26,6 +26,7 @@ public class AccountService {
 
     @Autowired
     private UserService userService;
+    @Autowired
     private DebitCardRepository debitCardRepository;
 
 
@@ -34,6 +35,16 @@ public class AccountService {
         this.debitCardRepository = debitCardRepository;
         this.accountRepository = accountRepository;
     }
+//    @Autowired
+//    public AccountService(DebitCardRepository debitCardRepository) {
+//        this.debitCardRepository = debitCardRepository;
+//    }
+@Autowired
+public AccountService(AccountRepository accountRepository, UserRepository userRepository, DebitCardRepository debitCardRepository) {
+    this.accountRepository = accountRepository;
+    this.userRepository = userRepository;
+    this.debitCardRepository = debitCardRepository;
+}
 
     public List<Account> getAllAccounts() {
         return (List<Account>) accountRepository.findAll();
@@ -42,7 +53,9 @@ public class AccountService {
     public AccountDTO getAccountByIban(String iban) {
         Optional<Account> accountOptional = accountRepository.findById(iban);
         if (!accountOptional.isPresent())
+
             throw new ServiceException("Account not found");
+
 
         Account account = accountOptional.get();
         AccountDTO accountDTO = mapToAccountDTO(account);
@@ -171,9 +184,18 @@ public class AccountService {
         return new NewAccountDTO(updatedAccount);
     }
 
+//    public void deleteAccount(String iban) {
+//        accountRepository.deleteById(iban);
+//    }
     public void deleteAccount(String iban) {
-        accountRepository.deleteById(iban);
+        Optional<Account> accountOptional = accountRepository.findById(iban);
+        if (accountOptional.isPresent()) {
+            accountRepository.deleteById(iban);
+        } else {
+            throw new ServiceException("Account not found");
+        }
     }
+
 
     public DebitCardDTO createDebitCard(Account account) {
         DebitCard existingActiveCard = debitCardRepository.findByAccountAndIsActive(account, true);
@@ -227,6 +249,9 @@ public class AccountService {
                 throw new ServiceException("Invalid debit card number");
             }
 
+            DebitCard debitCard = account.getDebitCard();
+            if (debitCard == null || !debitCard.getCardNumber().equals(debitCardDTO.getCardNumber()))
+                throw new ServiceException("Invalid debit card details");
             debitCard.setActive(active);
             debitCardRepository.save(debitCard);
         } catch (Exception ex) {
@@ -239,7 +264,24 @@ public class AccountService {
         return card != null && card.getAccount().getPin().equals(pin);
     }
 
+//    protected AccountDTO mapToAccountDTO(Account account) {
+//        AccountDTO accountDTO = new AccountDTO();
+//        accountDTO.setIban(account.getIban());
+//        accountDTO.setUser(mapToUserDTO2(account.getUser()));
+//        accountDTO.setAccountType(account.getAccountType());
+//        accountDTO.setCardUUID(account.getCardUUID());
+//        accountDTO.setPin(account.getPin());
+//        accountDTO.setDailyLimit(account.getDailyLimit());
+//        accountDTO.setBalance(account.getBalance());
+//        accountDTO.setAbsoluteLimit(account.getAbsoluteLimit());
+//        accountDTO.setDebitCardNumber(account.getDebitCard().getCardNumber());
+//
+//        return accountDTO;
+//    }
     protected AccountDTO mapToAccountDTO(Account account) {
+        if (account == null) {
+            return null;
+        }
         AccountDTO accountDTO = new AccountDTO();
         accountDTO.setIban(account.getIban());
         accountDTO.setUser(mapToUserDTO2(account.getUser()));
@@ -251,10 +293,19 @@ public class AccountService {
         accountDTO.setAbsoluteLimit(account.getAbsoluteLimit());
         accountDTO.setDebitCardNumber(account.getCardNumber());
 
+        DebitCard debitCard = account.getDebitCard();
+        if (debitCard != null) {
+            accountDTO.setDebitCardNumber(debitCard.getCardNumber());
+        }
+
         return accountDTO;
     }
 
+
     private UserDTO2 mapToUserDTO2(User user) {
+        if (user == null) {
+            return null;
+        }
         UserDTO2 userDTO = new UserDTO2();
         userDTO.setId(user.getId());
         userDTO.setFirstName(user.getFirstName());

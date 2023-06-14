@@ -4,11 +4,16 @@ import Group6.BankingApp.DAL.AccountRepository;
 import Group6.BankingApp.DAL.DebitCardRepository;
 import Group6.BankingApp.DAL.UserRepository;
 import Group6.BankingApp.Models.Account;
+import Group6.BankingApp.Models.Role;
+import Group6.BankingApp.Models.Transaction;
 import Group6.BankingApp.Models.User;
 import Group6.BankingApp.Models.DebitCard;
 import Group6.BankingApp.Models.dto.AccountDTO;
 import Group6.BankingApp.Models.dto.DebitCardDTO;
 import Group6.BankingApp.Models.dto.NewAccountDTO;
+import Group6.BankingApp.Models.dto.UserDTO;
+import Group6.BankingApp.Models.dto.UserDTO2;
+import org.hibernate.service.spi.ServiceException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -26,6 +31,13 @@ import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
+import java.util.Arrays;
+import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.Optional;
+
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
 class AccountServiceTest {
 
@@ -51,67 +63,7 @@ class AccountServiceTest {
         MockitoAnnotations.openMocks(this);
     }
 
-//    @Test
-//    void testAddAccount() {
-//
-//        AccountDTO accountDTO = new AccountDTO();
-//        accountDTO.setIban("NL01INHO9501054837");
-//
-//        UserDTO2 userDTO2 = new UserDTO2();
-//        userDTO2.setId(123L);
-//
-//        accountDTO.setUser(userDTO2);
-//
-//        Account result = accountService.addAccount(accountDTO);
-//
-//        ResponseEntity<Account> response = ResponseEntity.ok(result);
-//
-//        assertEquals(HttpStatus.OK, response.getStatusCode());
-//        assertEquals(result, response.getBody());
-//    }
-
-//    @Test
-//    void testAddAccount() {
-//
-//        AccountDTO accountDTO = new AccountDTO();
-//        accountDTO.setIban("NL01INHO9501054837");
-//
-//        UserDTO2 userDTO2 = new UserDTO2();
-//        userDTO2.setId(123L);
-//
-//        accountDTO.setUser(userDTO2);
-//
-//        Account result = accountService.addAccount(accountDTO);
-//
-//        ResponseEntity<Account> response = ResponseEntity.ok(result);
-//
-//        assertEquals(HttpStatus.OK, response.getStatusCode());
-//        assertEquals(result, response.getBody());
-//    }
-
-
-//    @Test
-//    void testUpdateAccountByIban() {
-//
-//        String iban = "NL01INHO9501054837";
-//        AccountDTO accountDTO = new AccountDTO();
-//        accountDTO.setAccountType("Savings");
-//        accountDTO.setDailyLimit(1000.0);
-//        accountDTO.setPin("1234");
-//
-//        Account accountToUpdate = new Account();
-//        accountToUpdate.setIban(iban);
-//
-//        Mockito.when(accountRepository.findById(iban)).thenReturn(Optional.of(accountToUpdate));
-//        Mockito.when(accountRepository.save(Mockito.any(Account.class))).thenReturn(accountToUpdate);
-//
-//        Account updatedAccount = accountService.updateAccountByIban(iban, accountDTO);
-//
-//        ResponseEntity<Account> response = ResponseEntity.ok(updatedAccount);
-//
-//        assertEquals(HttpStatus.OK, response.getStatusCode());
-//        assertEquals(updatedAccount, response.getBody());
-//    }
+    //WORKS
     @Test
     void testMapToAccountDTO() {
 
@@ -133,8 +85,46 @@ class AccountServiceTest {
         assertEquals(account.getPin(), accountDTO.getPin());
         assertEquals(account.getDailyLimit(), accountDTO.getDailyLimit());
     }
+    // wWORKS - negative condition
+    @Test
+    void testMapToAccountDTO_NullAccount() {
 
+        AccountDTO accountDTO = accountService.mapToAccountDTO(null);
 
+        assertNull(accountDTO);
+    }
+
+    //WORKS
+    @Test
+    void testGetAccountByIban_ValidIban() {
+        Account account = new Account();
+        account.setIban("NL01INHO9501054837");
+        account.setAccountType("Savings");
+
+        when(accountRepository.findById("NL01INHO9501054837")).thenReturn(Optional.of(account));
+
+        AccountDTO accountDTO = accountService.getAccountByIban("NL01INHO9501054837");
+
+        assertNotNull(accountDTO);
+
+        assertEquals("NL01INHO9501054837", accountDTO.getIban());
+        assertEquals("Savings", accountDTO.getAccountType());
+    }
+
+  //works -negative condition
+    @Test
+    void testGetAccountByIban_NonExistentIban() {
+        String nonExistentIban = "NL01INHO9501054837";
+        Account nonExistentAccount = null;
+        when(accountRepository.findById(nonExistentIban)).thenReturn(Optional.ofNullable(nonExistentAccount));
+
+        ServiceException exception = assertThrows(ServiceException.class, () -> accountService.getAccountByIban(nonExistentIban));
+
+        assertTrue(exception.getMessage().contains("Account not found"));
+        System.out.println(exception.getMessage());
+    }
+
+    //WORKS
     @Test
     void testDeactivateDebitCard() {
 
@@ -154,7 +144,7 @@ class AccountServiceTest {
 
         accountService.deactivateDebitCard(iban, debitCardDTO.getCardNumber() , active);
 
-        assertEquals(false, debitCard.isActive());
+        assertEquals(active, debitCard.isActive());
 
         ResponseEntity<Void> response = ResponseEntity.ok().build();
 
@@ -164,6 +154,117 @@ class AccountServiceTest {
 
     @Test
     void testMapToDebitCardDTO() {
+    // WORKS
+    @Test
+    public void testGetAllAccounts() {
+        User user1 = new User();
+        user1.setFirstName("John");
+        user1.setLastName("Doe");
+        user1.setEmail("john.doe@gmail.com");
+        user1.setPassword("123456");
+        user1.setPhoneNumber("0612345678");
+        user1.setHasAccount(true);
+        user1.setRoles(List.of(Role.ROLE_ADMIN));
+
+        User user2 = new User();
+        user2.setFirstName("Jane");
+        user2.setLastName("Smith");
+        user2.setEmail("jane.smith@gmail.com");
+        user2.setPassword("123456");
+        user2.setPhoneNumber("0612345678");
+        user2.setHasAccount(true);
+        user2.setRoles(List.of(Role.ROLE_USER));
+
+        List<User> users = Arrays.asList(user1, user2);
+
+        DebitCard debitCard1 = new DebitCard("1111222233334444", LocalDate.now().plusYears(3), "123", "John Doe", true, "UUID1");
+        DebitCard debitCard2 = new DebitCard("5555666677778888", LocalDate.now().plusYears(2), "456", "Jane Smith", true, "UUID2");
+
+
+
+        List<Account> accounts = Arrays.asList(
+                new Account("NL01INHO9501054837",user1,"Savings", accountService.generateCardUUID(), "1234", 1000.0, 600.0, 0, true, debitCard1),
+                new Account("NL01INHO9501054837",user2,"Savings", accountService.generateCardUUID(), "1234", 1000.0, 600.0, 0, true, debitCard1)
+        );
+
+        when(accountRepository.findAll()).thenReturn(accounts);
+
+        List<Account> result = accountService.getAllAccounts();
+
+        verify(accountRepository, times(1)).findAll();
+
+        assertNotNull(result);
+        assertEquals(2, result.size());
+
+        assertEquals(accounts.get(0), result.get(0));
+        assertEquals(accounts.get(1), result.get(1));
+    }
+    //WORKS
+    @Test
+    public void testFindAccountByIban() {
+        // Set up test data
+        User user1 = new User();
+        user1.setFirstName("John");
+        user1.setLastName("Doe");
+        user1.setEmail("john.doe@gmail.com");
+        user1.setPassword("123456");
+        user1.setPhoneNumber("0612345678");
+        user1.setHasAccount(true);
+        user1.setRoles(List.of(Role.ROLE_ADMIN));
+
+        DebitCard debitCard1 = new DebitCard("1111222233334444", LocalDate.now().plusYears(3), "123", "John Doe", true, "UUID1");
+
+        String testIban = "NL01INHO9501054837";
+        Account testAccount = new Account("NL01INHO9501054837", user1, "Savings", accountService.generateCardUUID(), "1234", 1000.0, 600.0, 0, true, debitCard1);
+
+        when(accountRepository.findByIban(testIban)).thenReturn(testAccount);
+
+        Account result = accountService.findAccountByIban(testIban);
+
+        assertNotNull(result);
+        assertEquals(testIban, result.getIban());
+
+        verify(accountRepository, times(1)).findByIban(testIban);
+    }
+
+    //works
+    @Test
+    void testMapToDebitCardDTO() {
+
+        DebitCard debitCard = new DebitCard();
+        debitCard.setCardNumber("1234567890");
+
+        DebitCardDTO debitCardDTO = accountService.mapToDebitCardDTO(debitCard);
+
+        assertNotNull(debitCardDTO);
+
+        assertEquals("1234567890", debitCardDTO.getCardNumber());
+    }
+
+    //works
+    @Test
+    void testDeleteAccount() {
+
+        String iban = "NL01INHO9501054837";
+        when(accountRepository.findById(iban)).thenReturn(Optional.of(new Account()));
+        accountService.deleteAccount(iban);
+        verify(accountRepository, times(1)).deleteById(iban);
+    }
+
+    //works - negative condition
+    @Test
+    void testDeleteAccount_NonExistentAccount() {
+        String nonExistentIban = "NL99NONEXISTENT";
+        
+        when(accountRepository.findById(nonExistentIban)).thenReturn(Optional.empty());
+
+        ServiceException exception = assertThrows(ServiceException.class, () -> accountService.deleteAccount(nonExistentIban));
+
+        verify(accountRepository, times(0)).deleteById(nonExistentIban);
+
+        assertEquals("Account not found", exception.getMessage());
+        System.out.println(exception.getMessage());
+    }
 
         DebitCard debitCard = new DebitCard();
         debitCard.setCardNumber("1234567890");
