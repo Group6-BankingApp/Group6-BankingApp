@@ -9,11 +9,13 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.time.LocalDate;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
 @SpringBootTest
 public class DebitCardServiceTest {
@@ -24,63 +26,54 @@ public class DebitCardServiceTest {
     @Mock
     private AccountRepository accountRepository;
 
+
     @InjectMocks
-    private DebitCardService debitCardService;
+    @Autowired
+    private AccountService debitCardService;
 
     @Test
-    public void testCreateDebitCard() {
-
+    void testCreateDebitCard() {
 
         Account account = new Account();
-        account.setIban("NL01INHO0000000001");
-        account.setCardUUID("some_uuid");
-        account.setPin("1234");
-        account.setBalance(1000.0);
-
+        account.setCardUUID("1037f321-5771-4c84-b24e-6e691d08b717");
+        account.setCardNumber(null);
 
         DebitCard existingActiveCard = new DebitCard();
-        existingActiveCard.setCardNumber("6638545966347381");
-        existingActiveCard.setExpirationDate(LocalDate.now().plusYears(5));
         existingActiveCard.setActive(true);
-        existingActiveCard.setUuid(account.getCardUUID());
-        existingActiveCard.setAccount(account);
-
 
         DebitCard newCard = new DebitCard();
-        newCard.setCardNumber("5538545966347381");
+        newCard.setCardNumber("1234567890");
         newCard.setExpirationDate(LocalDate.now().plusYears(5));
         newCard.setActive(false);
         newCard.setUuid(account.getCardUUID());
         newCard.setAccount(account);
 
+        when(debitCardRepository.findByAccountAndIsActive(account, true)).thenReturn(existingActiveCard);
+        when(debitCardRepository.save(any(DebitCard.class))).thenReturn(newCard);
 
-        DebitCard savedCard = new DebitCard();
-        savedCard.setId(1L);
-        savedCard.setCardNumber(newCard.getCardNumber());
-        savedCard.setExpirationDate(newCard.getExpirationDate());
-        savedCard.setActive(newCard.isActive());
-        savedCard.setUuid(newCard.getUuid());
-        savedCard.setAccount(newCard.getAccount());
-
-
-        Mockito.when(debitCardRepository.findByAccountAndIsActive(account, true)).thenReturn(existingActiveCard);
-        Mockito.when(debitCardRepository.save(existingActiveCard)).thenReturn(existingActiveCard);
-        Mockito.when(debitCardRepository.save(newCard)).thenReturn(savedCard);
-
-
-        Mockito.when(accountRepository.save(account)).thenReturn(account);
-
-
+        // Invoke the method
         DebitCardDTO result = debitCardService.createDebitCard(account);
 
+        // Verify the expected behavior
+        verify(debitCardRepository, times(1)).findByAccountAndIsActive(account, true);
+        verify(debitCardRepository, times(1)).save(newCard);
+        verify(accountRepository, times(1)).save(account);
 
-        assertEquals(savedCard.getCardNumber(), result.getCardNumber());
-
-
-        Mockito.verify(debitCardRepository, Mockito.times(1)).findByAccountAndIsActive(account, true);
-        Mockito.verify(debitCardRepository, Mockito.times(1)).save(existingActiveCard);
-        Mockito.verify(debitCardRepository, Mockito.times(1)).save(newCard);
-        Mockito.verify(accountRepository, Mockito.times(1)).save(account);
-
+        assertFalse(existingActiveCard.isActive());
+        assertEquals("1234567890", account.getCardNumber());
+        assertEquals("1234567890", result.getCardNumber());
     }
+
+//    @Test
+//    void testMapToDebitCardDTO() {
+//
+//        DebitCard debitCard = new DebitCard();
+//        debitCard.setCardNumber("1234567890");
+//
+//        DebitCardDTO debitCardDTO = debitCardService.mapToDebitCardDTO(debitCard);
+//
+//        assertNotNull(debitCardDTO);
+//
+//        assertEquals("1234567890", debitCardDTO.getCardNumber());
+//    }
 }
