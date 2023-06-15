@@ -9,16 +9,20 @@ public class TransactionDTO{
     private double amount;
     private String receiverIban;
     private String senderIban;
-    private String description;
+    private String timeCreated;
+    private UserDTO2 userDTO2;
+    private String pin;
 
     public TransactionDTO() {
     }
 
-    public TransactionDTO(double amount, String receiverIban, String senderIban, String description) {
+    public TransactionDTO(double amount, String receiverIban, String senderIban, String timeCreated, UserDTO2 userDTO2, String pin) {
         this.amount = amount;
         this.receiverIban = receiverIban;
         this.senderIban = senderIban;
-        this.description = description;
+        this.timeCreated = timeCreated;
+        this.userDTO2 = userDTO2;
+        this.pin = pin;
     }
 
     public double getAmount() {
@@ -33,7 +37,11 @@ public class TransactionDTO{
         return senderIban;
     }
 
-    public String getDescription() {
-        return description;
+    public String getTimeCreated() {
+        return timeCreated;
+    }
+
+    public UserDTO2 getUserDTO2() {
+        return userDTO2;
     }
 }

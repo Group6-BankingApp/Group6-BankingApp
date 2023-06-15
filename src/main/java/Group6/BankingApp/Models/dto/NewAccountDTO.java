@@ -8,6 +8,9 @@ public class NewAccountDTO {
     private String accountType;
     private String pin;
     private double dailyLimit;
+    private  double balance;
+    private  double absoluteLimit;
+    private double transactionLimit;
 
     public NewAccountDTO() {
     }
@@ -17,20 +20,34 @@ public class NewAccountDTO {
         this.accountType = account.getAccountType();
         this.pin = account.getPin();
         this.dailyLimit = account.getDailyLimit();
+        this.balance = account.getBalance();
+        this.absoluteLimit = account.getAbsoluteLimit();
+        this.transactionLimit = account.getTransactionLimit();
     }
 
-    public NewAccountDTO(Long userId, String accountType, String pin) {
-        this.userId = userId;
+    public NewAccountDTO( String accountType, String pin) {
         this.accountType = accountType;
         this.pin = pin;
         this.dailyLimit = 2000.00;
     }
 
-    public NewAccountDTO(Long userId, String accountType, String pin, double dailyLimit) {
+    public NewAccountDTO( Long userId,String accountType, String pin, double dailyLimit, double balance, double absoluteLimit,double transactionLimit) {
         this.userId = userId;
         this.accountType = accountType;
         this.pin = pin;
         this.dailyLimit = dailyLimit;
+        this.balance = balance;
+        this.absoluteLimit = absoluteLimit;
+        this.transactionLimit = transactionLimit;
+    }
+
+
+    public String getAccountType() {
+        return accountType;
+    }
+
+    public void setAccountType(String accountType) {
+        this.accountType = accountType;
     }
 
     public Long getUserId() {
@@ -39,14 +56,6 @@ public class NewAccountDTO {
 
     public void setUserId(Long userId) {
         this.userId = userId;
-    }
-
-    public String getAccountType() {
-        return accountType;
-    }
-
-    public void setAccountType(String accountType) {
-        this.accountType = accountType;
     }
 
     public String getPin() {
@@ -63,5 +72,29 @@ public class NewAccountDTO {
 
     public void setDailyLimit(double dailyLimit) {
         this.dailyLimit = dailyLimit;
+    }
+
+    public double getBalance() {
+        return balance;
+    }
+
+    public void setBalance(double balance) {
+        this.balance = balance;
+    }
+
+    public double getAbsoluteLimit() {
+        return absoluteLimit;
+    }
+
+    public void setAbsoluteLimit(double absoluteLimit) {
+        this.absoluteLimit = absoluteLimit;
+    }
+
+    public double getTransactionLimit() {
+        return transactionLimit;
+    }
+
+    public void setTransactionLimit(double transactionLimit) {
+        this.transactionLimit = transactionLimit;
     }
 }

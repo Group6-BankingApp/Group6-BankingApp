@@ -15,17 +15,17 @@ public class Transaction {
     private String senderIban;
     private String receiverIban;
     private double amount;
-    private String description;
+    private Long userId;
+
 
     public Transaction() {
     }
 
-    public Transaction(String senderIban, String receiverIban, double amount, String description) {
+    public Transaction(String senderIban, String receiverIban, double amount) {
         this.timeCreated = LocalDate.now();
         this.senderIban = senderIban;
         this.receiverIban = receiverIban;
         this.amount = amount;
-        this.description = description;
     }
 
     public Transaction(TransactionDTO transactionDTO) {
@@ -33,7 +33,7 @@ public class Transaction {
         this.senderIban = transactionDTO.getSenderIban();
         this.receiverIban = transactionDTO.getReceiverIban();
         this.amount = transactionDTO.getAmount();
-        this.description = transactionDTO.getDescription();
+        this.userId = transactionDTO.getUserDTO2().getId();
     }
 
 
@@ -55,7 +55,7 @@ public class Transaction {
         return receiverIban;
     }
 
-    public  void setreceiverIban(String receiverIban) {
+    public  void setReceiverIban(String receiverIban) {
         this.receiverIban = receiverIban;
     }
 
@@ -73,13 +73,5 @@ public class Transaction {
 
     public  void setAmount(Double amount) {
         this.amount = amount;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-    
-    public  void setDescription(String description) {
-        this.description = description;
     }
 }
