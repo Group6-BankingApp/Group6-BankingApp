@@ -139,8 +139,16 @@ public class AccountController {
             @PathVariable String cardNumber,
             @RequestParam(value = "active") Boolean active
     ) {
+        if (cardNumber == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        try {
             accountService.deactivateDebitCard(iban, cardNumber, active);
             return ResponseEntity.ok("Debit card deactivated successfully.");
+        } catch (Exception e) {
+            return ResponseEntity.notFound().build();
+        }
     }
 
     @PutMapping("/{iban}/pin")

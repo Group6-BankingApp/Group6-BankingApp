@@ -1,29 +1,45 @@
 package Group6.BankingApp;
 
 import Group6.BankingApp.Controllers.AccountController;
+import Group6.BankingApp.Controllers.UserController;
 import Group6.BankingApp.Models.Account;
-import Group6.BankingApp.Models.dto.AccountDTO;
-import Group6.BankingApp.Models.dto.DebitCardDTO;
-import Group6.BankingApp.Models.dto.NewAccountDTO;
+import Group6.BankingApp.Models.Role;
+import Group6.BankingApp.Models.User;
+import Group6.BankingApp.Models.dto.*;
 import Group6.BankingApp.Services.AccountService;
 import Group6.BankingApp.Services.UserService;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Collections;
 import java.util.List;
 
 
+import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
 class BankingAppApplicationTests {
@@ -32,12 +48,99 @@ class BankingAppApplicationTests {
 	void contextLoads() {
 	}
 
-	//Accounts
-	@Mock
-	private AccountService accountService;
+	//Users
+
+	private MockMvc mockMvc;
+
+
+	@InjectMocks
+	private UserController userController;
 
 	@Mock
 	private UserService userService;
+
+	private UserDTO2 userDTO2;
+
+	@BeforeEach
+	void setUp() {
+		User user1 = new User();
+		user1.setFirstName("John");
+		user1.setLastName("Doe");
+		user1.setEmail("john.doe@gmail.com");
+		user1.setPassword("123456");
+		user1.setPhoneNumber("0612345678");
+		user1.setHasAccount(true);
+		user1.setRoles(List.of(Role.ROLE_USER));
+		userDTO2 = new UserDTO2(user1);
+
+		mockMvc = MockMvcBuilders.standaloneSetup(userController).build();
+	}
+
+	@Test
+	void getAllUsersTest() throws Exception {
+		when(userService.getAllUsers()).thenReturn(List.of(userDTO2));
+
+		this.mockMvc.perform(MockMvcRequestBuilders.get("/users")).andDo(print())
+				.andExpect(MockMvcResultMatchers.status().isOk())
+				.andExpect(jsonPath("$", hasSize(1)))
+				.andExpect(jsonPath("$[0].firstName").value("John"))
+				.andExpect(jsonPath("$[0].lastName").value("Doe"));
+	}
+
+	@Test
+	void getAllUsersWithAccountTest() throws Exception{
+		when(userService.getAllUsersWithAccount()).thenReturn(List.of(userDTO2));
+
+		this.mockMvc.perform(MockMvcRequestBuilders.get("/users/withAccount")).andDo(print())
+				.andExpect(MockMvcResultMatchers.status().isOk())
+				.andExpect(jsonPath("$", hasSize(1)))
+				.andExpect(jsonPath("$[0].firstName").value("John"))
+				.andExpect(jsonPath("$[0].lastName").value("Doe"));
+	}
+
+	@Test
+	void getUserByIdTest() throws Exception{
+		when(userService.getUserById(any(Long.class))).thenReturn(userDTO2);
+
+		this.mockMvc.perform(MockMvcRequestBuilders.get("/users/1")).andDo(print())
+				.andExpect(MockMvcResultMatchers.status().isOk())
+				.andExpect(jsonPath("$.firstName").value("John"))
+				.andExpect(jsonPath("$.lastName").value("Doe"));
+	}
+
+	@Test
+	void addUserTest() throws Exception{
+		when(userService.addUser(any(UserDTO.class))).thenReturn(userDTO2);
+		this.mockMvc.perform(MockMvcRequestBuilders.post("/users")
+						.contentType(MediaType.APPLICATION_JSON)
+						.content("{}"))
+				.andExpect(status().isCreated())
+				.andExpect(jsonPath("$.firstName").value("John"))
+				.andExpect(jsonPath("$.lastName").value("Doe"));
+	}
+
+	@Test
+	void updateUserTest() throws Exception{
+		when(userService.updateUser(any(Long.class),any(UserDTO.class))).thenReturn(userDTO2);
+		this.mockMvc.perform(MockMvcRequestBuilders.put("/users/1")
+						.contentType(MediaType.APPLICATION_JSON)
+						.content("{}"))
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("$.firstName").value("John"))
+				.andExpect(jsonPath("$.lastName").value("Doe"));
+	}
+
+	@Test
+	void deleteUserTest() throws Exception{
+		doNothing().when(userService).deleteUser(any(Long.class));
+		this.mockMvc.perform(MockMvcRequestBuilders.delete("/users/1"))
+				.andExpect(status().isOk());
+	}
+
+
+	//Accounts
+	@Mock
+	private AccountService accountService;
 
 	@InjectMocks
 	private AccountController accountController;
@@ -201,13 +304,13 @@ class BankingAppApplicationTests {
 		ResponseEntity<String> response = accountController.deactivateDebitCard(iban, debitCardNum, true);
 
 		assertEquals(HttpStatus.OK, response.getStatusCode());
-		assertNull(response.getBody());
+		assertEquals(response.getBody(), "Debit card deactivated successfully.");
 	}
 
 	@Test
 	public void testDeactivateDebitCard_Failure() {
 		String iban = "123456789";
-		String debitCardNum = "123456789";
+		String debitCardNum = null;
 
 		ResponseEntity<String> response = accountController.deactivateDebitCard(iban, debitCardNum, true);
 
