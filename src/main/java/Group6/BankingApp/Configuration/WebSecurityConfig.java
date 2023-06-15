@@ -45,7 +45,8 @@ public class WebSecurityConfig {
                 .requestMatchers("/users/withAccount").authenticated()
                 .requestMatchers("/users/withoutAccount").authenticated()
                 .requestMatchers("/transactions").permitAll()
-                .requestMatchers("/transactions/{id}").permitAll();
+                .requestMatchers("/transactions/{id}").permitAll()
+                .requestMatchers("/transactions/customer/{iban}").permitAll();
 
         httpSecurity.addFilterBefore(jwtTokenFilter, UsernamePasswordAuthenticationFilter.class);
 

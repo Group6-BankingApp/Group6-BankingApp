@@ -1,4 +1,4 @@
 package Group6.BankingApp.Models.dto;
 
-public record TokenDTO(Long userid,String username,String token) {
+public record TokenDTO(UserDTO2 userDTO2,String token) {
 }

@@ -83,7 +83,6 @@ public class TransactionStepDefinitions extends BaseStepDefinitions {
         dto.setSenderIban(sender);
         dto.setReceiverIban(receiver);
         dto.setAmount(amount);
-        dto.setDescription(description);
         return dto;
     }
 

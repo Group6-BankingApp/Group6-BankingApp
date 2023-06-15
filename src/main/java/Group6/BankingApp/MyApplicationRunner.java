@@ -68,18 +68,16 @@ public class MyApplicationRunner implements ApplicationRunner {
         debitCardRepository.save(debitCard2);
 
         // Create and save Accounts
-        Account account1 = new Account("NL01INHO9501054837",user1,"Savings", accountService.generateCardUUID(), "1234", 1000.0, 600.0, 0, true, debitCard1);
-        //account1.setDebitCard(debitCard1);
-        account1.setUser(users.get(0));
+        Account account1 = new Account("NL01INHO9501054837",user1,"Current", accountService.generateCardUUID(), "1234", 1000.0, 1000.0, 0,100, true, debitCard1);
+        Account account= new Account("NL01INHO9501054804",user1,"Savings", accountService.generateCardUUID(), "1234", 1000.0, 1000.0, 0, 100,true, debitCard1);
         accountRepository.save(account1);
-        Account account2 = new Account("NL01INHO2371458805",user2, "Current", accountService.generateCardUUID(), "5678", 2000.0, 950.0, 0, true, debitCard2);
+        accountRepository.save(account);
+        Account account2 = new Account("NL01INHO2371458805",user2, "Current", accountService.generateCardUUID(), "5678", 2000.0, 950.0, 0,100, true, debitCard2);
         //account2.setDebitCard(debitCard2);
-        account2.setUser(users.get(1));
         accountRepository.save(account2);
 
-        Account account3 = new Account("NL01INH1234567890",user2, "Current", accountService.generateCardUUID(), "5678", 2000.0, 950.0, -100, true, debitCard2);
+        Account account3 = new Account("NL01INH1234567890",user2, "Savings", accountService.generateCardUUID(), "5678", 2000.0, 950.0, -100,100, true, debitCard2);
         //account2.setDebitCard(debitCard2);
-        account3.setUser(users.get(1));
         accountRepository.save(account3);
 //        Account account3 = new Account("NL01INHO5808504708", "Savings", accountService.generateCardUUID(), "1357", 1000.0, 0.0, 5000.0, true, null);
 //        account3.setDebitCard(debitCard1);
@@ -98,11 +96,11 @@ public class MyApplicationRunner implements ApplicationRunner {
 //        account6.setUser(users.get(2));
 //        accountRepository.save(account6);
             // Create and save Transactions
-            Transaction transaction1 = new Transaction(account1.getIban(), account2.getIban(), 200.0, "withdraw");
+            Transaction transaction1 = new Transaction(account1.getIban(), account2.getIban(), 200.0);
             transactionRepository.save(transaction1);
-            Transaction transaction2 = new Transaction(account2.getIban(), account3.getIban(), 155.0, "deposit");
+            Transaction transaction2 = new Transaction(account2.getIban(), account3.getIban(), 155.0);
             transactionRepository.save(transaction2);
-            Transaction transaction3 = new Transaction(account2.getIban(), account1.getIban(), 100.0, "regular");
+            Transaction transaction3 = new Transaction(account2.getIban(), account1.getIban(), 100.0);
             transactionRepository.save(transaction3);
 
             Iterable <Transaction> transactions =  transactionRepository.findAllBySenderIbanOrReceiverIban(account1.getIban(), account1.getIban());
