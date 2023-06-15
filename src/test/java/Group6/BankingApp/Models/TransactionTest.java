@@ -1,4 +1,4 @@
-package Models;
+package Group6.BankingApp.Models;
 
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
