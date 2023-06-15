@@ -51,5 +51,4 @@ class TransactionTest {
         assertEquals(description, transaction.getDescription());
         assertEquals(timeCreated, transaction.getTimeCreated());
     }
-    
 }
