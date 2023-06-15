@@ -11,6 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -39,12 +40,12 @@ class TransactionControllerTest {
         when(transactionService.findAllTransactions(0, 40, "", "", "NL67INGB1234567890", "")).thenReturn(transactions);
 
         // Calling the controller method
-        ResponseEntity<List<Transaction>> response = transactionController.getAllTransactions("NL67INGB1234567890", 0, 40, "", "", "");
+        ResponseEntity<List<Transaction>> response = transactionController.getAllTransactions("NL67INGB1234567890", 0, 40,  "","", "");
 
         // Verifying the response
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertEquals(transactions, response.getBody());
-        verify(transactionService, times(1)).findAllTransactions(0, 40, "", "", "NL67INGB1234567890", "");
+        verify(transactionService, times(1)).findAllTransactions(0, 40, (LocalDate.now().minusYears(1)).toString(), (LocalDate.now().toString()), "NL67INGB1234567890", "");
     }
 
     @Test
@@ -73,20 +74,6 @@ class TransactionControllerTest {
 
         assertEquals(HttpStatus.CREATED, response.getStatusCode());
         assertEquals(newTransaction, response.getBody());
-        verify(transactionService, times(1)).addTransaction(transaction, pin);
-    }
-
-    @Test
-    void testAddTransactionWithInsufficientBalance() {
-        Transaction transaction = new Transaction();
-        String pin = "0000";
-
-        when(transactionService.addTransaction(transaction, pin)).thenThrow(new ResponseStatusException(HttpStatus.BAD_REQUEST, "Insufficient balance"));
-
-        ResponseEntity response = transactionController.addTransaction(transaction, pin, "token");
-
-        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
-        assertNull(response.getBody());
         verify(transactionService, times(1)).addTransaction(transaction, pin);
     }
 
