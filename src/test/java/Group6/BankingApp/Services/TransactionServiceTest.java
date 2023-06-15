@@ -86,6 +86,5 @@ class TransactionServiceTest {
         assertEquals(transaction.getDescription(), result.getDescription());
     }
 
-    // Add more unit tests for the other methods in the TransactionService class
 
 }
