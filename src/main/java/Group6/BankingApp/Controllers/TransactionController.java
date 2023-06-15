@@ -1,6 +1,7 @@
 package Group6.BankingApp.Controllers;
 
 import Group6.BankingApp.Models.Transaction;
+import Group6.BankingApp.Models.dto.TransactionDTO;
 import Group6.BankingApp.Services.AccountService;
 import Group6.BankingApp.Services.TransactionService;
 import io.jsonwebtoken.Claims;
@@ -103,15 +104,15 @@ public class TransactionController {
         }
     }
 
-    @PostMapping
-    public ResponseEntity addTransaction(@RequestBody Transaction transaction, @RequestParam(defaultValue = "0000") String pin, @RequestHeader("Authorization") String token) {
-        try{
-            Transaction newTransaction=transactionService.addTransaction(transaction, pin);
-            return ResponseEntity.status(201).body(newTransaction);
-        }catch (Exception e){
-            return ResponseEntity.internalServerError().body(e.getCause().getMessage());
-        }
-    }
+//    @PostMapping
+//    public ResponseEntity addTransaction(@RequestBody Transaction transaction, @RequestParam(defaultValue = "0000") String pin, @RequestHeader("Authorization") String token) {
+//        try{
+//            Transaction newTransaction=transactionService.addTransaction(transaction, pin);
+//            return ResponseEntity.status(201).body(newTransaction);
+//        }catch (Exception e){
+//            return ResponseEntity.internalServerError().body(e.getCause().getMessage());
+//        }
+//    }
     @PostMapping(value = "/deposit")
     public ResponseEntity Deposit(@RequestBody Transaction transaction, @RequestHeader("Authorization") String token) {
         try{
@@ -123,9 +124,19 @@ public class TransactionController {
     }
     
     @PostMapping(value = "/withdraw")
-    public ResponseEntity Withdraw(@RequestBody Transaction transaction, @RequestParam(defaultValue = "0000") String pin, @RequestHeader("Authorization") String token) {
+    public ResponseEntity Withdraw(@RequestBody TransactionDTO transaction, @RequestParam(defaultValue = "0000") String pin, @RequestHeader("Authorization") String token) {
         try{
             Transaction newTransaction=transactionService.addTransactionWithdraw(transaction, pin);
+            return ResponseEntity.status(201).body(newTransaction);
+        }catch (Exception e){
+            return ResponseEntity.internalServerError().body(e.getCause().getMessage());
+        }
+    }
+
+    @PostMapping
+    public ResponseEntity makeTransfer (@RequestBody TransactionDTO transactionDTO) {
+        try{
+            Transaction newTransaction=transactionService.addTransaction(transactionDTO);
             return ResponseEntity.status(201).body(newTransaction);
         }catch (Exception e){
             return ResponseEntity.internalServerError().body(e.getCause().getMessage());

@@ -8,6 +8,7 @@ public class UserDTO2 {
     private String lastName;
     private String email;
     private String phoneNumber;
+    private String hasAccount;
 
     public UserDTO2(){}
 
@@ -17,6 +18,11 @@ public class UserDTO2 {
         this.lastName = user.getLastName();
         this.email = user.getEmail();
         this.phoneNumber = user.getPhoneNumber();
+        if (user.isHasAccount()) {
+            this.hasAccount = "Yes";
+        } else {
+            this.hasAccount = "No";
+        }
     }
 
     public Long getId() {
@@ -57,5 +63,9 @@ public class UserDTO2 {
 
     public void setPhoneNumber(String phoneNumber) {
         this.phoneNumber = phoneNumber;
+    }
+
+    public String getHasAccount() {
+        return hasAccount;
     }
 }
