@@ -28,7 +28,6 @@ public class Transaction {
         this.description = description;
     }
 
-    //TODO add userId from session token
     public Transaction(TransactionDTO transactionDTO) {
         this.timeCreated = LocalDate.now();
         this.senderIban = transactionDTO.getSenderIban();
