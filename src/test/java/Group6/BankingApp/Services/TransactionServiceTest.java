@@ -35,8 +35,8 @@ class TransactionServiceTest {
     void testGetAllTransactions() {
         // Create a list of transactions
         List<Transaction> transactions = Arrays.asList(
-                new Transaction("sender1", "receiver1", 100.0, "description1"),
-                new Transaction("sender2", "receiver2", 200.0, "description2")
+                new Transaction("sender1", "receiver1", 100.0),
+                new Transaction("sender2", "receiver2", 200.0)
         );
 
         // Mock the behavior of the transaction repository to return the list of transactions
@@ -62,7 +62,7 @@ class TransactionServiceTest {
     void testGetTransactionById() {
         // Create a transaction with a specific ID
         String transactionId = "transaction1";
-        Transaction transaction = new Transaction("sender1", "receiver1", 100.0, "description1");
+        Transaction transaction = new Transaction("sender1", "receiver1", 100.0);
         transaction.setTransactionId(transactionId);
 
         // Mock the behavior of the transaction repository to return the transaction with the specified ID
@@ -83,9 +83,7 @@ class TransactionServiceTest {
         assertEquals(transaction.getSenderIban(), result.getSenderIban());
         assertEquals(transaction.getReceiverIban(), result.getReceiverIban());
         assertEquals(transaction.getAmount(), result.getAmount());
-        assertEquals(transaction.getDescription(), result.getDescription());
     }
 
-    // Add more unit tests for the other methods in the TransactionService class
 
 }

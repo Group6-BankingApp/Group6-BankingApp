@@ -2,6 +2,7 @@ package Group6.BankingApp.Services;
 
 import Group6.BankingApp.DAL.TransactionRepository;
 import Group6.BankingApp.Models.Transaction;
+import Group6.BankingApp.Models.dto.TransactionDTO;
 import Group6.BankingApp.Services.AccountService;
 import Group6.BankingApp.Models.dto.AccountDTO;
 import Group6.BankingApp.Models.Account;
@@ -35,20 +36,15 @@ public class TransactionService {
         return transactionRepository.findById(id).orElse(null);
     }
 
-    public Transaction addTransaction(Transaction transaction, String pin) {
+    public Transaction addTransaction(TransactionDTO transaction) {
         try {
-            if((CheckSufficientFunds(transaction, pin)) && (CheckDailyLimit(accountService.getAccountByIban(transaction.getSenderIban()), transaction))){
+            if((CheckSufficientFunds(transaction, transaction.getPin())) && (CheckDailyLimit(accountService.getAccountByIban(transaction.getSenderIban()), transaction))){
                 TransferMoney(transaction);
-                Transaction newtransaction = new Transaction(
-                    transaction.getSenderIban(),
-                    transaction.getReceiverIban(),
-                    transaction.getAmount(),
-                    "regular transaction"
-                    );
-                    return transactionRepository.save(newtransaction);
+                Transaction newTransaction = new Transaction(transaction);
+                    return transactionRepository.save(newTransaction);
                 }
                 else {
-                    throw new ServiceException("Transaction Failed");
+                    throw new ServiceException("Insufficient funds or daily limit reached");
                 }
         } catch (Exception ex) {
             throw new ServiceException("Failed to add account", ex);
@@ -60,23 +56,21 @@ public class TransactionService {
             Transaction newtransaction = new Transaction(
                     "cash",
                     transaction.getReceiverIban(),
-                    transaction.getAmount(),
-                    "deposit transaction"
+                    transaction.getAmount()
             );
             return transactionRepository.save(newtransaction);
         } catch (Exception ex) {
             throw new ServiceException("Failed to add account", ex);
         }
     }
-    public Transaction addTransactionWithdraw(Transaction transaction, String pin) {
+    public Transaction addTransactionWithdraw(TransactionDTO transaction, String pin) {
         try {
             if(CheckSufficientFunds(transaction, pin)){
             WithdrawMoney(transaction);
             Transaction newtransaction = new Transaction(
                     transaction.getSenderIban(),
                     "cash",
-                    transaction.getAmount(),
-                    "withdraw transaction"
+                    transaction.getAmount()
             );
             return transactionRepository.save(newtransaction);
             }
@@ -87,18 +81,22 @@ public class TransactionService {
             throw new ServiceException("Failed to add account", ex);
         }
     }
-    public void TransferMoney(Transaction transaction) {
+    public void TransferMoney(TransactionDTO transaction) {
         //TODO: add transfer money logic
         AccountDTO senderAccount = accountService.getAccountByIban(transaction.getSenderIban());
         AccountDTO receiverAccount = accountService.getAccountByIban(transaction.getReceiverIban());
-        if(senderAccount.getAccountType() == "Current" && receiverAccount.getAccountType() == "Current")    {
+
+        if((senderAccount.getUser().getId() != receiverAccount.getUser().getId())&&!((senderAccount.getAccountType().equals("Current"))&&(receiverAccount.getAccountType().equals("Current")))){
+            throw new ServiceException("Transfer between different account types for different users is not allowed");
+        }
+        else if(senderAccount.getTransactionLimit()<transaction.getAmount()){
+            throw new ServiceException("Cannot transfer more than "+senderAccount.getTransactionLimit()+" per transaction");
+        }
+        else{
             senderAccount.setBalance(senderAccount.getBalance() - transaction.getAmount());
             receiverAccount.setBalance(receiverAccount.getBalance() + transaction.getAmount());
             accountService.updateAccountByIban(transaction.getSenderIban(), senderAccount);
             accountService.updateAccountByIban(transaction.getReceiverIban(), receiverAccount);
-        }
-        else{
-            throw new ServiceException("Invalid Account for Transfer");
         }
     }
 
@@ -113,7 +111,7 @@ public class TransactionService {
             throw new ServiceException("Invalid Account for Transfer");
         }
     }
-    public void WithdrawMoney(Transaction transaction) {
+    public void WithdrawMoney(TransactionDTO transaction) {
         AccountDTO senderAccount = accountService.getAccountByIban(transaction.getSenderIban());
         if(senderAccount.getAccountType() == "Current")    {
             senderAccount.setBalance(senderAccount.getBalance() - transaction.getAmount());
@@ -125,19 +123,20 @@ public class TransactionService {
     }
 
 
-    public boolean CheckSufficientFunds(Transaction transaction, String pin) {
+    public boolean CheckSufficientFunds(TransactionDTO transaction, String pin) {
         try {
-            if ((accountService.getAccountBalance(transaction.getSenderIban(), pin) - transaction.getAmount()) >= accountService.getAccountByIban(transaction.getSenderIban()).getAbsoluteLimit()) {
+            double absolutelimit=(accountService.getAccountByIban(transaction.getSenderIban())).getAbsoluteLimit();
+            if ((accountService.getAccountBalance(transaction.getSenderIban(), pin) - transaction.getAmount()) >=absolutelimit ) {
                 return true;
             } else {
                 return false;
             }
         } catch (Exception ex) {
-            throw new ServiceException("Transaction Failed", ex);
+            throw new ServiceException("Checking Transaction Failed", ex);
         }
     }
 
-    public boolean CheckDailyLimit(AccountDTO account, Transaction transaction){
+    public boolean CheckDailyLimit(AccountDTO account, TransactionDTO transaction){
         List<Transaction> dailyTransactions = findAllTransactions(0, 50, LocalDate.now().toString(), LocalDate.now().toString(), account.getIban(), account.getPin());
         //check if the sum of the transaction and the daily transactions is less than the daily limit
         double sum = transaction.getAmount();
@@ -195,4 +194,5 @@ public class TransactionService {
                 throw new ServiceException("Failed to retrieve transactions here", ex);
             }
         }
+
 }

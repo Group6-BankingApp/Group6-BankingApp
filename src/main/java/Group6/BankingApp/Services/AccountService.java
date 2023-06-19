@@ -82,7 +82,7 @@ public AccountService(AccountRepository accountRepository, UserRepository userRe
             String pin = newAccountDTO.getPin();
             double dailyLimit = newAccountDTO.getDailyLimit();
 
-            Account account = new Account(iban, user, accountType, cardUUID, pin, dailyLimit, 0.0, 0.0, true, null);
+            Account account = new Account(iban, user, accountType, cardUUID, pin, dailyLimit, newAccountDTO.getBalance(), newAccountDTO.getAbsoluteLimit(), newAccountDTO.getTransactionLimit(), true, null);
             accountRepository.save(account);
 
             AccountDTO accountDTO = mapToAccountDTO(account);
@@ -284,6 +284,7 @@ public AccountService(AccountRepository accountRepository, UserRepository userRe
         accountDTO.setDailyLimit(account.getDailyLimit());
         accountDTO.setBalance(account.getBalance());
         accountDTO.setAbsoluteLimit(account.getAbsoluteLimit());
+        accountDTO.setTransactionLimit(account.getTransactionLimit());
         accountDTO.setDebitCardNumber(account.getCardNumber());
 
         DebitCard debitCard = account.getDebitCard();

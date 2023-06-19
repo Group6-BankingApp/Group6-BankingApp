@@ -18,12 +18,13 @@ public class Account {
     private double dailyLimit;
     private double balance;
     private double absoluteLimit;
+    private double transactionLimit;
     private boolean status;
     private String cardNumber;
     @OneToOne
     private DebitCard debitCard;
 
-    public Account(String iban, String accountType, String cardUUID, String pin, double dailyLimit, double balance, double absoluteLimit, boolean status, String cardNumber) {
+    public Account(String iban, String accountType, String cardUUID, String pin, double dailyLimit, double balance, double absoluteLimit, double transactionLimit, boolean status, String cardNumber) {
         this.iban = iban;
         this.accountType = accountType;
         this.cardUUID = cardUUID;
@@ -31,11 +32,12 @@ public class Account {
         this.dailyLimit = dailyLimit;
         this.balance = balance;
         this.absoluteLimit = absoluteLimit;
+        this.transactionLimit = transactionLimit;
         this.status = status;
         this.cardNumber = cardNumber;
     }
 
-    public Account(String iban, User user, String accountType, String cardUUID, String pin, double dailyLimit, double balance, double absoluteLimit, boolean status, DebitCard debitCard) {
+    public Account(String iban, User user, String accountType, String cardUUID, String pin, double dailyLimit, double balance, double absoluteLimit,double transactionLimit, boolean status, DebitCard debitCard) {
         this.iban = iban;
         this.user = user;
         this.accountType = accountType;
@@ -44,8 +46,10 @@ public class Account {
         this.dailyLimit = dailyLimit;
         this.balance = balance;
         this.absoluteLimit = absoluteLimit;
+        this.transactionLimit = transactionLimit;
         this.status = status;
         this.debitCard = debitCard;
+        this.user.setHasAccount(true);
     }
 
     public Account(String iban, UserDTO2 userDTO2, String accountType, String cardUUID, String pin, double dailyLimit, double balance, double absoluteLimit, boolean status) {
@@ -151,7 +155,15 @@ public class Account {
         this.debitCard = debitCard;
     }
 
-    protected User mapToUser(UserDTO2 userDTO2) {
+    public double getTransactionLimit() {
+        return transactionLimit;
+    }
+
+    public void setTransactionLimit(double transactionLimit) {
+        this.transactionLimit = transactionLimit;
+    }
+
+    private User mapToUser(UserDTO2 userDTO2) {
         User user = new User();
         user.setId(userDTO2.getId());
         user.setFirstName(userDTO2.getFirstName());
