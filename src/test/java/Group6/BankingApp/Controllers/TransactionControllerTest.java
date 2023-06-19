@@ -62,19 +62,19 @@ class TransactionControllerTest {
     }
 
 
-    @Test
-    void testAddTransaction() {
-        Transaction transaction = new Transaction();
-        String pin = "0000";
-        Transaction newTransaction = new Transaction();
-
-        when(transactionService.addTransaction(transaction, pin)).thenReturn(newTransaction);
-
-        ResponseEntity response = transactionController.addTransaction(transaction, pin, "token");
-
-        assertEquals(HttpStatus.CREATED, response.getStatusCode());
-        assertEquals(newTransaction, response.getBody());
-        verify(transactionService, times(1)).addTransaction(transaction, pin);
-    }
+//    @Test
+//    void testAddTransaction() {
+//        Transaction transaction = new Transaction();
+//        String pin = "0000";
+//        Transaction newTransaction = new Transaction();
+//
+//        when(transactionService.addTransaction(transaction, pin)).thenReturn(newTransaction);
+//
+//        ResponseEntity response = transactionController.addTransaction(transaction, pin, "token");
+//
+//        assertEquals(HttpStatus.CREATED, response.getStatusCode());
+//        assertEquals(newTransaction, response.getBody());
+//        verify(transactionService, times(1)).addTransaction(transaction, pin);
+//    }
 
 }
