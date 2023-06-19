@@ -44,7 +44,7 @@ public class TransactionService {
                     return transactionRepository.save(newTransaction);
                 }
                 else {
-                    throw new ServiceException("Transaction Failed");
+                    throw new ServiceException("Insufficient funds or daily limit reached");
                 }
         } catch (Exception ex) {
             throw new ServiceException("Failed to add account", ex);
@@ -85,14 +85,18 @@ public class TransactionService {
         //TODO: add transfer money logic
         AccountDTO senderAccount = accountService.getAccountByIban(transaction.getSenderIban());
         AccountDTO receiverAccount = accountService.getAccountByIban(transaction.getReceiverIban());
-        if((senderAccount.getAccountType() == "Current" && receiverAccount.getAccountType() == "Current")||(senderAccount.getUser().getId()==receiverAccount.getUser().getId())||(senderAccount.getTransactionLimit()>transaction.getAmount()))    {
+
+        if((senderAccount.getUser().getId() != receiverAccount.getUser().getId())&&!((senderAccount.getAccountType().equals("Current"))&&(receiverAccount.getAccountType().equals("Current")))){
+            throw new ServiceException("Transfer between different account types for different users is not allowed");
+        }
+        else if(senderAccount.getTransactionLimit()<transaction.getAmount()){
+            throw new ServiceException("Cannot transfer more than "+senderAccount.getTransactionLimit()+" per transaction");
+        }
+        else{
             senderAccount.setBalance(senderAccount.getBalance() - transaction.getAmount());
             receiverAccount.setBalance(receiverAccount.getBalance() + transaction.getAmount());
             accountService.updateAccountByIban(transaction.getSenderIban(), senderAccount);
             accountService.updateAccountByIban(transaction.getReceiverIban(), receiverAccount);
-        }
-        else{
-            throw new ServiceException("Invalid Account for Transfer");
         }
     }
 
@@ -121,13 +125,14 @@ public class TransactionService {
 
     public boolean CheckSufficientFunds(TransactionDTO transaction, String pin) {
         try {
-            if ((accountService.getAccountBalance(transaction.getSenderIban(), pin) - transaction.getAmount()) >= accountService.getAccountByIban(transaction.getSenderIban()).getAbsoluteLimit()) {
+            double absolutelimit=(accountService.getAccountByIban(transaction.getSenderIban())).getAbsoluteLimit();
+            if ((accountService.getAccountBalance(transaction.getSenderIban(), pin) - transaction.getAmount()) >=absolutelimit ) {
                 return true;
             } else {
                 return false;
             }
         } catch (Exception ex) {
-            throw new ServiceException("Transaction Failed", ex);
+            throw new ServiceException("Checking Transaction Failed", ex);
         }
     }
 

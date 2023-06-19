@@ -284,6 +284,7 @@ public AccountService(AccountRepository accountRepository, UserRepository userRe
         accountDTO.setDailyLimit(account.getDailyLimit());
         accountDTO.setBalance(account.getBalance());
         accountDTO.setAbsoluteLimit(account.getAbsoluteLimit());
+        accountDTO.setTransactionLimit(account.getTransactionLimit());
         accountDTO.setDebitCardNumber(account.getCardNumber());
 
         DebitCard debitCard = account.getDebitCard();

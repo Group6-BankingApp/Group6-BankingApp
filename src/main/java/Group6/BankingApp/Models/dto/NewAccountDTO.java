@@ -8,8 +8,8 @@ public class NewAccountDTO {
     private String accountType;
     private String pin;
     private double dailyLimit;
-    private  double balance;
-    private  double absoluteLimit;
+    private double balance;
+    private double absoluteLimit;
     private double transactionLimit;
 
     public NewAccountDTO() {
@@ -25,21 +25,21 @@ public class NewAccountDTO {
         this.transactionLimit = account.getTransactionLimit();
     }
 
-    public NewAccountDTO( String accountType, String pin) {
-        this.accountType = accountType;
-        this.pin = pin;
-        this.dailyLimit = 2000.00;
-    }
-
-    public NewAccountDTO( Long userId,String accountType, String pin, double dailyLimit, double balance, double absoluteLimit,double transactionLimit) {
-        this.userId = userId;
-        this.accountType = accountType;
-        this.pin = pin;
-        this.dailyLimit = dailyLimit;
-        this.balance = balance;
-        this.absoluteLimit = absoluteLimit;
-        this.transactionLimit = transactionLimit;
-    }
+//    public NewAccountDTO( String accountType, String pin) {
+//        this.accountType = accountType;
+//        this.pin = pin;
+//        this.dailyLimit = 2000.00;
+//    }
+//
+//    public NewAccountDTO( Long userId,String accountType, String pin, double dailyLimit, double balance, double absoluteLimit,double transactionLimit) {
+//        this.userId = userId;
+//        this.accountType = accountType;
+//        this.pin = pin;
+//        this.dailyLimit = dailyLimit;
+//        this.balance = balance;
+//        this.absoluteLimit = absoluteLimit;
+//        this.transactionLimit = transactionLimit;
+//    }
 
 
     public String getAccountType() {
