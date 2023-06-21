@@ -18,11 +18,12 @@ public class UserDTO2 {
         this.lastName = user.getLastName();
         this.email = user.getEmail();
         this.phoneNumber = user.getPhoneNumber();
-        if (user.isHasAccount()) {
-            this.hasAccount = "Yes";
-        } else {
-            this.hasAccount = "No";
-        }
+//        if (user.isHasAccount()) {
+//            this.hasAccount = "Yes";
+//        } else {
+//            this.hasAccount = "No";
+//        }
+        this.hasAccount = user.isHasAccount() ? "Yes" : "No";
     }
 
     public Long getId() {
@@ -67,5 +68,10 @@ public class UserDTO2 {
 
     public String getHasAccount() {
         return hasAccount;
+    }
+
+    public void setHasAccount(String hasAccount) {
+        // Update the string representation to boolean value
+        this.hasAccount = hasAccount.equalsIgnoreCase("Yes") ? "Yes" : "No";
     }
 }
