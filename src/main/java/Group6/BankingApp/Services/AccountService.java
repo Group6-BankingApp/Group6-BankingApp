@@ -26,16 +26,17 @@ public class AccountService {
     @Autowired
     private UserRepository userRepository;
 
-    @Autowired
-    private UserService userService;
+
+    private final UserService userService;
     @Autowired
     private DebitCardRepository debitCardRepository;
 
     @Autowired
-    public AccountService(AccountRepository accountRepository, UserRepository userRepository, DebitCardRepository debitCardRepository) {
+    public AccountService(AccountRepository accountRepository, UserRepository userRepository, DebitCardRepository debitCardRepository, UserService userService) {
         this.accountRepository = accountRepository;
         this.userRepository = userRepository;
         this.debitCardRepository = debitCardRepository;
+        this.userService = userService;
     }
 
     public List<Account> getAllAccounts() {
@@ -61,39 +62,87 @@ public class AccountService {
         return account;
     }
 
-    public CreatedAccountsDTO addAccount(NewAccountDTO newAccountDTO) {
+//    public AccountDTO addAccount(NewAccountDTO newAccountDTO) {
+//        try {
+//            String iban = generateIban();
+//            Long userId = newAccountDTO.getUserId();
+//            User user = userService.getFullUserById(userId);
+//            if (user == null)
+//                throw new ServiceException("User with ID " + userId + " does not exist.");
+//
+//            // Update the hasAccount property of the user
+//            user.setHasAccount(true);
+//            userRepository.save(user);
+//            System.out.println("USER: " + user.isHasAccount());
+//
+//            String accountType = newAccountDTO.getAccountType();
+//            String cardUUID = generateCardUUID();
+//            String pin = newAccountDTO.getPin();
+//            double dailyLimit = newAccountDTO.getDailyLimit();
+//
+//            Account account = new Account(iban, user, accountType, cardUUID, pin, dailyLimit, newAccountDTO.getBalance(), newAccountDTO.getAbsoluteLimit(), newAccountDTO.getTransactionLimit(), true, null);
+//            accountRepository.save(account);
+//
+//
+//
+//            AccountDTO accountDTO = mapToAccountDTO(account);
+//
+//            return accountDTO;
+//        } catch (Exception ex) {
+//            throw new ServiceException("Failed to add account", ex);
+//        }
+//    }
+
+    public AccountDTO addAccount(NewAccountDTO newAccountDTO) {
         try {
-            String iban = generateIban();
-            String savingsIban = generateIban();
             Long userId = newAccountDTO.getUserId();
-            User user = userService.getFullUserById(userId);
-            if (user == null)
-                throw new ServiceException("User with ID " + userId + " does not exist.");
+            User user = validateUserExistence(userId);
 
-            String cardUUID = generateCardUUID();
-            String pin = newAccountDTO.getPin();
-            double dailyLimit = newAccountDTO.getDailyLimit();
+            updateHasAccountProperty(user);
 
-            Account account = new Account(iban, user, "Current", cardUUID, pin, dailyLimit, newAccountDTO.getBalance(), newAccountDTO.getAbsoluteLimit(), newAccountDTO.getTransactionLimit(), true, null);
-            user.setHasCurrentAccount(true);
-            Account savingsAccount = new Account(savingsIban, user, "Savings", cardUUID, pin, 200, 0, 0, 100, false, null);
-            user.setHasSavingsAccount(true);
-            userRepository.save(user);
+            Account account = generateAccount(newAccountDTO, user);
             accountRepository.save(account);
-            accountRepository.save(savingsAccount);
-
-
 
             AccountDTO accountDTO = mapToAccountDTO(account);
-            AccountDTO savingsAccountDTO = mapToAccountDTO(savingsAccount);
-            CreatedAccountsDTO createdAccountsDTO = new CreatedAccountsDTO(accountDTO, savingsAccountDTO);
-            return createdAccountsDTO;
-        } catch (Exception ex) {
+
+            return accountDTO;
+        } catch (EntityNotFoundException ex) {
+            throw new ServiceException("User not found", ex);
+        }  catch (Exception ex) {
             throw new ServiceException("Failed to add account", ex);
         }
     }
 
-    public NewAccountDTO updateAccountByIban(String iban, Account account) {
+
+    private Account generateAccount(NewAccountDTO newAccountDTO, User user) {
+        String iban = generateIban();
+        String accountType = newAccountDTO.getAccountType();
+        String cardUUID = generateCardUUID();
+        String pin = newAccountDTO.getPin();
+        double dailyLimit = newAccountDTO.getDailyLimit();
+
+        return new Account(iban, user, accountType, cardUUID, pin, dailyLimit,
+                newAccountDTO.getBalance(), newAccountDTO.getAbsoluteLimit(),
+                newAccountDTO.getTransactionLimit(), true, null);
+    }
+
+
+    private void updateHasAccountProperty(User user) {
+        user.setHasAccount(true);
+        userRepository.save(user);
+    }
+
+    private User validateUserExistence(Long userId) {
+        User user = userRepository.findById(userId).orElse(null);
+        if (user == null) {
+            throw new ServiceException("User with ID " + userId + " does not exist.");
+        }
+        return user;
+    }
+
+    public NewAccountDTO updateAccountByIban(String iban, AccountDTO accountDTO) {
+        Account account = accountRepository.findById(iban)
+                .orElse(null);
 
         if(account == null)
             throw new ServiceException("This account does not exist!");
@@ -102,7 +151,7 @@ public class AccountService {
         if(user == null)
             throw new ServiceException("User does not exist.");
 
-        Long userId = account.getUser().getId();
+        Long userId = accountDTO.getUser().getId();
         if(userId == null)
             throw new ServiceException("User ID: " + userId + " does not exist.");
 
@@ -110,7 +159,14 @@ public class AccountService {
             throw new ServiceException("The user ID in the accountDTO does not match the user ID in the account");
 
         // Update the account from accountDTO
-
+        account.setIban(accountDTO.getIban());
+        account.setUser(user);
+        account.setAccountType(accountDTO.getAccountType());
+        account.setCardUUID(accountDTO.getCardUUID());
+        account.setPin(accountDTO.getPin());
+        account.setDailyLimit(accountDTO.getDailyLimit());
+        account.setBalance(accountDTO.getBalance());
+        account.setAbsoluteLimit(accountDTO.getAbsoluteLimit());
 
         Account updatedAccount = accountRepository.save(account);
         return new NewAccountDTO(updatedAccount);
@@ -264,6 +320,7 @@ public class AccountService {
         }
         AccountDTO accountDTO = new AccountDTO();
         accountDTO.setIban(account.getIban());
+        accountDTO.setUser(mapToUserDTO2(account.getUser()));
         accountDTO.setAccountType(account.getAccountType());
         accountDTO.setCardUUID(account.getCardUUID());
         accountDTO.setPin(account.getPin());

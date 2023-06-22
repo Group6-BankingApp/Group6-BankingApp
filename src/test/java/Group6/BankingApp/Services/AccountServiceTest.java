@@ -9,6 +9,7 @@ import Group6.BankingApp.Models.DebitCard;
 import Group6.BankingApp.Models.dto.AccountDTO;
 import Group6.BankingApp.Models.dto.DebitCardDTO;
 import Group6.BankingApp.Models.dto.NewAccountDTO;
+import Group6.BankingApp.Models.dto.UserDTO2;
 import org.hibernate.service.spi.ServiceException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -24,6 +25,7 @@ import org.springframework.http.HttpStatus;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -52,6 +54,116 @@ class AccountServiceTest {
     void setUp() {
         MockitoAnnotations.openMocks(this);
     }
+
+    @Test
+    public void testAddAccount() {
+        // Arrange
+        NewAccountDTO newAccountDTO = new NewAccountDTO();
+        newAccountDTO.setUserId(1L);
+        newAccountDTO.setAccountType("Current");
+        newAccountDTO.setPin("1234");
+        newAccountDTO.setDailyLimit(1000.0);
+        newAccountDTO.setBalance(500.0);
+        newAccountDTO.setAbsoluteLimit(2000.0);
+        newAccountDTO.setTransactionLimit(100.0);
+
+        User user = new User();
+        user.setId(1L);
+
+        when(userRepository.findById(1L)).thenReturn(java.util.Optional.of(user));
+
+        // Act
+        AccountDTO accountDTO = accountService.addAccount(newAccountDTO);
+
+        // Assert
+        assertNotNull(accountDTO);
+        assertEquals(user.getId(), accountDTO.getUser().getId());
+
+        // Verify
+        verify(userRepository, times(1)).findById(1L);
+        verify(userRepository, times(1)).save(any(User.class));
+        verify(accountRepository, times(1)).save(any(Account.class));
+    }
+
+    @Test
+    public void testAddAccount_InvalidUser() {
+        // Arrange
+        NewAccountDTO newAccountDTO = new NewAccountDTO();
+        newAccountDTO.setUserId(1L);
+        // Simulate user not found
+        when(userRepository.findById(1L)).thenReturn(Optional.empty());
+
+        // Act & Assert
+        assertThrows(ServiceException.class, () -> {
+            accountService.addAccount(newAccountDTO);
+        });
+
+        // Verify
+        verify(userRepository, times(1)).findById(1L);
+        verify(userRepository, never()).save(any(User.class));
+        verify(accountRepository, never()).save(any(Account.class));
+    }
+
+    @Test
+    public void testUpdateAccountByIban() {
+        // Arrange
+        String iban = "1234567890";
+        AccountDTO accountDTO = new AccountDTO();
+        accountDTO.setIban("1234567890");
+        UserDTO2 userDTO = new UserDTO2();
+        userDTO.setId(1L);
+        accountDTO.setUser(userDTO);
+        accountDTO.setAccountType("Current");
+        accountDTO.setCardUUID("95453eda-ffb5-4338-9cf8-0a4b6f424fff");
+        accountDTO.setPin("1234");
+        accountDTO.setDailyLimit(1000.0);
+        accountDTO.setBalance(500.0);
+        accountDTO.setAbsoluteLimit(2000.0);
+        accountDTO.setTransactionLimit(100.0);
+
+        Account existingAccount = new Account();
+        existingAccount.setIban("1234567890");
+        User existingUser = new User();
+        existingUser.setId(1L);
+        existingAccount.setUser(existingUser);
+
+        when(accountRepository.findById(iban)).thenReturn(java.util.Optional.of(existingAccount));
+        when(accountRepository.save(any(Account.class))).thenReturn(existingAccount);
+
+        // Act
+        NewAccountDTO updatedAccountDTO = accountService.updateAccountByIban(iban, accountDTO);
+
+        // Assert
+        assertNotNull(updatedAccountDTO);
+        assertEquals(existingAccount.getUser().getId(), updatedAccountDTO.getUserId());
+
+        // Verify
+        verify(accountRepository, times(1)).findById(iban);
+        verify(accountRepository, times(1)).save(any(Account.class));
+    }
+
+    @Test
+    public void testUpdateAccountByIban_AccountNotFound() {
+        // Arrange
+        String iban = "1234567890";
+        AccountDTO accountDTO = new AccountDTO();
+        accountDTO.setIban("1234567890");
+        UserDTO2 userDTO = new UserDTO2();
+        userDTO.setId(1L);
+        accountDTO.setUser(userDTO);
+        // Simulate account not found
+        when(accountRepository.findById(iban)).thenReturn(Optional.empty());
+
+        // Act & Assert
+        assertThrows(ServiceException.class, () -> {
+            accountService.updateAccountByIban(iban, accountDTO);
+        });
+
+        // Verify
+        verify(accountRepository, times(1)).findById(iban);
+        verify(accountRepository, never()).save(any(Account.class));
+    }
+
 
 //    @Test
 //    void testAddAccount() {
@@ -187,6 +299,7 @@ class AccountServiceTest {
     void testCreateDebitCard() {
         // Arrange
         Account account = new Account();
+        account.setAccountType("Current");
 
         // Create a new debit card
         DebitCard newCard = new DebitCard();
