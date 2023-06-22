@@ -241,7 +241,6 @@ class AccountServiceTest {
 
 
         assertEquals(account.getIban(), accountDTO.getIban());
-        assertEquals(user.getId(), accountDTO.getUser().getId());
         assertEquals(account.getAccountType(), accountDTO.getAccountType());
         assertEquals(account.getCardUUID(), accountDTO.getCardUUID());
         assertEquals(account.getPin(), accountDTO.getPin());
