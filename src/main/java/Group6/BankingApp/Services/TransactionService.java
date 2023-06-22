@@ -36,42 +36,6 @@ public class TransactionService {
         return transactionRepository.findById(id).orElse(null);
     }
 
-    public Transaction addTransfer(TransactionDTO transactionDTO){
-        try {
-            if(!transactionDTO.getSenderIban().equals(transactionDTO.getReceiverIban())){
-                Account senderAccount = accountService.findAccountByIban(transactionDTO.getSenderIban());
-                Account receiverAccount = accountService.findAccountByIban(transactionDTO.getReceiverIban());
-                if((senderAccount.getBalance()-senderAccount.getAbsoluteLimit())<transactionDTO.getAmount()){
-                    throw new ServiceException("Insufficient funds");
-                }
-                if(senderAccount.getUser().getId()!=receiverAccount.getUser().getId()){
-                    if(!(senderAccount.getAccountType().equals("Current") && receiverAccount.getAccountType().equals("Current"))){
-                        throw new ServiceException("Cross-account transfers are only allowed between current accounts");
-                    }
-                    if (transactionDTO.getAmount()>senderAccount.getTransactionLimit()){
-                        throw new ServiceException("Transaction limit exceeded");
-                    }
-                    else if(transactionDTO.getAmount()>senderAccount.getDailyLimit()){
-                        throw new ServiceException("Daily limit reached");
-                    }
-                    else{
-                        senderAccount.setDailyLimit(senderAccount.getDailyLimit()-transactionDTO.getAmount());
-                    }
-                }
-                senderAccount.setBalance(senderAccount.getBalance()-transactionDTO.getAmount());
-                receiverAccount.setBalance(receiverAccount.getBalance()+transactionDTO.getAmount());
-                accountService.updateAccountByIban(senderAccount.getIban(), senderAccount);
-                accountService.updateAccountByIban(receiverAccount.getIban(), receiverAccount);
-                Transaction newTransaction = new Transaction(transactionDTO);
-                return transactionRepository.save(newTransaction);
-            }
-            else {
-                throw new ServiceException("Sender and receiver cannot be the same");
-            }
-        }catch (Exception ex){
-            throw new ServiceException("Failed to add transaction. ", ex);
-        }
-    }
     public Transaction addTransaction(TransactionDTO transaction) {
         try {
             if((CheckSufficientFunds(transaction, transaction.getPin())) && (CheckDailyLimit(accountService.getAccountByIban(transaction.getSenderIban()), transaction))){
@@ -83,7 +47,7 @@ public class TransactionService {
                     throw new ServiceException("Insufficient funds or daily limit reached");
                 }
         } catch (Exception ex) {
-            throw new ServiceException("Failed to add transaction", ex);
+            throw new ServiceException("Failed to add account", ex);
         }
     }
     public Transaction addTransactionDeposit(Transaction transaction) {
@@ -119,13 +83,13 @@ public class TransactionService {
     }
     public void TransferMoney(TransactionDTO transaction) {
         //TODO: add transfer money logic
-        Account senderAccount = accountService.findAccountByIban(transaction.getSenderIban());
-        Account receiverAccount = accountService.findAccountByIban(transaction.getReceiverIban());
+        AccountDTO senderAccount = accountService.getAccountByIban(transaction.getSenderIban());
+        AccountDTO receiverAccount = accountService.getAccountByIban(transaction.getReceiverIban());
 
         if((senderAccount.getUser().getId() != receiverAccount.getUser().getId())&&!((senderAccount.getAccountType().equals("Current"))&&(receiverAccount.getAccountType().equals("Current")))){
             throw new ServiceException("Transfer between different account types for different users is not allowed");
         }
-        else if(senderAccount.getTransactionLimit()<=transaction.getAmount()){
+        else if(senderAccount.getTransactionLimit()<transaction.getAmount()){
             throw new ServiceException("Cannot transfer more than "+senderAccount.getTransactionLimit()+" per transaction");
         }
         else{
@@ -138,7 +102,7 @@ public class TransactionService {
 
     public void DespositMoney(Transaction transaction) {
         //TODO: add transfer money logic
-        Account receiverAccount = accountService.findAccountByIban(transaction.getReceiverIban());
+        AccountDTO receiverAccount = accountService.getAccountByIban(transaction.getReceiverIban());
         if(receiverAccount.getAccountType() == "Current")    {
             receiverAccount.setBalance(receiverAccount.getBalance() + transaction.getAmount());
             accountService.updateAccountByIban(transaction.getReceiverIban(), receiverAccount);
@@ -148,7 +112,7 @@ public class TransactionService {
         }
     }
     public void WithdrawMoney(TransactionDTO transaction) {
-        Account senderAccount = accountService.findAccountByIban(transaction.getSenderIban());
+        AccountDTO senderAccount = accountService.getAccountByIban(transaction.getSenderIban());
         if(senderAccount.getAccountType() == "Current")    {
             senderAccount.setBalance(senderAccount.getBalance() - transaction.getAmount());
             accountService.updateAccountByIban(transaction.getSenderIban(), senderAccount);

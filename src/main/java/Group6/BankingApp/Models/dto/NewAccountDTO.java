@@ -5,6 +5,7 @@ import Group6.BankingApp.Models.Account;
 public class NewAccountDTO {
 
     private Long userId;
+    private String accountType;
     private String pin;
     private double dailyLimit;
     private double balance;
@@ -16,6 +17,7 @@ public class NewAccountDTO {
 
     public NewAccountDTO(Account account) {
         this.userId = account.getUser().getId();
+        this.accountType = account.getAccountType();
         this.pin = account.getPin();
         this.dailyLimit = account.getDailyLimit();
         this.balance = account.getBalance();
@@ -39,6 +41,14 @@ public class NewAccountDTO {
 //        this.transactionLimit = transactionLimit;
 //    }
 
+
+    public String getAccountType() {
+        return accountType;
+    }
+
+    public void setAccountType(String accountType) {
+        this.accountType = accountType;
+    }
 
     public Long getUserId() {
         return userId;

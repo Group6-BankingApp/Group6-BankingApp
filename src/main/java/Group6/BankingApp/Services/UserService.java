@@ -36,7 +36,7 @@ public class UserService {
     }
 
     public List<UserDTO2> getAllUsersWithAccount() {
-        List<User> users = (List<User>) userRepository.findAllByHasCurrentAccountIsTrueAndHasSavingsAccountIsTrue();
+        List<User> users = (List<User>) userRepository.findAllByHasAccountIsTrue();
         List<UserDTO2>userDTO2s= convertToUserDTO2(users);
         return userDTO2s;
     }
@@ -61,8 +61,7 @@ public class UserService {
             user.setPassword(userDTO.getPassword());
             user.setPhoneNumber(userDTO.getPhoneNumber());
             user.setRoles(List.of(Role.ROLE_USER));
-            user.setHasCurrentAccount(false);
-            user.setHasSavingsAccount(false);
+            user.setHasAccount(false);
             UserDTO2 userdto = new UserDTO2(userRepository.save(user));
             return userdto;
         }
@@ -119,7 +118,7 @@ public class UserService {
     }
 
     public List<UserDTO2> getAllUsersWithoutAccount() {
-        List<User> users = (List<User>) userRepository.findAllByHasCurrentAccountIsFalseAndHasSavingsAccountIsFalse();
+        List<User> users = (List<User>) userRepository.findAllByHasAccountIsFalse();
         List<UserDTO2>userDTO2s= convertToUserDTO2(users);
         return userDTO2s;
     }
