@@ -49,7 +49,6 @@ public class Account {
         this.transactionLimit = transactionLimit;
         this.status = status;
         this.debitCard = debitCard;
-        this.user.setHasAccount(true);
     }
 
     public Account(String iban, UserDTO2 userDTO2, String accountType, String cardUUID, String pin, double dailyLimit, double balance, double absoluteLimit, boolean status) {
