@@ -24,8 +24,17 @@ public class User {
     private String email;
     private String password;
     private String phoneNumber;
-    private boolean hasAccount;
+    private boolean hasCurrentAccount;
+    private boolean hasSavingsAccount;
 
     @ElementCollection (fetch = FetchType.EAGER)
     private List<Role> roles;
+
+    public void setHasCurrentAccount(boolean hasCurrentAccount) {
+        this.hasCurrentAccount = hasCurrentAccount;
+    }
+
+    public void setHasSavingsAccount(boolean hasSavingsAccount) {
+        this.hasSavingsAccount = hasSavingsAccount;
+    }
 }

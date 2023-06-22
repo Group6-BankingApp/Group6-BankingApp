@@ -6,7 +6,6 @@ import org.springframework.stereotype.Component;
 public class AccountDTO {
 
     private String iban;
-    private UserDTO2 user;
     private String accountType;
     private String cardUUID;
     private String pin;
@@ -18,9 +17,8 @@ public class AccountDTO {
 
     public AccountDTO(){}
 
-    public AccountDTO(String iban, UserDTO2 user, String accountType, String cardUUID, String pin, double dailyLimit, double balance, double absoluteLimit,double transactionLimit, String cardNumber) {
+    public AccountDTO(String iban, String accountType, String cardUUID, String pin, double dailyLimit, double balance, double absoluteLimit,double transactionLimit, String cardNumber) {
         this.iban = iban;
-        this.user = user;
         this.accountType = accountType;
         this.cardUUID = cardUUID;
         this.pin = pin;
@@ -37,14 +35,6 @@ public class AccountDTO {
 
     public void setIban(String iban) {
         this.iban = iban;
-    }
-
-    public UserDTO2 getUser() {
-        return user;
-    }
-
-    public void setUser(UserDTO2 user) {
-        this.user = user;
     }
 
     public String getAccountType() {

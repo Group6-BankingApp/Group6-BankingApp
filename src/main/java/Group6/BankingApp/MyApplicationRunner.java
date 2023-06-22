@@ -46,7 +46,8 @@ public class MyApplicationRunner implements ApplicationRunner {
         user1.setEmail("john.doe@gmail.com");
         user1.setPassword("123456");
         user1.setPhoneNumber("0612345678");
-        user1.setHasAccount(true);
+        user1.setHasCurrentAccount(false);
+        user1.setHasSavingsAccount(false);
         user1.setRoles(List.of(Role.ROLE_ADMIN));
 
         User user2 = new User();
@@ -55,7 +56,8 @@ public class MyApplicationRunner implements ApplicationRunner {
         user2.setEmail("jane.smith@gmail.com");
         user2.setPassword("123456");
         user2.setPhoneNumber("0612345678");
-        user2.setHasAccount(true);
+        user2.setHasCurrentAccount(false);
+        user2.setHasSavingsAccount(false);
         user2.setRoles(List.of(Role.ROLE_USER));
 
         List<User> users = Arrays.asList(user1, user2);
@@ -70,6 +72,9 @@ public class MyApplicationRunner implements ApplicationRunner {
         // Create and save Accounts
         Account account1 = new Account("NL01INHO9501054837",user1,"Current", accountService.generateCardUUID(), "1234", 1000.0, 1000.0, 0,100, true, debitCard1);
         Account account= new Account("NL01INHO9501054804",user1,"Savings", accountService.generateCardUUID(), "1234", 1000.0, 1000.0, 0, 100,true, debitCard1);
+        user1.setHasCurrentAccount(true);
+        user1.setHasSavingsAccount(true);
+        userRepository.save(user1);
         accountRepository.save(account1);
         accountRepository.save(account);
         Account account2 = new Account("NL01INHO2371458805",user2, "Current", accountService.generateCardUUID(), "5678", 2000.0, 950.0, 0,100, true, debitCard2);
@@ -78,7 +83,11 @@ public class MyApplicationRunner implements ApplicationRunner {
 
         Account account3 = new Account("NL01INH1234567890",user2, "Savings", accountService.generateCardUUID(), "5678", 2000.0, 950.0, -100,100, true, debitCard2);
         //account2.setDebitCard(debitCard2);
+        user2.setHasCurrentAccount(true);
+        user2.setHasSavingsAccount(true);
+        userRepository.save(user2);
         accountRepository.save(account3);
+
 //        Account account3 = new Account("NL01INHO5808504708", "Savings", accountService.generateCardUUID(), "1357", 1000.0, 0.0, 5000.0, true, null);
 //        account3.setDebitCard(debitCard1);
 //        account3.setUser(users.get(2));
