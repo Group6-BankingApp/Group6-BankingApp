@@ -136,7 +136,7 @@ public class TransactionController {
     @PostMapping
     public ResponseEntity makeTransfer (@RequestBody TransactionDTO transactionDTO) {
         try{
-            Transaction newTransaction=transactionService.addTransfer(transactionDTO);
+            Transaction newTransaction=transactionService.addTransaction(transactionDTO);
             return ResponseEntity.status(201).body(newTransaction);
         }catch (Exception e){
             return ResponseEntity.internalServerError().body(e.getCause().getMessage());

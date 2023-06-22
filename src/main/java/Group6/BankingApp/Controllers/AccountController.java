@@ -3,7 +3,6 @@ package Group6.BankingApp.Controllers;
 import Group6.BankingApp.Models.Account;
 import Group6.BankingApp.Models.DebitCard;
 import Group6.BankingApp.Models.dto.AccountDTO;
-import Group6.BankingApp.Models.dto.CreatedAccountsDTO;
 import Group6.BankingApp.Models.dto.DebitCardDTO;
 import Group6.BankingApp.Models.dto.NewAccountDTO;
 import Group6.BankingApp.Services.AccountService;
@@ -61,17 +60,17 @@ public class AccountController {
     }
 
     @PostMapping
-    public ResponseEntity<CreatedAccountsDTO> createAccount(@RequestBody NewAccountDTO newAccountDTO) {
+    public ResponseEntity<AccountDTO> createAccount(@RequestBody NewAccountDTO newAccountDTO) {
         if (newAccountDTO == null) {
             // Return a BAD_REQUEST response if the newAccountDTO is empty
             return ResponseEntity.badRequest().build();
         }
 
         try {
-            CreatedAccountsDTO accountDTO = accountService.addAccount(newAccountDTO);
+            AccountDTO accountDTO = accountService.addAccount(newAccountDTO);
             return ResponseEntity.status(HttpStatus.CREATED).body(accountDTO);
         } catch (Exception ex) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new AccountDTO());
         }
     }
 
@@ -93,8 +92,7 @@ public class AccountController {
     @PutMapping("/{iban}")
     public ResponseEntity<NewAccountDTO> updateAccountByIban(@PathVariable("iban") String iban,
                                                              @RequestBody AccountDTO accountDTO) {
-        Account account = accountService.findAccountByIban(iban);
-        NewAccountDTO updatedAccountDTO = accountService.updateAccountByIban(iban, account);
+        NewAccountDTO updatedAccountDTO = accountService.updateAccountByIban(iban, accountDTO);
         return ResponseEntity.ok().body(updatedAccountDTO);
     }
 
