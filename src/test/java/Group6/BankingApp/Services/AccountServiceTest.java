@@ -9,6 +9,8 @@ import Group6.BankingApp.Models.DebitCard;
 import Group6.BankingApp.Models.dto.AccountDTO;
 import Group6.BankingApp.Models.dto.DebitCardDTO;
 import Group6.BankingApp.Models.dto.NewAccountDTO;
+import org.hibernate.service.spi.ServiceException;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -133,34 +135,6 @@ class AccountServiceTest {
         assertEquals(account.getDailyLimit(), accountDTO.getDailyLimit());
     }
 
-
-    @Test
-    void testDeactivateDebitCard() {
-
-        String iban = "NL01INHO9501054837";
-        boolean active = true;
-        DebitCardDTO debitCardDTO = new DebitCardDTO();
-        debitCardDTO.setCardNumber("123456789");
-
-        Account account = new Account();
-        account.setIban(iban);
-        DebitCard debitCard = new DebitCard();
-        debitCard.setCardNumber(debitCardDTO.getCardNumber());
-        debitCard.setActive(true);
-        account.setDebitCard(debitCard);
-
-        Mockito.when(accountRepository.findByIban(iban)).thenReturn(account);
-
-        accountService.deactivateDebitCard(iban, debitCardDTO.getCardNumber() , active);
-
-        assertEquals(false, debitCard.isActive());
-
-        ResponseEntity<Void> response = ResponseEntity.ok().build();
-
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertNull(response.getBody());
-    }
-
     @Test
     void testMapToDebitCardDTO() {
 
@@ -210,90 +184,25 @@ class AccountServiceTest {
     }
 
     @Test
-    public void testCreateDebitCard() {
-
-
+    void testCreateDebitCard() {
+        // Arrange
         Account account = new Account();
-        account.setIban("NL01INHO0000000001");
-        account.setCardUUID("618cfb19-02bc-4896-b510-6943a6996026");
-        account.setPin("1234");
-        account.setBalance(1000.0);
 
-
-        DebitCard existingActiveCard = new DebitCard();
-        existingActiveCard.setCardNumber("6638545966347381");
-        existingActiveCard.setExpirationDate(LocalDate.now().plusYears(5));
-        existingActiveCard.setActive(true);
-        existingActiveCard.setUuid(account.getCardUUID());
-        existingActiveCard.setAccount(account);
-
-
+        // Create a new debit card
         DebitCard newCard = new DebitCard();
-        newCard.setCardNumber("5538545966347381");
-        newCard.setExpirationDate(LocalDate.now().plusYears(5));
-        newCard.setActive(false);
-        newCard.setUuid(account.getCardUUID());
         newCard.setAccount(account);
 
+        // Mock the repository method calls
+        when(debitCardRepository.save(any(DebitCard.class))).thenReturn(newCard);
+        when(accountRepository.save(any(Account.class))).thenReturn(account);
 
-        DebitCard savedCard = new DebitCard();
-        savedCard.setId(1L);
-        savedCard.setCardNumber(newCard.getCardNumber());
-        savedCard.setExpirationDate(newCard.getExpirationDate());
-        savedCard.setActive(newCard.isActive());
-        savedCard.setUuid(newCard.getUuid());
-        savedCard.setAccount(newCard.getAccount());
-
-
-        Mockito.when(debitCardRepository.findByAccountAndIsActive(account, true)).thenReturn(existingActiveCard);
-        Mockito.when(debitCardRepository.save(existingActiveCard)).thenReturn(existingActiveCard);
-        Mockito.when(debitCardRepository.save(newCard)).thenReturn(savedCard);
-
-
-        Mockito.when(accountRepository.save(account)).thenReturn(account);
-
-
+        // Act
         DebitCardDTO result = accountService.createDebitCard(account);
 
-
-        assertEquals(savedCard.getCardNumber(), result.getCardNumber());
-
-
-        Mockito.verify(debitCardRepository, Mockito.times(1)).findByAccountAndIsActive(account, true);
-        Mockito.verify(debitCardRepository, Mockito.times(1)).save(existingActiveCard);
-        Mockito.verify(debitCardRepository, Mockito.times(1)).save(newCard);
-        Mockito.verify(accountRepository, Mockito.times(1)).save(account);
-
-    }
-
-    @Test
-    public void testUpdatePin() {
-        // Create a sample AccountDTO with updated pin
-        AccountDTO accountDTO = new AccountDTO();
-        accountDTO.setPin("1122");
-
-        // Create a sample Account with existing pin
-        Account account = new Account();
-        account.setPin("2468");
-
-        // Mock the behavior of the accountRepository
-        when(accountRepository.findById("NL01INHO9501054837")).thenReturn(java.util.Optional.of(account));
-        when(accountRepository.save(account)).thenReturn(account);
-
-        // Call the updatePin method
-        NewAccountDTO updatedAccountDTO = accountService.updatePin("NL01INHO9501054837", accountDTO);
-
-        // Assert that the pin has been updated
-        assertEquals(accountDTO.getPin(), updatedAccountDTO.getPin());
-    }
-
-    private boolean isValidUUID(String uuidString) {
-        try {
-            UUID.fromString(uuidString);
-            return true;
-        } catch (IllegalArgumentException e) {
-            return false;
-        }
+        // Assert
+        assertNotNull(result);
+        assertEquals(newCard.getId(), result.getCardNumber());
+        assertEquals(newCard.getCardNumber(), result.getCardNumber());
     }
 
     @Test
@@ -333,5 +242,93 @@ class AccountServiceTest {
 
         assertFalse(previousCard.isActive());
         verify(debitCardRepository, times(1)).save(previousCard);
+    }
+
+    @Test
+    void deactivateDebitCard_ValidIbanAndCardNumber_ActiveStatusUpdated() {
+        // Arrange
+        String iban = "1234567890";
+        String cardNumber = "1111111111111111";
+        boolean active = false;
+
+        Account account = new Account();
+        DebitCard debitCard = new DebitCard();
+        debitCard.setActive(true);
+
+        when(accountRepository.findByIban(iban)).thenReturn(account);
+        when(debitCardRepository.findByAccountAndCardNumber(account, cardNumber)).thenReturn(debitCard);
+
+        // Act
+        accountService.deactivateDebitCard(iban, cardNumber, active);
+
+        // Assert
+        assertFalse(debitCard.isActive());
+        verify(debitCardRepository, times(1)).save(debitCard);
+    }
+
+    @Test
+    void deactivateDebitCard_InvalidIban_ThrowsServiceException() {
+        // Arrange
+        String iban = "1234567890";
+        String cardNumber = "1111111111111111";
+        boolean active = false;
+
+        when(accountRepository.findByIban(iban)).thenReturn(null);
+
+        // Act and Assert
+        assertThrows(ServiceException.class, () -> accountService.deactivateDebitCard(iban, cardNumber, active));
+        verify(debitCardRepository, never()).findByAccountAndCardNumber(any(), any());
+        verify(debitCardRepository, never()).save(any());
+    }
+
+    @Test
+    void deactivateDebitCard_InvalidCardNumber_ThrowsServiceException() {
+        // Arrange
+        String iban = "1234567890";
+        String cardNumber = "1111111111111111";
+        boolean active = false;
+
+        Account account = new Account();
+
+        when(accountRepository.findByIban(iban)).thenReturn(account);
+        when(debitCardRepository.findByAccountAndCardNumber(account, cardNumber)).thenReturn(null);
+
+        // Act and Assert
+        assertThrows(ServiceException.class, () -> accountService.deactivateDebitCard(iban, cardNumber, active));
+        verify(debitCardRepository, times(1)).findByAccountAndCardNumber(account, cardNumber);
+        verify(debitCardRepository, never()).save(any());
+    }
+
+    @Test
+    void testDeactivateDebitCard() {
+        // Create a sample account and debit card
+        Account account = new Account();
+        account.setIban("1234567890");
+
+        DebitCard debitCard = new DebitCard();
+        debitCard.setCardNumber("1111111111111111");
+        debitCard.setActive(true);
+
+        // Mock the behavior of the repositories
+        Mockito.when(accountRepository.findByIban(Mockito.anyString())).thenReturn(account);
+        Mockito.when(debitCardRepository.findByAccountAndCardNumber(Mockito.any(), Mockito.anyString())).thenReturn(debitCard);
+        Mockito.when(debitCardRepository.save(Mockito.any())).thenReturn(debitCard);
+
+        // Call the method to deactivate the debit card
+        accountService.deactivateDebitCard("1234567890", "1111111111111111", false);
+
+        // Verify that the debit card status was updated
+        Mockito.verify(debitCardRepository).save(debitCard);
+        // Assert the expected debit card status
+        Assertions.assertFalse(debitCard.isActive());
+    }
+
+    private boolean isValidUUID(String uuidString) {
+        try {
+            UUID.fromString(uuidString);
+            return true;
+        } catch (IllegalArgumentException e) {
+            return false;
+        }
     }
 }

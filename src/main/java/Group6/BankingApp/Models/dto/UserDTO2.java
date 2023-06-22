@@ -78,4 +78,9 @@ public class UserDTO2 {
     public String getHasSavingsAccount() {
         return hasSavingsAccount;
     }
+
+    public void setHasAccount(String hasAccount) {
+        // Update the string representation to boolean value
+        this.hasAccount = hasAccount.equalsIgnoreCase("Yes") ? "Yes" : "No";
+    }
 }

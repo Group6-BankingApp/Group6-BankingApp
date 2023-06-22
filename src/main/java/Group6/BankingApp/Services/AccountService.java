@@ -9,6 +9,7 @@ import Group6.BankingApp.Models.DebitCard;
 import Group6.BankingApp.Models.User;
 import Group6.BankingApp.Models.dto.*;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.transaction.Transactional;
 import org.hibernate.service.spi.ServiceException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -18,6 +19,7 @@ import java.util.*;
 
 @Service
 public class AccountService {
+
 
     private final AccountRepository accountRepository;
 
@@ -29,22 +31,12 @@ public class AccountService {
     @Autowired
     private DebitCardRepository debitCardRepository;
 
-
-//    @Autowired
-//    public AccountService(DebitCardRepository debitCardRepository, AccountRepository accountRepository) {
-//        this.debitCardRepository = debitCardRepository;
-//        this.accountRepository = accountRepository;
-//    }
-//    @Autowired
-//    public AccountService(DebitCardRepository debitCardRepository) {
-//        this.debitCardRepository = debitCardRepository;
-//    }
-@Autowired
-public AccountService(AccountRepository accountRepository, UserRepository userRepository, DebitCardRepository debitCardRepository) {
-    this.accountRepository = accountRepository;
-    this.userRepository = userRepository;
-    this.debitCardRepository = debitCardRepository;
-}
+    @Autowired
+    public AccountService(AccountRepository accountRepository, UserRepository userRepository, DebitCardRepository debitCardRepository) {
+        this.accountRepository = accountRepository;
+        this.userRepository = userRepository;
+        this.debitCardRepository = debitCardRepository;
+    }
 
     public List<Account> getAllAccounts() {
         return (List<Account>) accountRepository.findAll();
@@ -65,7 +57,7 @@ public AccountService(AccountRepository accountRepository, UserRepository userRe
     public Account findAccountByIban(String iban){
         Account account = accountRepository.findByIban(iban);
         if(account == null)
-            throw new ServiceException("This account does not exist.");
+            throw new ServiceException("Invalid IBAN!");
         return account;
     }
 
@@ -89,6 +81,8 @@ public AccountService(AccountRepository accountRepository, UserRepository userRe
             userRepository.save(user);
             accountRepository.save(account);
             accountRepository.save(savingsAccount);
+
+
 
             AccountDTO accountDTO = mapToAccountDTO(account);
             AccountDTO savingsAccountDTO = mapToAccountDTO(savingsAccount);
@@ -114,11 +108,6 @@ public AccountService(AccountRepository accountRepository, UserRepository userRe
 
         if(!userId.equals(user.getId()))
             throw new ServiceException("The user ID in the accountDTO does not match the user ID in the account");
-
-//        User user = userRepository.findById(userId)
-//                .orElse(null);
-//        if(user == null)
-//            throw new ServiceException("User with ID " + userId + " does not exist.");
 
         // Update the account from accountDTO
 
@@ -181,9 +170,6 @@ public AccountService(AccountRepository accountRepository, UserRepository userRe
         return new NewAccountDTO(updatedAccount);
     }
 
-//    public void deleteAccount(String iban) {
-//        accountRepository.deleteById(iban);
-//    }
     public void deleteAccount(String iban) {
         Optional<Account> accountOptional = accountRepository.findById(iban);
         if (accountOptional.isPresent()) {
@@ -193,22 +179,28 @@ public AccountService(AccountRepository accountRepository, UserRepository userRe
         }
     }
 
-
     public DebitCardDTO createDebitCard(Account account) {
+        if(!"Current".equals(account.getAccountType())){
+            throw new ServiceException("Debit card can only be created for 'Current' accounts!");
+        }
         deactivatePreviousCard(account);
 
+        DebitCard newCard = createNewDebitCard(account);
+        DebitCard savedCard = debitCardRepository.save(newCard);
+        account.setDebitCard(savedCard);
+        Account savedAccount = accountRepository.save(account);
+
+        return mapToDebitCardDTO(savedCard);
+    }
+
+    private DebitCard createNewDebitCard(Account account) {
         DebitCard newCard = new DebitCard();
         newCard.setCardNumber(generateDebitCardNumber());
         newCard.setExpirationDate(LocalDate.now().plusYears(5));
         newCard.setActive(false);
         newCard.setUuid(account.getCardUUID());
         newCard.setAccount(account);
-
-        DebitCard savedCard = debitCardRepository.save(newCard);
-        account.setDebitCard(savedCard);
-        Account savedAccount = accountRepository.save(account);
-
-        return mapToDebitCardDTO(savedCard);
+        return newCard;
     }
 
     public void deactivatePreviousCard(Account account) {
@@ -220,9 +212,10 @@ public AccountService(AccountRepository accountRepository, UserRepository userRe
     }
 
     public DebitCardDTO activateDebitCard(String cardUUID, String pin) {
-        DebitCard card = debitCardRepository.findByUuidAndIsActive(cardUUID, false);
-        if(card == null && card.getAccount().getPin() != pin)
+        DebitCard card = getInactiveDebitCardByUUIDAndPin(cardUUID, pin);
+        if (card == null) {
             return null;
+        }
 
         deactivatePreviousCard(card.getAccount());
         card.setActive(true);
@@ -230,23 +223,34 @@ public AccountService(AccountRepository accountRepository, UserRepository userRe
         return mapToDebitCardDTO(savedCard);
     }
 
-    public void deactivateDebitCard(String iban, String cardNumber, boolean active) {
+    private DebitCard getInactiveDebitCardByUUIDAndPin(String cardUUID, String pin) {
+        DebitCard card = debitCardRepository.findByUuidAndIsActive(cardUUID, false);
+        if (card != null && card.getAccount().getPin().equals(pin)) {
+            return card;
+        }
+        return null;
+    }
+
+    public void deactivateDebitCard(String iban, String cardNumber, boolean active){
         try {
-            Account account = accountRepository.findByIban(iban);
-            if (account == null) {
-                throw new ServiceException("Invalid IBAN");
-            }
-
-            DebitCard debitCard = debitCardRepository.findByAccountAndCardNumber(account, cardNumber);
-            if (debitCard == null) {
-                throw new ServiceException("Invalid debit card number");
-            }
-
-            debitCard.setActive(active);
-            debitCardRepository.save(debitCard);
-        } catch (Exception ex) {
+            Account account = findAccountByIban(iban);
+            DebitCard debitCard = getDebitCardByAccountAndCardNumber(account, cardNumber);
+            updateDebitCardStatus(debitCard, active);
+        }catch (Exception ex){
             throw new ServiceException("Failed to deactivate debit card", ex);
         }
+    }
+
+    private DebitCard getDebitCardByAccountAndCardNumber(Account account, String cardNumber){
+        DebitCard debitCard = debitCardRepository.findByAccountAndCardNumber(account, cardNumber);
+        if (debitCard == null)
+            throw new ServiceException("Invalid debit card number!");
+        return debitCard;
+    }
+
+    private void updateDebitCardStatus(DebitCard debitCard, boolean active){
+        debitCard.setActive(active);
+        debitCardRepository.save(debitCard);
     }
 
     public boolean verifyCardCredentials(String cardUUID, String pin) {
@@ -254,20 +258,6 @@ public AccountService(AccountRepository accountRepository, UserRepository userRe
         return card != null && card.getAccount().getPin().equals(pin);
     }
 
-//    protected AccountDTO mapToAccountDTO(Account account) {
-//        AccountDTO accountDTO = new AccountDTO();
-//        accountDTO.setIban(account.getIban());
-//        accountDTO.setUser(mapToUserDTO2(account.getUser()));
-//        accountDTO.setAccountType(account.getAccountType());
-//        accountDTO.setCardUUID(account.getCardUUID());
-//        accountDTO.setPin(account.getPin());
-//        accountDTO.setDailyLimit(account.getDailyLimit());
-//        accountDTO.setBalance(account.getBalance());
-//        accountDTO.setAbsoluteLimit(account.getAbsoluteLimit());
-//        accountDTO.setDebitCardNumber(account.getDebitCard().getCardNumber());
-//
-//        return accountDTO;
-//    }
     protected AccountDTO mapToAccountDTO(Account account) {
         if (account == null) {
             return null;
@@ -302,7 +292,7 @@ public AccountService(AccountRepository accountRepository, UserRepository userRe
         userDTO.setLastName(user.getLastName());
         userDTO.setEmail(user.getEmail());
         userDTO.setPhoneNumber(user.getPhoneNumber());
-
+        userDTO.setHasAccount(user.isHasAccount() ? "Yes" : "No");
         return userDTO;
     }
 
@@ -330,10 +320,8 @@ public AccountService(AccountRepository accountRepository, UserRepository userRe
 
         StringBuilder sb = new StringBuilder();
         sb.append("4");
-        for (int i = 0; i < 3; i++)
-            sb.append(random.nextInt(10));
 
-        for (int i = 0; i < 12; i++)
+        for (int i = 0; i < 15; i++)
             sb.append(random.nextInt(10));
 
         return sb.toString();
