@@ -61,9 +61,7 @@ public class AccountService {
         return account;
     }
 
-
     public CreatedAccountsDTO addAccount(NewAccountDTO newAccountDTO) {
-
         try {
             String iban = generateIban();
             String savingsIban = generateIban();
@@ -71,7 +69,6 @@ public class AccountService {
             User user = userService.getFullUserById(userId);
             if (user == null)
                 throw new ServiceException("User with ID " + userId + " does not exist.");
-
 
             String cardUUID = generateCardUUID();
             String pin = newAccountDTO.getPin();

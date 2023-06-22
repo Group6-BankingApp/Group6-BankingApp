@@ -19,7 +19,6 @@ public class UserDTO2 {
         this.lastName = user.getLastName();
         this.email = user.getEmail();
         this.phoneNumber = user.getPhoneNumber();
-
         if (user.isHasCurrentAccount()) {
             this.hasCurrentAccount = "Yes";
         } else {
@@ -30,7 +29,6 @@ public class UserDTO2 {
         } else {
             this.hasSavingsAccount = "No";
         }
-
     }
 
     public Long getId() {
