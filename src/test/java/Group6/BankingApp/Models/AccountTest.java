@@ -33,26 +33,4 @@ public class AccountTest {
         assertEquals(user, user2);
     }
 
-//    @Test
-//    void testMapToUser() {
-//
-//        UserDTO2 userDTO2 = new UserDTO2();
-//        userDTO2.setId(1L);
-//        userDTO2.setFirstName("Daniel");
-//        userDTO2.setLastName("Rozenhart");
-//        userDTO2.setEmail("daniel.roz@email.com");
-//        userDTO2.setPhoneNumber("0614987314");
-//
-//        // Call the mapToUser method
-//        Account account = new Account();
-//        User user = account.mapToUser(userDTO2);
-//
-//        // Verify the mapped user properties
-//        Assertions.assertEquals(userDTO2.getId(), user.getId());
-//        Assertions.assertEquals(userDTO2.getFirstName(), user.getFirstName());
-//        Assertions.assertEquals(userDTO2.getLastName(), user.getLastName());
-//        Assertions.assertEquals(userDTO2.getEmail(), user.getEmail());
-//        Assertions.assertEquals(userDTO2.getPhoneNumber(), user.getPhoneNumber());
-//    }
-
 }
