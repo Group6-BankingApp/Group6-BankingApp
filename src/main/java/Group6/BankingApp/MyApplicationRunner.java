@@ -1,13 +1,11 @@
 package Group6.BankingApp;
 
-import Group6.BankingApp.Controllers.AccountController;
 import Group6.BankingApp.DAL.AccountRepository;
 import Group6.BankingApp.DAL.DebitCardRepository;
 import Group6.BankingApp.DAL.UserRepository;
 import Group6.BankingApp.DAL.TransactionRepository;
 import Group6.BankingApp.Models.*;
 import Group6.BankingApp.Models.User;
-import Group6.BankingApp.Models.dto.AccountDTO;
 import Group6.BankingApp.Services.AccountService;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,7 +44,8 @@ public class MyApplicationRunner implements ApplicationRunner {
         user1.setEmail("john.doe@gmail.com");
         user1.setPassword("123456");
         user1.setPhoneNumber("0612345678");
-        user1.setHasAccount(true);
+        user1.setHasCurrentAccount(false);
+        user1.setHasSavingsAccount(false);
         user1.setRoles(List.of(Role.ROLE_ADMIN));
 
         User user2 = new User();
@@ -55,30 +54,42 @@ public class MyApplicationRunner implements ApplicationRunner {
         user2.setEmail("jane.smith@gmail.com");
         user2.setPassword("123456");
         user2.setPhoneNumber("0612345678");
-        user2.setHasAccount(true);
+        user2.setHasCurrentAccount(false);
+        user2.setHasSavingsAccount(false);
         user2.setRoles(List.of(Role.ROLE_USER));
 
         List<User> users = Arrays.asList(user1, user2);
         userRepository.saveAll(users);
 
-        // Create and save DebitCards
-        DebitCard debitCard1 = new DebitCard("1111222233334444", LocalDate.now().plusYears(3), "123", "John Doe", true, "UUID1");
+        // Create and save Accounts
+        Account account1 = new Account("NL01INHO9501054837",user1,"Current", "1234", 1000.0, 1000.0, 0,100);
+        Account account = new Account("NL01INHO9501054804",user1,"Savings", "1234", 1000.0, 1000.0, 0, 100);
+        user1.setHasCurrentAccount(true);
+        user1.setHasSavingsAccount(true);
+        userRepository.save(user1);
+        accountRepository.save(account);
+        Account account2 = new Account("NL01INHO2371458805",user2, "Current", "5678", 2000.0, 950.0, -20,100);
+        //account2.setDebitCard(debitCard2);
+
+        Account account3 = new Account("NL01INH1234567890",user2, "Savings", "5678", 2000.0, 950.0, -100,100);
+        //account2.setDebitCard(debitCard2);
+        user2.setHasCurrentAccount(true);
+        user2.setHasSavingsAccount(true);
+        userRepository.save(user2);
+        accountRepository.save(account3);
+
+        DebitCard debitCard1 = new DebitCard("1111222233334444", LocalDate.now().plusYears(3), true, "UUID1", account1);
+        account1.setHasCard(true);
+        account1.setCardNumber(debitCard1.getCardNumber());
+        accountRepository.save(account1);
         debitCardRepository.save(debitCard1);
-        DebitCard debitCard2 = new DebitCard("5555666677778888", LocalDate.now().plusYears(2), "456", "Jane Smith", true, "UUID2");
+
+        DebitCard debitCard2 = new DebitCard("5555666677778888", LocalDate.now().plusYears(2), true, "UUID2", account2);
+        account2.setHasCard(true);
+        account2.setCardNumber(debitCard2.getCardNumber());
+        accountRepository.save(account2);
         debitCardRepository.save(debitCard2);
 
-        // Create and save Accounts
-        Account account1 = new Account("NL01INHO9501054837",user1,"Current", accountService.generateCardUUID(), "1234", 1000.0, 1000.0, 0,100, true, debitCard1);
-        Account account= new Account("NL01INHO9501054804",user1,"Savings", accountService.generateCardUUID(), "1234", 1000.0, 1000.0, 0, 100,true, debitCard1);
-        accountRepository.save(account1);
-        accountRepository.save(account);
-        Account account2 = new Account("NL01INHO2371458805",user2, "Current", accountService.generateCardUUID(), "5678", 2000.0, 950.0, 0,100, true, debitCard2);
-        //account2.setDebitCard(debitCard2);
-        accountRepository.save(account2);
-
-        Account account3 = new Account("NL01INH1234567890",user2, "Savings", accountService.generateCardUUID(), "5678", 2000.0, 950.0, -100,100, true, debitCard2);
-        //account2.setDebitCard(debitCard2);
-        accountRepository.save(account3);
 //        Account account3 = new Account("NL01INHO5808504708", "Savings", accountService.generateCardUUID(), "1357", 1000.0, 0.0, 5000.0, true, null);
 //        account3.setDebitCard(debitCard1);
 //        account3.setUser(users.get(2));
@@ -96,16 +107,62 @@ public class MyApplicationRunner implements ApplicationRunner {
 //        account6.setUser(users.get(2));
 //        accountRepository.save(account6);
             // Create and save Transactions
-            Transaction transaction1 = new Transaction(account1.getIban(), account2.getIban(), 200.0);
+            LocalDate date = LocalDate.of(2021, 1, 1);
+            LocalDate date2 = LocalDate.of(2022, 1, 2);
+            LocalDate date3 = LocalDate.of(2022, 8, 3);
+            LocalDate date4 = LocalDate.of(2023, 1, 3);
+            Transaction transaction1 = new Transaction(account1.getIban(), account2.getIban(), 200.0,date);
             transactionRepository.save(transaction1);
-            Transaction transaction2 = new Transaction(account2.getIban(), account3.getIban(), 155.0);
+            Transaction transaction2 = new Transaction(account1.getIban(), account2.getIban(), 100.0,date2);
             transactionRepository.save(transaction2);
-            Transaction transaction3 = new Transaction(account2.getIban(), account1.getIban(), 100.0);
+            Transaction transaction3 = new Transaction(account1.getIban(), account2.getIban(), 50.0,date3);
             transactionRepository.save(transaction3);
+            Transaction transaction4 = new Transaction(account1.getIban(), account2.getIban(), 25.0,date4);
+            transactionRepository.save(transaction4);
+            Transaction transaction5 = new Transaction(account2.getIban(), account1.getIban(), 200.0,date);
+            transactionRepository.save(transaction5);
+            Transaction transaction6 = new Transaction(account2.getIban(), account1.getIban(), 100.0,date2);
+            transactionRepository.save(transaction6);
+            Transaction transaction7 = new Transaction(account2.getIban(), account1.getIban(), 50.0,date3);
+            transactionRepository.save(transaction7);
+            Transaction transaction8 = new Transaction(account2.getIban(), account1.getIban(), 25.0,date4);
+            transactionRepository.save(transaction8);
+            Transaction transaction9 = new Transaction(account1.getIban(), account3.getIban(), 200.0,date);
+            transactionRepository.save(transaction9);
+            Transaction transaction10 = new Transaction(account1.getIban(), account3.getIban(), 100.0,date2);
+            transactionRepository.save(transaction10);
+            Transaction transaction11 = new Transaction(account1.getIban(), account3.getIban(), 50.0,date3);
+            transactionRepository.save(transaction11);
+            Transaction transaction12 = new Transaction(account1.getIban(), account3.getIban(), 25.0,date4);
+            transactionRepository.save(transaction12);
+            Transaction transaction13 = new Transaction(account3.getIban(), account1.getIban(), 200.0,date);
+            transactionRepository.save(transaction13);
+            Transaction transaction14 = new Transaction(account3.getIban(), account1.getIban(), 100.0,date2);
+            transactionRepository.save(transaction14);
+            Transaction transaction15 = new Transaction(account3.getIban(), account1.getIban(), 50.0,date3);
+            transactionRepository.save(transaction15);
+            Transaction transaction16 = new Transaction(account3.getIban(), account1.getIban(), 25.0,date4);
+            transactionRepository.save(transaction16);
+            Transaction transaction17 = new Transaction(account2.getIban(), account3.getIban(), 200.0,date);
+            transactionRepository.save(transaction17);
+            Transaction transaction18 = new Transaction(account2.getIban(), account3.getIban(), 100.0,date2);
+            transactionRepository.save(transaction18);
+            Transaction transaction19 = new Transaction(account2.getIban(), account3.getIban(), 50.0,date3);
+            transactionRepository.save(transaction19);
+            Transaction transaction20 = new Transaction(account2.getIban(), account3.getIban(), 25.0,date4);
+            transactionRepository.save(transaction20);
+            Transaction transaction21 = new Transaction(account3.getIban(), account2.getIban(), 200.0,date);
+            transactionRepository.save(transaction21);
+            Transaction transaction22 = new Transaction(account3.getIban(), account2.getIban(), 100.0,date2);
+            transactionRepository.save(transaction22);
+            Transaction transaction23 = new Transaction(account3.getIban(), account2.getIban(), 50.0,date3);
+            transactionRepository.save(transaction23);
+            Transaction transaction24 = new Transaction(account3.getIban(), account2.getIban(), 25.0,date4);
+            transactionRepository.save(transaction24);
 
-            Iterable <Transaction> transactions =  transactionRepository.findAllBySenderIbanOrReceiverIban(account1.getIban(), account1.getIban());
-            for (Transaction transaction : transactions) {
-                System.out.println(transaction.getAmount());
-            }
+//            Iterable <Transaction> transactions =  transactionRepository.findAllBySenderIbanOrReceiverIban(account1.getIban(), account1.getIban());
+//            for (Transaction transaction : transactions) {
+//                System.out.println(transaction.getAmount());
+//            }
     }
 }

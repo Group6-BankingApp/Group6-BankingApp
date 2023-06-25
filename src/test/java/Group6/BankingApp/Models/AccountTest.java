@@ -1,12 +1,9 @@
 package Group6.BankingApp.Models;
 
-import Group6.BankingApp.Models.dto.UserDTO2;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.*;
 
 public class AccountTest {
 

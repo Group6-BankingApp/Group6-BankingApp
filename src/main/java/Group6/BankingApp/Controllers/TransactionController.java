@@ -1,12 +1,11 @@
 package Group6.BankingApp.Controllers;
 
 import Group6.BankingApp.Models.Transaction;
+import Group6.BankingApp.Models.dto.AtmResponseDTO;
+import Group6.BankingApp.Models.dto.AtmTransactionDTO;
 import Group6.BankingApp.Models.dto.TransactionDTO;
-import Group6.BankingApp.Services.AccountService;
+import Group6.BankingApp.Models.dto.FilterDTO;
 import Group6.BankingApp.Services.TransactionService;
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.security.Keys;
 
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -14,7 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
-import org.hibernate.service.spi.ServiceException;
+
 import java.time.LocalDate;
 import java.util.List;
 
@@ -30,69 +29,38 @@ public class TransactionController {
     }
 
     @GetMapping
-    public ResponseEntity<List<Transaction>> getAllTransactions(
-            //@RequestHeader("Authorization") String token,
-            @RequestParam(defaultValue = "NL67INGB1234567890") String iban,
-            @RequestParam(defaultValue = "0") Integer skip,
-            @RequestParam(defaultValue = "40") Integer limit,
-            @RequestParam(defaultValue = "") String dateFrom,
-            @RequestParam(defaultValue = "") String dateTo,
-            @RequestParam(defaultValue = "") String pin
-    ) {
+    public ResponseEntity<List<Transaction>> getAllTransactions() {
         try {
-            // Remove "Bearer " prefix from the token string
-            // String jwtToken = token.replace("Bearer ", "");
-
-            // // // Validate and parse the JWT token
-            // Claims claims = Jwts.parserBuilder()
-            //     .setSigningKey(Keys.hmacShaKeyFor(SECRET_KEY.getBytes()))
-            //     .build()
-            //     .parseClaimsJws(jwtToken)
-            //     .getBody();
-
-            // // // Extract user information from the claims
-            // String userId = claims.getSubject();
-            // // Perform additional authentication and authorization checks if needed
-
-            if (dateTo.isEmpty()) {
-                LocalDate oneYearAgo = LocalDate.now().minusYears(1);
-                dateFrom = oneYearAgo.toString();
-            }
-
-            if (dateTo.isEmpty()) {
-                LocalDate today = LocalDate.now();
-                dateTo = today.toString();
-            }
-
-            if (pin.isEmpty()) {
-                // pin = "invalid";
-            }
-
-            if (skip != null && skip < 0) {
-                return ResponseEntity.badRequest().build();
-            } else if (skip == null) {
-                skip = 0;
-            }
-            if (limit != null && (limit < 0 || limit > 50)) {
-                return ResponseEntity.badRequest().build();
-            } else if (limit == null) {
-                limit = 0;
-            }
-            List<Transaction> transactions = null;
-            try {
-                transactions = transactionService.findAllTransactions(skip, limit, dateFrom, dateTo, iban, pin);
-                return ResponseEntity.ok(transactions);
-            }catch (Exception e){
-                throw e;
-            }
-        }catch (Exception e){
+            List<Transaction> transactions = transactionService.findAll();
+            return ResponseEntity.ok(transactions);
+        }
+        catch (Exception e){
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to retrieve transactions", e);
         }
     }
 
     @GetMapping(value = "/customer/{iban}")
-    public List<Transaction> getTransactionsByIban(@PathVariable String iban) {
-        return transactionService.findAllTransactions(iban);
+    public ResponseEntity<List<Transaction>> getTransactionsByIban(@PathVariable String iban) {
+        try{
+            List<Transaction> transactions=transactionService.findAllTransactions(iban);
+            return ResponseEntity.ok(transactions);
+        }catch (Exception e){
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to retrieve transactions", e);
+        }
+    }
+
+    @PostMapping(value = "/customer/{iban}/filter")
+    public ResponseEntity<List<Transaction>> getFilteredTransactionsByIban(@PathVariable String iban,@RequestBody FilterDTO filter) {
+        try{
+            List<Transaction> transactions = transactionService.findTransactionsByFilter(iban, filter);
+            return ResponseEntity.ok(transactions);
+        }catch (Exception e){
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to retrieve transactions", e);
+        }
+    }
+
+    private boolean allFilterEmpty(FilterDTO filter) {
+        return filter.getStartDate()==null && filter.getEndDate()==null && filter.getMinAmount()==null && filter.getMaxAmount()==null && filter.getAccount()==null && filter.getFromOrTo()==null;
     }
 
     @GetMapping(value = "/{id}")
@@ -114,22 +82,22 @@ public class TransactionController {
 //        }
 //    }
     @PostMapping(value = "/deposit")
-    public ResponseEntity Deposit(@RequestBody Transaction transaction, @RequestHeader("Authorization") String token) {
+    public ResponseEntity<AtmResponseDTO> Deposit(@RequestBody AtmTransactionDTO transaction){
         try{
-            Transaction newTransaction=transactionService.addTransactionDeposit(transaction);
-            return ResponseEntity.status(201).body(newTransaction);
+            AtmResponseDTO responseDTO = transactionService.makeDeposit(transaction);
+            return ResponseEntity.status(201).body(responseDTO);
         }catch (Exception e){
-            return ResponseEntity.internalServerError().body(e.getCause().getMessage());
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to deposit", e);
         }
     }
     
     @PostMapping(value = "/withdraw")
-    public ResponseEntity Withdraw(@RequestBody TransactionDTO transaction, @RequestParam(defaultValue = "0000") String pin, @RequestHeader("Authorization") String token) {
+    public ResponseEntity<AtmResponseDTO> Withdraw(@RequestBody AtmTransactionDTO transaction) {
         try{
-            Transaction newTransaction=transactionService.addTransactionWithdraw(transaction, pin);
-            return ResponseEntity.status(201).body(newTransaction);
+            AtmResponseDTO responseDTO = transactionService.makeWithdraw(transaction);
+            return ResponseEntity.status(201).body(responseDTO);
         }catch (Exception e){
-            return ResponseEntity.internalServerError().body(e.getCause().getMessage());
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to withdraw", e);
         }
     }
 
