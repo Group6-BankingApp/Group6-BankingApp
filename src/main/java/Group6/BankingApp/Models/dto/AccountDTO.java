@@ -1,5 +1,6 @@
 package Group6.BankingApp.Models.dto;
 
+import Group6.BankingApp.Models.Account;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -7,26 +8,48 @@ public class AccountDTO {
 
     private String iban;
     private String accountType;
-    private String cardUUID;
     private String pin;
     private double dailyLimit;
     private double balance;
     private double absoluteLimit;
     private double transactionLimit;
+    private String hasCard;
     private String cardNumber;
 
-    public AccountDTO(){}
+    public AccountDTO() {
+    }
 
-    public AccountDTO(String iban, String accountType, String cardUUID, String pin, double dailyLimit, double balance, double absoluteLimit,double transactionLimit, String cardNumber) {
+    public AccountDTO(Account account){
+        this.iban = account.getIban();
+        this.accountType = account.getAccountType();
+        this.pin = account.getPin();
+        this.dailyLimit = account.getDailyLimit();
+        this.balance = account.getBalance();
+        this.absoluteLimit = account.getAbsoluteLimit();
+        this.transactionLimit = account.getTransactionLimit();
+        if(account.getHasCard()){
+            this.hasCard = "Yes";
+            this.cardNumber = account.getCardNumber();
+        }   else {
+            this.hasCard = "No";
+            this.cardNumber = "No card";
+        }
+    }
+
+
+    public AccountDTO(String iban, String accountType, String pin, double dailyLimit, double balance, double absoluteLimit,double transactionLimit, Boolean hasCard) {
         this.iban = iban;
         this.accountType = accountType;
-        this.cardUUID = cardUUID;
         this.pin = pin;
         this.dailyLimit = dailyLimit;
         this.balance = balance;
         this.absoluteLimit = absoluteLimit;
         this.transactionLimit = transactionLimit;
-        this.cardNumber = cardNumber;
+        if (hasCard) {
+            this.hasCard = "Yes";
+        } else {
+            this.hasCard = "No";
+        }
     }
 
     public String getIban() {
@@ -43,14 +66,6 @@ public class AccountDTO {
 
     public void setAccountType(String accountType) {
         this.accountType = accountType;
-    }
-
-    public String getCardUUID() {
-        return cardUUID;
-    }
-
-    public void setCardUUID(String cardUUID) {
-        this.cardUUID = cardUUID;
     }
 
     public String getPin() {
@@ -93,11 +108,23 @@ public class AccountDTO {
         this.transactionLimit = transactionLimit;
     }
 
-    public String getDebitCardNumber() {
+    public String getHasCard() {
+        return hasCard;
+    }
+
+    public void setHasCard(Boolean hasCard) {
+        if (hasCard) {
+            this.hasCard = "Yes";
+        } else {
+            this.hasCard = "No";
+        }
+    }
+
+    public String getCardNumber() {
         return cardNumber;
     }
 
-    public void setDebitCardNumber(String cardNumber) {
+    public void setCardNumber(String cardNumber) {
         this.cardNumber = cardNumber;
     }
 }

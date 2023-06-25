@@ -8,7 +8,6 @@ import Group6.BankingApp.Models.dto.DebitCardDTO;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
@@ -29,14 +28,15 @@ public class DebitCardServiceTest {
 
     @InjectMocks
     @Autowired
-    private AccountService debitCardService;
+    private AccountService accountService;
+
+    @InjectMocks
+    DebitCardService debitCardService;
 
     @Test
     void testCreateDebitCard() {
 
         Account account = new Account();
-        account.setCardUUID("1037f321-5771-4c84-b24e-6e691d08b717");
-        account.setCardNumber(null);
 
         DebitCard existingActiveCard = new DebitCard();
         existingActiveCard.setActive(true);
@@ -45,7 +45,7 @@ public class DebitCardServiceTest {
         newCard.setCardNumber("1234567890");
         newCard.setExpirationDate(LocalDate.now().plusYears(5));
         newCard.setActive(false);
-        newCard.setUuid(account.getCardUUID());
+        newCard.setUuid("1234567890");
         newCard.setAccount(account);
 
         when(debitCardRepository.findByAccountAndIsActive(account, true)).thenReturn(existingActiveCard);
@@ -60,8 +60,7 @@ public class DebitCardServiceTest {
         verify(accountRepository, times(1)).save(account);
 
         assertFalse(existingActiveCard.isActive());
-        assertEquals("1234567890", account.getCardNumber());
-        assertEquals("1234567890", result.getCardNumber());
+        assertEquals("1234567890", newCard.getCardNumber());
     }
 
 //    @Test

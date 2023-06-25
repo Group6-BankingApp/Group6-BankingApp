@@ -26,4 +26,6 @@ public interface UserRepository extends CrudRepository<User, Long> {
     Optional<User> findByEmail(String username);
 
     Iterable<User> findAllByHasCurrentAccountIsFalseAndHasSavingsAccountIsFalse();
+
+    Iterable<User> findAllByHasCurrentAccountIsTrueAndHasSavingsAccountIsFalse();
 }

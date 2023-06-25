@@ -1,21 +1,17 @@
 package Group6.BankingApp.Controllers;
 
 import Group6.BankingApp.Models.Account;
-import Group6.BankingApp.Models.DebitCard;
-import Group6.BankingApp.Models.dto.AccountDTO;
-import Group6.BankingApp.Models.dto.CreatedAccountsDTO;
-import Group6.BankingApp.Models.dto.DebitCardDTO;
-import Group6.BankingApp.Models.dto.NewAccountDTO;
+import Group6.BankingApp.Models.dto.*;
 import Group6.BankingApp.Services.AccountService;
+import Group6.BankingApp.Services.DebitCardService;
 import lombok.extern.java.Log;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.util.HashMap;
 import java.util.Map;
 
 import java.util.List;
@@ -27,6 +23,8 @@ import java.util.List;
 public class AccountController {
 
     private final AccountService accountService;
+    @Autowired
+    private  DebitCardService debitCardService;
 
     public AccountController(AccountService accountService) {
         this.accountService = accountService;
@@ -61,15 +59,25 @@ public class AccountController {
     }
 
     @PostMapping
-    public ResponseEntity<CreatedAccountsDTO> createAccount(@RequestBody NewAccountDTO newAccountDTO) {
+    public ResponseEntity<AccountDTO> createAccount(@RequestBody NewAccountDTO newAccountDTO) {
         if (newAccountDTO == null) {
             // Return a BAD_REQUEST response if the newAccountDTO is empty
             return ResponseEntity.badRequest().build();
         }
 
         try {
-            CreatedAccountsDTO accountDTO = accountService.addAccount(newAccountDTO);
+            AccountDTO accountDTO = accountService.addAccount(newAccountDTO);
             return ResponseEntity.status(HttpStatus.CREATED).body(accountDTO);
+        } catch (Exception ex) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
+    }
+
+    @PostMapping("/savings/{id}")
+    public ResponseEntity<SavingsAccountDTO> createSavingsAccount(@PathVariable Long id) {
+        try {
+            SavingsAccountDTO savingsAccountDTO = accountService.addSavingsAccount(id);
+            return ResponseEntity.status(HttpStatus.CREATED).body(savingsAccountDTO);
         } catch (Exception ex) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
@@ -122,7 +130,7 @@ public class AccountController {
         Account account = accountService.findAccountByIban(iban);
         if (account == null)
             return ResponseEntity.notFound().build();
-        return ResponseEntity.status(HttpStatus.CREATED).body(accountService.createDebitCard(account));
+        return ResponseEntity.status(HttpStatus.CREATED).body(debitCardService.createDebitCard(account));
     }
 
     @PostMapping("/{iban}/debitcard/activate")
@@ -135,18 +143,14 @@ public class AccountController {
         }
     }
 
-    @PutMapping("/{iban}/debitcard/{cardNumber}/deactivate")
-    public ResponseEntity<String> deactivateDebitCard(
-            @PathVariable("iban") String iban,
-            @PathVariable String cardNumber,
-            @RequestParam(value = "active") Boolean active
-    ) {
+    @PutMapping("/{iban}/deactivateDebitCard/{cardNumber}")
+    public ResponseEntity<String> deactivateDebitCard(@PathVariable("iban") String iban, @PathVariable String cardNumber) {
         if (cardNumber == null) {
             return ResponseEntity.notFound().build();
         }
 
         try {
-            accountService.deactivateDebitCard(iban, cardNumber, active);
+            accountService.deactivateDebitCard(iban, cardNumber, false);
             return ResponseEntity.ok("Debit card deactivated successfully.");
         } catch (Exception e) {
             return ResponseEntity.notFound().build();
@@ -159,18 +163,36 @@ public class AccountController {
         NewAccountDTO updatedAccountDTO = accountService.updatePin(iban, accountDTO);
         return ResponseEntity.ok().body(updatedAccountDTO);
     }
-    @GetMapping("/customer")
-    public List<AccountDTO> getAccountsByCustomerId(@RequestBody Map<String, Long> requestBody) {
+
+    @GetMapping("/customer/{id}")
+    public List<AccountDTO> getAllAccountsByCustomerId(@PathVariable("id") Long id) {
         try {
-            return  accountService.getAccountsByCustomerId(requestBody.get("id"));
+            return  accountService.getAllAccountsByCustomerId(id);
         } catch (Exception e) {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to retrieve accounts", e);
         }
     }
-    @GetMapping("/customer/{id}")
+    @GetMapping("/customer/Current")
+    public List<AccountDTO> getCurrentAccountsByCustomerId(@RequestBody Map<String, Long> requestBody) {
+        try {
+            return  accountService.getCurrentAccountsByCustomerId(requestBody.get("id"));
+        } catch (Exception e) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to retrieve accounts", e);
+        }
+    }
+    @GetMapping("/customer/current/{id}")
     public List<AccountDTO> getAccountsByCustomerId(@PathVariable("id") Long id) {
         try {
-            return  accountService.getAccountsByCustomerId(id);
+            return  accountService.getCurrentAccountsByCustomerId(id);
+        } catch (Exception e) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to retrieve accounts", e);
+        }
+    }
+
+    @GetMapping("/customer/Savings/{id}")
+    public  List<SavingsAccountDTO> getSavingsAccountsByCustomerId(@PathVariable("id") Long id) {
+        try {
+            return  accountService.getSavingsAccountsByCustomerId(id);
         } catch (Exception e) {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to retrieve accounts", e);
         }

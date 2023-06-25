@@ -30,10 +30,16 @@ public class User {
     @ElementCollection (fetch = FetchType.EAGER)
     private List<Role> roles;
 
+    public boolean isHasCurrentAccount() {
+        return hasCurrentAccount;
+    }
     public void setHasCurrentAccount(boolean hasCurrentAccount) {
         this.hasCurrentAccount = hasCurrentAccount;
     }
 
+    public boolean isHasSavingsAccount() {
+        return hasSavingsAccount;
+    }
     public void setHasSavingsAccount(boolean hasSavingsAccount) {
         this.hasSavingsAccount = hasSavingsAccount;
     }

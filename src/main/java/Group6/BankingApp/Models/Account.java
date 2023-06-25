@@ -13,54 +13,44 @@ public class Account {
     @OneToOne
     private User user;
     private String accountType;
-    private String cardUUID;
     private String pin;
     private double dailyLimit;
     private double balance;
     private double absoluteLimit;
     private double transactionLimit;
-    private boolean status;
+    private boolean hasCard;
     private String cardNumber;
-    @OneToOne
-    private DebitCard debitCard;
 
-    public Account(String iban, String accountType, String cardUUID, String pin, double dailyLimit, double balance, double absoluteLimit, double transactionLimit, boolean status, String cardNumber) {
+
+    public Account(String iban, String accountType, String pin, double dailyLimit, double balance, double absoluteLimit, double transactionLimit) {
         this.iban = iban;
         this.accountType = accountType;
-        this.cardUUID = cardUUID;
         this.pin = pin;
         this.dailyLimit = dailyLimit;
         this.balance = balance;
         this.absoluteLimit = absoluteLimit;
         this.transactionLimit = transactionLimit;
-        this.status = status;
-        this.cardNumber = cardNumber;
     }
 
-    public Account(String iban, User user, String accountType, String cardUUID, String pin, double dailyLimit, double balance, double absoluteLimit,double transactionLimit, boolean status, DebitCard debitCard) {
+    public Account(String iban, User user, String accountType, String pin, double dailyLimit, double balance, double absoluteLimit, double transactionLimit) {
         this.iban = iban;
         this.user = user;
         this.accountType = accountType;
-        this.cardUUID = cardUUID;
         this.pin = pin;
         this.dailyLimit = dailyLimit;
         this.balance = balance;
         this.absoluteLimit = absoluteLimit;
         this.transactionLimit = transactionLimit;
-        this.status = status;
-        this.debitCard = debitCard;
     }
 
-    public Account(String iban, UserDTO2 userDTO2, String accountType, String cardUUID, String pin, double dailyLimit, double balance, double absoluteLimit, boolean status) {
+    public Account(String iban, UserDTO2 userDTO2, String accountType, String pin, double dailyLimit, double balance, double absoluteLimit) {
         this.iban = iban;
         this.user = mapToUser(userDTO2);
         this.accountType = accountType;
-        this.cardUUID = cardUUID;
         this.pin = pin;
         this.dailyLimit = dailyLimit;
         this.balance = balance;
         this.absoluteLimit = absoluteLimit;
-        this.status = status;
     }
 
     public Account() {
@@ -80,14 +70,6 @@ public class Account {
 
     public void setUser(User user) {
         this.user = user;
-    }
-
-    public String getCardUUID() {
-        return cardUUID;
-    }
-
-    public void setCardUUID(String cardUUID) {
-        this.cardUUID = cardUUID;
     }
 
     public String getPin() {
@@ -130,28 +112,16 @@ public class Account {
         this.absoluteLimit = absoluteLimit;
     }
 
-    public boolean getStatus() {
-        return status;
+    public boolean getHasCard() {
+        if (hasCard) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
-    public void setStatus(boolean status) {
-        this.status = status;
-    }
-
-    public String getCardNumber() {
-        return cardNumber;
-    }
-
-    public void setCardNumber(String cardNumber) {
-        this.cardNumber = cardNumber;
-    }
-
-    public DebitCard getDebitCard() {
-        return debitCard;
-    }
-
-    public void setDebitCard(DebitCard debitCard) {
-        this.debitCard = debitCard;
+    public void setHasCard(boolean hasCard) {
+        this.hasCard = hasCard;
     }
 
     public double getTransactionLimit() {
@@ -160,6 +130,14 @@ public class Account {
 
     public void setTransactionLimit(double transactionLimit) {
         this.transactionLimit = transactionLimit;
+    }
+
+    public String getCardNumber() {
+        return cardNumber;
+    }
+
+    public void setCardNumber(String cardNumber) {
+        this.cardNumber = cardNumber;
     }
 
     private User mapToUser(UserDTO2 userDTO2) {

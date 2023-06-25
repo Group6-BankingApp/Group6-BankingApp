@@ -37,6 +37,8 @@ public class UserService {
 
     public List<UserDTO2> getAllUsersWithAccount() {
         List<User> users = (List<User>) userRepository.findAllByHasCurrentAccountIsTrueAndHasSavingsAccountIsTrue();
+        List<User> users2 = (List<User>) userRepository.findAllByHasCurrentAccountIsTrueAndHasSavingsAccountIsFalse();
+        users.addAll(users2);
         List<UserDTO2>userDTO2s= convertToUserDTO2(users);
         return userDTO2s;
     }

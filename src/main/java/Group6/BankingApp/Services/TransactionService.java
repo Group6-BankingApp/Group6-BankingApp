@@ -2,15 +2,11 @@ package Group6.BankingApp.Services;
 
 import Group6.BankingApp.DAL.TransactionRepository;
 import Group6.BankingApp.Models.Transaction;
-import Group6.BankingApp.Models.dto.TransactionDTO;
-import Group6.BankingApp.Services.AccountService;
-import Group6.BankingApp.Models.dto.AccountDTO;
+import Group6.BankingApp.Models.dto.*;
 import Group6.BankingApp.Models.Account;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import jakarta.persistence.EntityNotFoundException;
 
-import org.hibernate.annotations.Check;
 import org.hibernate.service.spi.ServiceException;
 import java.util.List;
 import java.util.*;
@@ -41,17 +37,17 @@ public class TransactionService {
             if(!transactionDTO.getSenderIban().equals(transactionDTO.getReceiverIban())){
                 Account senderAccount = accountService.findAccountByIban(transactionDTO.getSenderIban());
                 Account receiverAccount = accountService.findAccountByIban(transactionDTO.getReceiverIban());
-                if((senderAccount.getBalance()-senderAccount.getAbsoluteLimit())<transactionDTO.getAmount()){
+                if((senderAccount.getBalance()- senderAccount.getAbsoluteLimit())<transactionDTO.getAmount()){
                     throw new ServiceException("Insufficient funds");
                 }
-                if(senderAccount.getUser().getId()!=receiverAccount.getUser().getId()){
+                if(senderAccount.getUser().getId()!= receiverAccount.getUser().getId()){
                     if(!(senderAccount.getAccountType().equals("Current") && receiverAccount.getAccountType().equals("Current"))){
                         throw new ServiceException("Cross-account transfers are only allowed between current accounts");
                     }
-                    if (transactionDTO.getAmount()>senderAccount.getTransactionLimit()){
+                    if (transactionDTO.getAmount()> senderAccount.getTransactionLimit()){
                         throw new ServiceException("Transaction limit exceeded");
                     }
-                    else if(transactionDTO.getAmount()>senderAccount.getDailyLimit()){
+                    else if(transactionDTO.getAmount()> senderAccount.getDailyLimit()){
                         throw new ServiceException("Daily limit reached");
                     }
                     else{
@@ -72,20 +68,20 @@ public class TransactionService {
             throw new ServiceException("Failed to add transaction. ", ex);
         }
     }
-    public Transaction addTransaction(TransactionDTO transaction) {
-        try {
-            if((CheckSufficientFunds(transaction, transaction.getPin())) && (CheckDailyLimit(accountService.getAccountByIban(transaction.getSenderIban()), transaction))){
-                TransferMoney(transaction);
-                Transaction newTransaction = new Transaction(transaction);
-                    return transactionRepository.save(newTransaction);
-                }
-                else {
-                    throw new ServiceException("Insufficient funds or daily limit reached");
-                }
-        } catch (Exception ex) {
-            throw new ServiceException("Failed to add transaction", ex);
-        }
-    }
+//    public Transaction addTransaction(TransactionDTO transaction) {
+//        try {
+//            if((CheckSufficientFunds(transaction, transaction.getPin())) && (CheckDailyLimit(accountService.getAccountByIban(transaction.getSenderIban()), transaction))){
+//                TransferMoney(transaction);
+//                Transaction newTransaction = new Transaction(transaction);
+//                    return transactionRepository.save(newTransaction);
+//                }
+//                else {
+//                    throw new ServiceException("Insufficient funds or daily limit reached");
+//                }
+//        } catch (Exception ex) {
+//            throw new ServiceException("Failed to add transaction", ex);
+//        }
+//    }
     public Transaction addTransactionDeposit(Transaction transaction) {
         try {
             DespositMoney(transaction);
@@ -126,7 +122,7 @@ public class TransactionService {
             throw new ServiceException("Transfer between different account types for different users is not allowed");
         }
         else if(senderAccount.getTransactionLimit()<=transaction.getAmount()){
-            throw new ServiceException("Cannot transfer more than "+senderAccount.getTransactionLimit()+" per transaction");
+            throw new ServiceException("Cannot transfer more than "+ senderAccount.getTransactionLimit()+" per transaction");
         }
         else{
             senderAccount.setBalance(senderAccount.getBalance() - transaction.getAmount());
@@ -231,4 +227,139 @@ public class TransactionService {
             }
         }
 
+    public AtmResponseDTO makeWithdraw(AtmTransactionDTO transaction) {
+        try {
+            Account account = accountService.findAccountByIban(transaction.getIban());
+            Double amount = Double.parseDouble(transaction.getAmount());
+            if(account.getAccountType().equals("Current")){
+                if((account.getBalance()-account.getAbsoluteLimit())>=amount){
+                    Transaction newtransaction = new Transaction(transaction.getIban() ,"NL01INHO0000000001", amount);
+                    newtransaction.setUserId(account.getUser().getId());
+                    newtransaction.setTimeCreated(LocalDate.now());
+                    transactionRepository.save(newtransaction);
+                    account.setBalance(account.getBalance()-amount);
+                    account.setDailyLimit(account.getDailyLimit()-amount);
+                    accountService.updateAccountByIban(transaction.getIban(), account);
+                    String balance = Double.toString(account.getBalance());
+                    AtmResponseDTO response = new AtmResponseDTO(account.getUser().getFirstName() + " " + account.getUser().getLastName(), account.getCardNumber(),account.getIban(), balance);
+                    return response;
+                }
+                else{
+                    throw new ServiceException("Insufficient funds");
+                }
+            }
+            else{
+                throw new ServiceException("Invalid account type");
+            }
+        } catch (Exception ex) {
+            throw new ServiceException("Failed to withdraw", ex);
+        }
+    }
+
+    public AtmResponseDTO makeDeposit(AtmTransactionDTO transaction) {
+        try {
+            Account account = accountService.findAccountByIban(transaction.getIban());
+            Double amount = Double.parseDouble(transaction.getAmount());
+            if(account.getAccountType().equals("Current")){
+                Transaction newtransaction = new Transaction("NL01INHO0000000001", transaction.getIban() ,amount);
+                newtransaction.setUserId(account.getUser().getId());
+                newtransaction.setTimeCreated(LocalDate.now());
+                transactionRepository.save(newtransaction);
+                account.setBalance(account.getBalance()+amount);
+                String balance = Double.toString(account.getBalance());
+                accountService.updateAccountByIban(transaction.getIban(), account);
+                AtmResponseDTO response = new AtmResponseDTO(account.getUser().getFirstName()+" "+account.getUser().getLastName(), account.getCardNumber(), account.getIban(), balance);
+
+                return response;
+            }
+            else{
+                throw new ServiceException("Invalid account type");
+            }
+        } catch (Exception ex) {
+            throw new ServiceException("Failed to deposit", ex);
+        }
+    }
+
+    public List<Transaction> findTransactionsByFilter(String iban, FilterDTO filter) {
+        filter=checkFilter(filter);
+        try{
+            Iterable<Transaction> transactions = null;
+            List<Transaction> filteredTransactions = null;
+            if((filter.getAccount()==null)||(filter.getAccount().equals(""))){
+                if((filter.getFromOrTo()==null)||(filter.getFromOrTo().equals(""))){
+                    transactions = transactionRepository.findAll();
+                    filteredTransactions = applyFilters(transactions, filter);
+                }
+                else{
+                    if(filter.getFromOrTo().equals("from")){
+                        transactions = transactionRepository.findAllByReceiverIban(iban);
+                        filteredTransactions = applyFilters(transactions, filter);
+                    }
+                    else{
+                        transactions = transactionRepository.findAllBySenderIban(iban);
+                        filteredTransactions = applyFilters(transactions, filter);
+                    }
+                }
+            }
+            else{
+                if((filter.getFromOrTo()==null)||(filter.getFromOrTo().equals(""))){
+                    transactions = transactionRepository.findAllBySenderIbanAndReceiverIban(iban, filter.getAccount());
+                    Iterable<Transaction> transactions2 = transactionRepository.findAllBySenderIbanAndReceiverIban(filter.getAccount(), iban);
+                    filteredTransactions = applyFilters(transactions, filter);
+                    List<Transaction> filtered2 = applyFilters(transactions2, filter);
+                    filteredTransactions.addAll(filtered2);
+                }
+                else{
+                    if(filter.getFromOrTo().equals("from")){
+                        transactions = transactionRepository.findAllBySenderIbanAndReceiverIban(filter.getAccount(), iban);
+                        filteredTransactions = applyFilters(transactions, filter);
+                    }
+                    else{
+                        transactions = transactionRepository.findAllBySenderIbanAndReceiverIban(iban, filter.getAccount());
+                        filteredTransactions = applyFilters(transactions, filter);
+                    }
+                }
+            }
+            return  filteredTransactions;
+        }
+        catch(Exception ex){
+            throw new ServiceException("Failed to retrieve transactions", ex);
+        }
+    }
+
+    private FilterDTO checkFilter(FilterDTO filter) {
+        if(filter.getMinAmount()==null){
+            filter.setMinAmount(0.0);
+        }
+        if(filter.getMaxAmount()==null){
+            filter.setMaxAmount(100000000.0);
+        }
+        if(filter.getStartDate()==null){
+            filter.setStartDate(LocalDate.of(1900, 1, 1));
+        }
+        if(filter.getEndDate()==null){
+            filter.setEndDate(LocalDate.now());
+        }
+        return filter;
+    }
+
+    private List<Transaction> applyFilters(Iterable<Transaction> transactions, FilterDTO filter) {
+        List<Transaction> filteredTransactions = new ArrayList<>();
+        for (Transaction transaction : transactions) {
+            if((transaction.getTimeCreated().isAfter(filter.getStartDate()) && transaction.getTimeCreated().isBefore(filter.getEndDate()))
+                    &&((transaction.getAmount()<=filter.getMaxAmount())&&(transaction.getAmount()>=filter.getMinAmount()))){
+                filteredTransactions.add(transaction);
+            }
+        }
+        return filteredTransactions;
+    }
+
+    public List<Transaction> findAll() {
+try {
+            Iterable<Transaction> allTransactions = transactionRepository.findAll();
+            return (List<Transaction>) allTransactions;
+        } catch (Exception ex) {
+            throw new ServiceException("Failed to retrieve transactions here", ex);
+        }
+    }
 }

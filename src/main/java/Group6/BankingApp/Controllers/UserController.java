@@ -1,7 +1,5 @@
 package Group6.BankingApp.Controllers;
 
-import Group6.BankingApp.Models.Account;
-import Group6.BankingApp.Models.Role;
 import Group6.BankingApp.Models.User;
 import Group6.BankingApp.Models.dto.*;
 import Group6.BankingApp.Services.AccountService;
@@ -13,7 +11,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import javax.naming.AuthenticationException;
 import java.util.List;
 
 @RestController

@@ -11,7 +11,6 @@ public class TransactionDTO{
     private String senderIban;
     private String timeCreated;
     private UserDTO2 userDTO2;
-    private String pin;
 
     public TransactionDTO() {
     }
@@ -22,7 +21,6 @@ public class TransactionDTO{
         this.senderIban = senderIban;
         this.timeCreated = timeCreated;
         this.userDTO2 = userDTO2;
-        this.pin = pin;
     }
 
     public double getAmount() {
