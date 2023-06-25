@@ -71,8 +71,6 @@ public class NewAccountDTO {
     }
 
     public void setDailyLimit(double dailyLimit) {
-        if(dailyLimit < 0)
-            throw new IllegalArgumentException("Daily limit cannot be negative");
         this.dailyLimit = dailyLimit;
     }
 
@@ -81,8 +79,6 @@ public class NewAccountDTO {
     }
 
     public void setBalance(double balance) {
-        if(balance < 0)
-            throw new IllegalArgumentException("Balance cannot be negative");
         this.balance = balance;
     }
 
@@ -91,8 +87,6 @@ public class NewAccountDTO {
     }
 
     public void setAbsoluteLimit(double absoluteLimit) {
-        if(absoluteLimit < 0)
-            throw new IllegalArgumentException("Absolute limit cannot be negative");
         this.absoluteLimit = absoluteLimit;
     }
 
@@ -101,8 +95,6 @@ public class NewAccountDTO {
     }
 
     public void setTransactionLimit(double transactionLimit) {
-        if(transactionLimit < 0)
-            throw new IllegalArgumentException("Transaction limit cannot be negative");
         this.transactionLimit = transactionLimit;
     }
 }

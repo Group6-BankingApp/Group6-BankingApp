@@ -107,9 +107,9 @@ class AccountServiceTest {
     @Test
     public void testUpdateAccountByIban() {
         // Arrange
-        String iban = "1234567890";
+        String iban = "NL01INH1234567890";
         AccountDTO accountDTO = new AccountDTO();
-        accountDTO.setIban("1234567890");
+        accountDTO.setIban("NL01INH1234567890");
         UserDTO2 userDTO = new UserDTO2();
         userDTO.setId(1L);
         accountDTO.setUser(userDTO);
@@ -122,7 +122,7 @@ class AccountServiceTest {
         accountDTO.setTransactionLimit(100.0);
 
         Account existingAccount = new Account();
-        existingAccount.setIban("1234567890");
+        existingAccount.setIban("NL01INH1234567890");
         User existingUser = new User();
         existingUser.setId(1L);
         existingAccount.setUser(existingUser);
@@ -145,9 +145,9 @@ class AccountServiceTest {
     @Test
     public void testUpdateAccountByIban_AccountNotFound() {
         // Arrange
-        String iban = "1234567890";
+        String iban = "NL01INH1234567890";
         AccountDTO accountDTO = new AccountDTO();
-        accountDTO.setIban("1234567890");
+        accountDTO.setIban("NL01INH1234567890");
         UserDTO2 userDTO = new UserDTO2();
         userDTO.setId(1L);
         accountDTO.setUser(userDTO);
@@ -359,10 +359,10 @@ class AccountServiceTest {
     }
 
     @Test
-    void deactivateDebitCard_ValidIbanAndCardNumber_ActiveStatusUpdated() {
+    void deactivateDebitCard_ValidIbanAndCardNumber() {
         // Arrange
-        String iban = "1234567890";
-        String cardNumber = "1111111111111111";
+        String iban = "NL01INH1234567890";
+        String cardNumber = "41111111111111";
         boolean active = false;
 
         Account account = new Account();
@@ -381,9 +381,9 @@ class AccountServiceTest {
     }
 
     @Test
-    void deactivateDebitCard_InvalidIban_ThrowsServiceException() {
+    void deactivateDebitCard_InvalidIban() {
         // Arrange
-        String iban = "1234567890";
+        String iban = "NL01INH1234567890";
         String cardNumber = "1111111111111111";
         boolean active = false;
 
@@ -396,9 +396,9 @@ class AccountServiceTest {
     }
 
     @Test
-    void deactivateDebitCard_InvalidCardNumber_ThrowsServiceException() {
+    void deactivateDebitCard_InvalidCardNumber() {
         // Arrange
-        String iban = "1234567890";
+        String iban = "NL01INH1234567890";
         String cardNumber = "1111111111111111";
         boolean active = false;
 
@@ -417,10 +417,10 @@ class AccountServiceTest {
     void testDeactivateDebitCard() {
         // Create a sample account and debit card
         Account account = new Account();
-        account.setIban("1234567890");
+        account.setIban("NL01INH1234567890");
 
         DebitCard debitCard = new DebitCard();
-        debitCard.setCardNumber("1111111111111111");
+        debitCard.setCardNumber("41111111111111");
         debitCard.setActive(true);
 
         // Mock the behavior of the repositories
@@ -428,12 +428,12 @@ class AccountServiceTest {
         Mockito.when(debitCardRepository.findByAccountAndCardNumber(Mockito.any(), Mockito.anyString())).thenReturn(debitCard);
         Mockito.when(debitCardRepository.save(Mockito.any())).thenReturn(debitCard);
 
-        // Call the method to deactivate the debit card
-        accountService.deactivateDebitCard("1234567890", "1111111111111111", false);
+        // Deactivate the debit card
+        accountService.deactivateDebitCard("NL01INH1234567890", "41111111111111", false);
 
-        // Verify that the debit card status was updated
+        // Verify
         Mockito.verify(debitCardRepository).save(debitCard);
-        // Assert the expected debit card status
+        // Assert
         Assertions.assertFalse(debitCard.isActive());
     }
 
