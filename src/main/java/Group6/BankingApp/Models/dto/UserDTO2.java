@@ -66,7 +66,11 @@ public class UserDTO2 {
         this.phoneNumber = phoneNumber;
     }
 
-    public String getHasAccount() {
-        return hasAccount;
+    public String getHasCurrentAccount() {
+        return hasCurrentAccount;
+    }
+
+    public String getHasSavingsAccount() {
+        return hasSavingsAccount;
     }
 }
