@@ -8,7 +8,6 @@ public class NewAccountDTO {
     private String accountType;
     private String pin;
     private double dailyLimit;
-    private double balance;
     private double absoluteLimit;
     private double transactionLimit;
 
@@ -20,7 +19,6 @@ public class NewAccountDTO {
         this.accountType = account.getAccountType();
         this.pin = account.getPin();
         this.dailyLimit = account.getDailyLimit();
-        this.balance = account.getBalance();
         this.absoluteLimit = account.getAbsoluteLimit();
         this.transactionLimit = account.getTransactionLimit();
     }
@@ -72,14 +70,6 @@ public class NewAccountDTO {
 
     public void setDailyLimit(double dailyLimit) {
         this.dailyLimit = dailyLimit;
-    }
-
-    public double getBalance() {
-        return balance;
-    }
-
-    public void setBalance(double balance) {
-        this.balance = balance;
     }
 
     public double getAbsoluteLimit() {

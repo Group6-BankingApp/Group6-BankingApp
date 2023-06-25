@@ -12,7 +12,7 @@ public interface UserRepository extends CrudRepository<User, Long> {
     @Override
     Iterable<User> findAll();
 
-    Iterable<User>findAllByHasAccountIsTrue();
+    Iterable<User>findAllByHasCurrentAccountIsTrueAndHasSavingsAccountIsTrue();
 
     @Override
     Optional<User> findById(Long aLong);
@@ -25,5 +25,7 @@ public interface UserRepository extends CrudRepository<User, Long> {
 
     Optional<User> findByEmail(String username);
 
-    Iterable<User> findAllByHasAccountIsFalse();
+    Iterable<User> findAllByHasCurrentAccountIsFalseAndHasSavingsAccountIsFalse();
+
+    Iterable<User> findAllByHasCurrentAccountIsTrueAndHasSavingsAccountIsFalse();
 }

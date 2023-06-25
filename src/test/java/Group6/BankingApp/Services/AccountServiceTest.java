@@ -19,10 +19,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
-import org.springframework.http.HttpStatus;
 
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -43,6 +40,8 @@ class AccountServiceTest {
     @Autowired
     private AccountService accountService;
 
+    @InjectMocks
+    private DebitCardService debitCardService;
 
     @InjectMocks
     private UserService userService;
@@ -243,7 +242,6 @@ class AccountServiceTest {
         assertEquals(account.getIban(), accountDTO.getIban());
         assertEquals(user.getId(), accountDTO.getUser().getId());
         assertEquals(account.getAccountType(), accountDTO.getAccountType());
-        assertEquals(account.getCardUUID(), accountDTO.getCardUUID());
         assertEquals(account.getPin(), accountDTO.getPin());
         assertEquals(account.getDailyLimit(), accountDTO.getDailyLimit());
     }
@@ -276,7 +274,7 @@ class AccountServiceTest {
     @Test
     void testGenerateCardUUID() {
 
-        String cardUUID = accountService.generateCardUUID();
+        String cardUUID = debitCardService.generateCardUUID();
 
         assertNotNull(cardUUID);
 
@@ -285,7 +283,7 @@ class AccountServiceTest {
 
     @Test
     public void testGenerateDebitCardNumber() {
-        String debitCardNumber = accountService.generateDebitCardNumber();
+        String debitCardNumber = debitCardService.generateDebitCardNumber();
 
         // Assert that the generated debit card number is valid
         assertEquals(16, debitCardNumber.length());
@@ -311,7 +309,7 @@ class AccountServiceTest {
         when(accountRepository.save(any(Account.class))).thenReturn(account);
 
         // Act
-        DebitCardDTO result = accountService.createDebitCard(account);
+        DebitCardDTO result = debitCardService.createDebitCard(account);
 
         // Assert
         assertNotNull(result);
@@ -338,7 +336,7 @@ class AccountServiceTest {
 
         when(accountRepository.findAllByUserId(customerId)).thenReturn(accounts);
 
-        List<AccountDTO> accountDTOs = accountService.getAccountsByCustomerId(customerId);
+        List<AccountDTO> accountDTOs = accountService.getCurrentAccountsByCustomerId(customerId);
 
         assertEquals(accounts.size(), accountDTOs.size());
     }

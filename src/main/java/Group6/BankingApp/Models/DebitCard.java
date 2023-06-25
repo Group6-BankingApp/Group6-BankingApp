@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import java.time.LocalDate;
 
 @Entity
+@Table(name = "debit_cards")
 public class DebitCard {
 
     @Id
@@ -22,14 +23,12 @@ public class DebitCard {
     public DebitCard() {
     }
 
-    public DebitCard(String cardNumber, LocalDate expirationDate, boolean isActive, String uuid) {
+    public DebitCard(String cardNumber, LocalDate expirationDate, boolean isActive, String uuid, Account account) {
         this.cardNumber = cardNumber;
         this.expirationDate = expirationDate;
         this.isActive = isActive;
         this.uuid = uuid;
-    }
-
-    public DebitCard(String s, LocalDate plusYears, String s1, String john_doe, boolean b, String uuid1) {
+        this.account = account;
     }
 
     public Long getId() {

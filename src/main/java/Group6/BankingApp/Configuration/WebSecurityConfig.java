@@ -36,13 +36,15 @@ public class WebSecurityConfig {
 
         httpSecurity.authorizeHttpRequests()
                 .requestMatchers("/accounts").permitAll()
+                .requestMatchers("/accounts/savings/{id}").permitAll()
                 .requestMatchers("/accounts/{id}").permitAll()
+                .requestMatchers("/accounts/customer").permitAll()
                 .requestMatchers("/accounts/customer/{id}").permitAll()
                 .requestMatchers("/accounts/{iban}").permitAll()
                 .requestMatchers("/accounts/{iban}/pin").permitAll()
                 .requestMatchers("/accounts/{iban}/debitcard").permitAll()
                 .requestMatchers("/accounts/{iban}/debitcard/activate").permitAll()
-                .requestMatchers("/accounts/{iban}/debitcard/{cardNumber}/deactivate").permitAll()
+                .requestMatchers("/accounts/{iban}/deactivateDebitCard/{cardNumber}").permitAll()
                 .requestMatchers("/users/{id}").permitAll()
                 .requestMatchers("/users").permitAll()
                 .requestMatchers("/users/login").permitAll()
@@ -50,7 +52,12 @@ public class WebSecurityConfig {
                 .requestMatchers("/users/withoutAccount").authenticated()
                 .requestMatchers("/transactions").permitAll()
                 .requestMatchers("/transactions/{id}").permitAll()
-                .requestMatchers("/transactions/customer/{iban}").permitAll();
+                .requestMatchers("/transactions/customer/{iban}").permitAll()
+                .requestMatchers("/transactions/customer/{iban}/filter").permitAll()
+                .requestMatchers("/transactions/deposit").permitAll()
+                .requestMatchers("/transactions/withdraw").permitAll()
+                .requestMatchers("/debitcards").permitAll()
+                .requestMatchers("/debitcards/cardInsert").permitAll();
 
         httpSecurity.addFilterBefore(jwtTokenFilter, UsernamePasswordAuthenticationFilter.class);
 

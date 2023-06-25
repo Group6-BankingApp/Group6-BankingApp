@@ -2,7 +2,6 @@ package Group6.BankingApp;
 
 import Group6.BankingApp.Controllers.AccountController;
 import Group6.BankingApp.Controllers.UserController;
-import Group6.BankingApp.Models.Account;
 import Group6.BankingApp.Models.Role;
 import Group6.BankingApp.Models.User;
 import Group6.BankingApp.Models.dto.*;
@@ -11,16 +10,12 @@ import Group6.BankingApp.Services.UserService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
@@ -301,7 +296,7 @@ class BankingAppApplicationTests {
 
 		Mockito.doNothing().when(accountService).deactivateDebitCard(iban, debitCardNum, true);
 
-		ResponseEntity<String> response = accountController.deactivateDebitCard(iban, debitCardNum, true);
+		ResponseEntity<String> response = accountController.deactivateDebitCard(iban, debitCardNum);
 
 		assertEquals(HttpStatus.OK, response.getStatusCode());
 		assertEquals(response.getBody(), "Debit card deactivated successfully.");
@@ -312,7 +307,7 @@ class BankingAppApplicationTests {
 		String iban = "123456789";
 		String debitCardNum = null;
 
-		ResponseEntity<String> response = accountController.deactivateDebitCard(iban, debitCardNum, true);
+		ResponseEntity<String> response = accountController.deactivateDebitCard(iban, debitCardNum);
 
 		assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
 		assertNull(response.getBody());
