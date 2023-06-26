@@ -62,7 +62,7 @@ public class MyApplicationRunner implements ApplicationRunner {
         userRepository.saveAll(users);
 
         // Create and save Accounts
-        Account account1 = new Account("NL01INHO9501054837",user1,"Current", "1234", 1000.0, 1000.0, 0,100);
+        Account account1 = new Account("NL01INHO9501054837",user1,"Current", "1234", 200.0, 1000.0, 0,100);
         Account account = new Account("NL01INHO9501054804",user1,"Savings", "1234", 1000.0, 1000.0, 0, 100);
         user1.setHasCurrentAccount(true);
         user1.setHasSavingsAccount(true);

@@ -232,6 +232,12 @@ public class TransactionService {
             Account account = accountService.findAccountByIban(transaction.getIban());
             Double amount = Double.parseDouble(transaction.getAmount());
             if(account.getAccountType().equals("Current")){
+                if(account.getTransactionLimit()<amount){
+                    throw new ServiceException("Transaction limit exceeded");
+                }
+                if((account.getDailyLimit()-amount)<0){
+                    throw new ServiceException("Daily limit exceeded");
+                }
                 if((account.getBalance()-account.getAbsoluteLimit())>=amount){
                     Transaction newtransaction = new Transaction(transaction.getIban() ,"NL01INHO0000000001", amount);
                     newtransaction.setUserId(account.getUser().getId());
@@ -251,8 +257,9 @@ public class TransactionService {
             else{
                 throw new ServiceException("Invalid account type");
             }
-        } catch (Exception ex) {
-            throw new ServiceException("Failed to withdraw", ex);
+
+        } catch (ServiceException ex) {
+            throw new ServiceException(ex.getMessage());
         }
     }
 
@@ -287,7 +294,7 @@ public class TransactionService {
             List<Transaction> filteredTransactions = null;
             if((filter.getAccount()==null)||(filter.getAccount().equals(""))){
                 if((filter.getFromOrTo()==null)||(filter.getFromOrTo().equals(""))){
-                    transactions = transactionRepository.findAll();
+                    transactions = transactionRepository.findAllBySenderIbanOrReceiverIban(iban, iban);
                     filteredTransactions = applyFilters(transactions, filter);
                 }
                 else{
