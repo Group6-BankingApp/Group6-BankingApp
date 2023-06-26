@@ -36,11 +36,13 @@ public class UserController {
         return new TokenDTO(userDTO2,userService.login(loginDTO));
     }
 
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @GetMapping(value = "/withAccount")
     public ResponseEntity<List<UserDTO2>> getAllUsersWithAccount() {
         return ResponseEntity.ok(userService.getAllUsersWithAccount());
     }
 
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @GetMapping(value = "/withoutAccount")
     public ResponseEntity<List<UserDTO2>> getAllUsersWithoutAccount() {
         return ResponseEntity.ok(userService.getAllUsersWithoutAccount());
@@ -52,6 +54,7 @@ public class UserController {
         return ResponseEntity.ok(userService.getAllUsers());
     }
 
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @GetMapping(value = "/{id}")
     public ResponseEntity<UserDTO2> getUserById(@PathVariable Long id) {
         return ResponseEntity.ok(userService.getUserById(id));
@@ -62,12 +65,14 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.CREATED).body(userService.addUser(userDTO));
     }
 
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @PutMapping(value = "/{id}")
     public ResponseEntity<UserDTO2> updateUser(@PathVariable Long id, @RequestBody UserDTO userDTO) {
         UserDTO2 user=userService.updateUser(id, userDTO);
         return ResponseEntity.ok().body(user);
     }
 
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @DeleteMapping(value = "/{id}")
     public ResponseEntity deleteUser(@PathVariable Long id) {
         userService.deleteUser(id);

@@ -62,7 +62,7 @@ public class UserServiceTest {
         assertEquals(newUser.getLastName(), result.getLastName());
         assertEquals(newUser.getEmail(), result.getEmail());
         assertEquals(newUser.getPhoneNumber(), result.getPhoneNumber());
-        assertEquals("No", result.getHasAccount());
+        assertEquals("No", result.getHasCurrentAccount());
     }
 
     @Test
@@ -98,7 +98,7 @@ public class UserServiceTest {
         assertEquals(userDTO.getLastName(), result.getLastName());
         assertEquals(userDTO.getEmail(), result.getEmail());
         assertEquals(userDTO.getPhoneNumber(), result.getPhoneNumber());
-        assertEquals("No", result.getHasAccount());
+        assertEquals("No", result.getHasCurrentAccount());
     }
 
     @Test
@@ -186,7 +186,7 @@ public class UserServiceTest {
         user1.setLastName("Mokhtar");
         user1.setEmail("mohamad@gmail.com");
         user1.setPhoneNumber("0655987321");
-        user1.setHasAccount(false);
+        user1.setHasCurrentAccount(false);
 
         User user2 = new User();
         user2.setId(2L);
@@ -194,12 +194,12 @@ public class UserServiceTest {
         user2.setLastName("Ziani");
         user2.setEmail("abdelilah@email.com");
         user2.setPhoneNumber("0678912345");
-        user2.setHasAccount(false);
+        user2.setHasCurrentAccount(false);
 
         users.add(user1);
         users.add(user2);
 
-        when(userRepository.findAllByHasAccountIsFalse()).thenReturn(users);
+        when(userRepository.findAllByHasCurrentAccountIsFalseAndHasSavingsAccountIsFalse()).thenReturn(users);
 
         // Act
         List<UserDTO2> result = userService.getAllUsersWithoutAccount();
@@ -214,7 +214,7 @@ public class UserServiceTest {
         assertEquals(user1.getLastName(), userDTO2_1.getLastName());
         assertEquals(user1.getEmail(), userDTO2_1.getEmail());
         assertEquals(user1.getPhoneNumber(), userDTO2_1.getPhoneNumber());
-        assertEquals("No", userDTO2_1.getHasAccount());
+        assertEquals("No", userDTO2_1.getHasCurrentAccount());
 
         UserDTO2 userDTO2_2 = result.get(1);
         assertEquals(user2.getId(), userDTO2_2.getId());
@@ -222,6 +222,6 @@ public class UserServiceTest {
         assertEquals(user2.getLastName(), userDTO2_2.getLastName());
         assertEquals(user2.getEmail(), userDTO2_2.getEmail());
         assertEquals(user2.getPhoneNumber(), userDTO2_2.getPhoneNumber());
-        assertEquals("No", userDTO2_2.getHasAccount());
+        assertEquals("No", userDTO2_2.getHasCurrentAccount());
     }
 }

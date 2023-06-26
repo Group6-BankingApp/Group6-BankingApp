@@ -132,7 +132,6 @@ public class AccountService {
     }
 
     public NewAccountDTO updateAccountByIban(String iban, Account account) {
-
         if(account == null)
             throw new ServiceException("This account does not exist!");
 

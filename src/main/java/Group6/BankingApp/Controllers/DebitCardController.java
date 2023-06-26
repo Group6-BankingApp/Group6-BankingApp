@@ -5,6 +5,7 @@ import Group6.BankingApp.Services.DebitCardService;
 import lombok.extern.java.Log;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -20,6 +21,7 @@ public class DebitCardController {
         this.debitCardService = debitCardService;
     }
 
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @GetMapping
     public Object getAllDebitCards() {
         return debitCardService.getAllDebitCards();

@@ -8,7 +8,8 @@ public class UserDTO2 {
     private String lastName;
     private String email;
     private String phoneNumber;
-    private String hasAccount;
+    private String hasCurrentAccount;
+    private String hasSavingsAccount;
 
     public UserDTO2(){}
 
@@ -18,12 +19,16 @@ public class UserDTO2 {
         this.lastName = user.getLastName();
         this.email = user.getEmail();
         this.phoneNumber = user.getPhoneNumber();
-//        if (user.isHasAccount()) {
-//            this.hasAccount = "Yes";
-//        } else {
-//            this.hasAccount = "No";
-//        }
-        this.hasAccount = user.isHasAccount() ? "Yes" : "No";
+        if(user.isHasCurrentAccount()){
+            this.hasCurrentAccount = "Yes";
+        }else{
+            this.hasCurrentAccount = "No";
+        }
+        if(user.isHasSavingsAccount()){
+            this.hasSavingsAccount = "Yes";
+        }else{
+            this.hasSavingsAccount = "No";
+        }
     }
 
     public Long getId() {
@@ -70,7 +75,15 @@ public class UserDTO2 {
         return hasCurrentAccount;
     }
 
+    public void setHasCurrentAccount(String hasCurrentAccount) {
+        this.hasCurrentAccount = hasCurrentAccount;
+    }
+
     public String getHasSavingsAccount() {
         return hasSavingsAccount;
+    }
+
+    public void setHasSavingsAccount(String hasSavingsAccount) {
+        this.hasSavingsAccount = hasSavingsAccount;
     }
 }

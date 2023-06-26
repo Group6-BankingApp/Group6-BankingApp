@@ -7,9 +7,11 @@ import Group6.BankingApp.Models.dto.TransactionDTO;
 import Group6.BankingApp.Models.dto.FilterDTO;
 import Group6.BankingApp.Services.TransactionService;
 
+import org.hibernate.service.spi.ServiceException;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 //import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
@@ -27,7 +29,7 @@ public class TransactionController {
     public TransactionController(TransactionService transactionService) {
         this.transactionService = transactionService;
     }
-
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @GetMapping
     public ResponseEntity<List<Transaction>> getAllTransactions() {
         try {
@@ -38,7 +40,7 @@ public class TransactionController {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to retrieve transactions", e);
         }
     }
-
+    @PreAuthorize("hasAnyRole('ROLE_USER', 'ROLE_ADMIN')")
     @GetMapping(value = "/customer/{iban}")
     public ResponseEntity<List<Transaction>> getTransactionsByIban(@PathVariable String iban) {
         try{
@@ -49,6 +51,7 @@ public class TransactionController {
         }
     }
 
+    @PreAuthorize("hasAnyRole('ROLE_USER', 'ROLE_ADMIN')")
     @PostMapping(value = "/customer/{iban}/filter")
     public ResponseEntity<List<Transaction>> getFilteredTransactionsByIban(@PathVariable String iban,@RequestBody FilterDTO filter) {
         try{
@@ -59,10 +62,7 @@ public class TransactionController {
         }
     }
 
-    private boolean allFilterEmpty(FilterDTO filter) {
-        return filter.getStartDate()==null && filter.getEndDate()==null && filter.getMinAmount()==null && filter.getMaxAmount()==null && filter.getAccount()==null && filter.getFromOrTo()==null;
-    }
-
+    @PreAuthorize("hasAnyRole('ROLE_USER', 'ROLE_ADMIN')")
     @GetMapping(value = "/{id}")
     public ResponseEntity<Transaction> getTransactionById(@PathVariable String id) {
         try{
@@ -72,22 +72,14 @@ public class TransactionController {
         }
     }
 
-//    @PostMapping
-//    public ResponseEntity addTransaction(@RequestBody Transaction transaction, @RequestParam(defaultValue = "0000") String pin, @RequestHeader("Authorization") String token) {
-//        try{
-//            Transaction newTransaction=transactionService.addTransaction(transaction, pin);
-//            return ResponseEntity.status(201).body(newTransaction);
-//        }catch (Exception e){
-//            return ResponseEntity.internalServerError().body(e.getCause().getMessage());
-//        }
-//    }
+
     @PostMapping(value = "/deposit")
     public ResponseEntity<AtmResponseDTO> Deposit(@RequestBody AtmTransactionDTO transaction){
         try{
             AtmResponseDTO responseDTO = transactionService.makeDeposit(transaction);
             return ResponseEntity.status(201).body(responseDTO);
-        }catch (Exception e){
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to deposit", e);
+        }catch(ServiceException e){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,  e.getMessage());
         }
     }
     
@@ -97,14 +89,15 @@ public class TransactionController {
             AtmResponseDTO responseDTO = transactionService.makeWithdraw(transaction);
             return ResponseEntity.status(201).body(responseDTO);
         }catch (Exception e){
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to withdraw", e);
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR,  e.getMessage());
         }
     }
 
+    @PreAuthorize("hasAnyRole('ROLE_USER', 'ROLE_ADMIN')")
     @PostMapping
     public ResponseEntity makeTransfer (@RequestBody TransactionDTO transactionDTO) {
         try{
-            Transaction newTransaction=transactionService.addTransaction(transactionDTO);
+            Transaction newTransaction=transactionService.addTransfer(transactionDTO);
             return ResponseEntity.status(201).body(newTransaction);
         }catch (Exception e){
             return ResponseEntity.internalServerError().body(e.getCause().getMessage());
