@@ -7,18 +7,16 @@ public class UserDTO {
     private String email;
     private String password;
     private String phoneNumber;
-    private String hasAccount;
 
     public UserDTO() {
     }
 
-    public UserDTO(String firstName, String lastName, String email, String password, String phoneNumber, String hasAccount) {
+    public UserDTO(String firstName, String lastName, String email, String password, String phoneNumber) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
         this.password = password;
         this.phoneNumber = phoneNumber;
-        this.hasAccount = hasAccount;
     }
 
     public String getFirstName() {
@@ -39,9 +37,5 @@ public class UserDTO {
 
     public String getPhoneNumber() {
         return phoneNumber;
-    }
-
-    public String getHasAccount() {
-        return hasAccount;
     }
 }

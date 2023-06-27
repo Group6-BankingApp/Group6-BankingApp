@@ -25,8 +25,6 @@ public class AccountService {
     private UserRepository userRepository;
 
     @Autowired
-    private UserService userService;
-    @Autowired
     private DebitCardRepository debitCardRepository;
 
     @Autowired
@@ -191,10 +189,11 @@ public class AccountService {
         }
     }
 
-    public NewAccountDTO updatePin(String iban, AccountDTO accountDTO) {
-        Account account = accountRepository.findById(iban)
-                .orElseThrow(() -> new IllegalArgumentException("Account not found"));
-
+    public AccountDTO updatePin(AccountDTO accountDTO) {
+        Account account = accountRepository.findById(accountDTO.getIban()).orElse(null);
+        if (account == null) {
+            throw new IllegalArgumentException("Account not found");
+        }
         User user = account.getUser();
         if (user == null) {
             throw new IllegalArgumentException("User not found in the account");
@@ -203,14 +202,28 @@ public class AccountService {
         // Update the account's pin
         account.setPin(accountDTO.getPin());
 
-        Account updatedAccount = accountRepository.save(account);
-        return new NewAccountDTO(updatedAccount);
+        accountRepository.save(account);
+        return new AccountDTO(account);
     }
 
     public void deleteAccount(String iban) {
         Optional<Account> accountOptional = accountRepository.findById(iban);
         if (accountOptional.isPresent()) {
+            Account account = accountOptional.get();
+            if(account.getHasCard()){
+                DebitCard debitCard = debitCardRepository.findByAccount(account);
+                debitCardRepository.delete(debitCard);
+            }
             accountRepository.deleteById(iban);
+            if (account.getAccountType().equals("Current")){
+                User user = account.getUser();
+                user.setHasCurrentAccount(false);
+                userRepository.save(user);
+            } else if (account.getAccountType().equals("Savings")){
+                User user = account.getUser();
+                user.setHasSavingsAccount(false);
+                userRepository.save(user);
+            }
         } else {
             throw new ServiceException("Account not found");
         }
@@ -377,6 +390,34 @@ public class AccountService {
             return accountDTOS;
         }catch (Exception ex){
             throw new ServiceException("Failed to get all accounts", ex);
+        }
+    }
+
+    public List<Account> getAllAccountsByUserId(Long id) {
+        try {
+            List<Account> accounts = accountRepository.findAllByUserId(id);
+            return accounts;
+        }catch (Exception ex){
+            throw new ServiceException("Failed to get all accounts", ex);
+        }
+    }
+
+    public String getIbanbyFullName(FullNameDTO fullNameDTO) {
+        try {
+            User user = userRepository.findByFirstNameAndLastName(fullNameDTO.getFirstName(), fullNameDTO.getLastName());
+            if (user == null)
+                throw new ServiceException("User does not exist!");
+            List <Account> accounts = accountRepository.findAllByUserId(user.getId());
+            if (accounts == null)
+                throw new ServiceException("Account does not exist!");
+            Account account = accounts.get(0);
+            for (Account account1 : accounts) {
+                if (account1.getAccountType().equals("Current"))
+                    account = account1;
+            }
+            return account.getIban();
+        }catch (Exception ex){
+            throw new ServiceException(ex.getMessage());
         }
     }
 }
