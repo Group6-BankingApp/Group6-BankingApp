@@ -45,7 +45,7 @@ public class UserServiceTest {
     @Test
     void testAddUser_UniqueEmail() {
         // Arrange
-        UserDTO userDTO = new UserDTO("Mohamad", "Mokhtar", "mohamad@gamil.com", "123456", "1234567890", "No");
+        UserDTO userDTO = new UserDTO("Mohamad", "Mokhtar", "mohamad@gamil.com", "123456", "1234567890");
         User newUser = new User();
         newUser.setEmail(userDTO.getEmail());
 
@@ -68,7 +68,7 @@ public class UserServiceTest {
     @Test
     void testAddUser_UsedEmail() {
         // Arrange
-        UserDTO userDTO = new UserDTO("Mohamad", "Mokhtar", "mohamad@gmail.com", "123456", "1234567890", "No");
+        UserDTO userDTO = new UserDTO("Mohamad", "Mokhtar", "mohamad@gmail.com", "123456", "1234567890");
 
         when(userRepository.findByEmail(userDTO.getEmail())).thenReturn(Optional.of(new User()));
 
@@ -80,7 +80,7 @@ public class UserServiceTest {
     void testUpdateUser_UserExists() {
         // Arrange
         Long userId = 1L;
-        UserDTO userDTO = new UserDTO("John", "Doe", "johndoe@example.com", "123456", "1234567890", "No");
+        UserDTO userDTO = new UserDTO("John", "Doe", "johndoe@example.com", "123456", "1234567890");
 
         User existingUser = new User();
         existingUser.setId(userId);
@@ -105,7 +105,7 @@ public class UserServiceTest {
     void testUpdateUser_UserDoesNotExist() {
         // Arrange
         Long userId = 1L;
-        UserDTO userDTO = new UserDTO("Mohamad", "Mokhtar", "mohamad@gmail.com", "123456", "1234567890", "No");
+        UserDTO userDTO = new UserDTO("Mohamad", "Mokhtar", "mohamad@gmail.com", "123456", "1234567890");
 
         when(userRepository.findById(userId)).thenReturn(Optional.empty());
 

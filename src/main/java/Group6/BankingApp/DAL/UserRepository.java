@@ -28,4 +28,8 @@ public interface UserRepository extends CrudRepository<User, Long> {
     Iterable<User> findAllByHasCurrentAccountIsFalseAndHasSavingsAccountIsFalse();
 
     Iterable<User> findAllByHasCurrentAccountIsTrueAndHasSavingsAccountIsFalse();
+
+    Iterable<User> findAllByHasCurrentAccountIsFalseAndHasSavingsAccountIsTrue();
+
+    User findByFirstNameAndLastName(String firstName, String lastName);
 }
