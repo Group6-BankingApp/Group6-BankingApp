@@ -112,14 +112,6 @@ public class AccountDTO {
         return hasCard;
     }
 
-    public void setHasCard(Boolean hasCard) {
-        if (hasCard) {
-            this.hasCard = "Yes";
-        } else {
-            this.hasCard = "No";
-        }
-    }
-
     public String getCardNumber() {
         return cardNumber;
     }

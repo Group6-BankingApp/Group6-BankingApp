@@ -11,6 +11,7 @@ import Group6.BankingApp.Services.AccountService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
@@ -25,14 +26,16 @@ public class MyApplicationRunner implements ApplicationRunner {
     private DebitCardRepository debitCardRepository;
     private AccountService accountService;
     private TransactionRepository transactionRepository;
+    private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
     @Autowired
-    public MyApplicationRunner(UserRepository userRepository, AccountRepository accountRepository, DebitCardRepository debitCardRepository, AccountService accountService, TransactionRepository transactionRepository) {
+    public MyApplicationRunner(UserRepository userRepository, AccountRepository accountRepository, DebitCardRepository debitCardRepository, AccountService accountService, TransactionRepository transactionRepository, BCryptPasswordEncoder bCryptPasswordEncoder) {
         this.userRepository = userRepository;
         this.accountRepository = accountRepository;
         this.debitCardRepository = debitCardRepository;
         this.accountService = accountService;
         this.transactionRepository = transactionRepository;
+        this.bCryptPasswordEncoder = bCryptPasswordEncoder;
     }
     @Override
     public void run(ApplicationArguments args) throws Exception {
@@ -42,7 +45,8 @@ public class MyApplicationRunner implements ApplicationRunner {
         user1.setFirstName("John");
         user1.setLastName("Doe");
         user1.setEmail("john.doe@gmail.com");
-        user1.setPassword("123456");
+        String password = bCryptPasswordEncoder.encode("123456");
+        user1.setPassword(password);
         user1.setPhoneNumber("0612345678");
         user1.setHasCurrentAccount(false);
         user1.setHasSavingsAccount(false);
@@ -52,11 +56,12 @@ public class MyApplicationRunner implements ApplicationRunner {
         user2.setFirstName("Jane");
         user2.setLastName("Smith");
         user2.setEmail("jane.smith@gmail.com");
-        user2.setPassword("123456");
+        String password2 = bCryptPasswordEncoder.encode("123456");
+        user2.setPassword(password2);
         user2.setPhoneNumber("0612345678");
         user2.setHasCurrentAccount(false);
         user2.setHasSavingsAccount(false);
-        user2.setRoles(List.of(Role.ROLE_USER));
+        user2.setRoles(List.of(Role.ROLE_ADMIN));
 
         List<User> users = Arrays.asList(user1, user2);
         userRepository.saveAll(users);
