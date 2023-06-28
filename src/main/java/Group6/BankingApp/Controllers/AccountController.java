@@ -5,6 +5,7 @@ import Group6.BankingApp.Models.dto.*;
 import Group6.BankingApp.Services.AccountService;
 import Group6.BankingApp.Services.DebitCardService;
 import lombok.extern.java.Log;
+import org.hibernate.service.spi.ServiceException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -113,10 +114,10 @@ public class AccountController {
     }
 
     @PreAuthorize("hasRole('ROLE_ADMIN')")
-    @DeleteMapping("/{iban}")
-    public ResponseEntity<Void> deleteAccountByIban(@PathVariable("Iban") String Iban) {
+    @DeleteMapping("/{iban}/delete")
+    public ResponseEntity<Void> deleteAccountByIban(@PathVariable String iban) {
         try {
-            accountService.deleteAccount(Iban);
+            accountService.deleteAccount(iban);
             return ResponseEntity.ok().build();
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
@@ -169,11 +170,14 @@ public class AccountController {
     }
 
     @PreAuthorize("hasRole('ROLE_ADMIN')")
-    @PutMapping("/{iban}/pin")
-    public ResponseEntity<NewAccountDTO> updatePin(@PathVariable("iban") String iban,
-                                                   @RequestBody AccountDTO accountDTO) {
-        NewAccountDTO updatedAccountDTO = accountService.updatePin(iban, accountDTO);
-        return ResponseEntity.ok().body(updatedAccountDTO);
+    @PutMapping("/update")
+    public ResponseEntity<AccountDTO> updatePin(@RequestBody AccountDTO accountDTO) {
+        try{
+            AccountDTO updatedAccountDTO = accountService.updatePin(accountDTO);
+            return ResponseEntity.ok().body(updatedAccountDTO);
+        }catch (ServiceException e){
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to update pin", e);
+        }
     }
 
     @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_USER')")
@@ -213,6 +217,16 @@ public class AccountController {
             return  accountService.getSavingsAccountsByCustomerId(id);
         } catch (Exception e) {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to retrieve accounts", e);
+        }
+    }
+
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_USER')")
+    @PostMapping("/customerIban")
+    public String getIbanbyFullName(@RequestBody FullNameDTO fullNameDTO) {
+        try {
+            return  accountService.getIbanbyFullName(fullNameDTO);
+        } catch (Exception e) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
         }
     }
 }

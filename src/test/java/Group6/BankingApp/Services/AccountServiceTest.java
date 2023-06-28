@@ -20,6 +20,7 @@ import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -158,6 +159,27 @@ class AccountServiceTest {
         verify(accountRepository, never()).save(any(Account.class));
     }
 
+    @Test
+    void testGetAllAccountsByUserId() {
+        // Arrange
+        Long userId = 1L;
+        List<Account> expectedAccounts = new ArrayList<>();
+        expectedAccounts.add(new Account());
+        expectedAccounts.add(new Account());
+
+        when(accountRepository.findAllByUserId(userId)).thenReturn(expectedAccounts);
+
+        // Act
+        List<Account> actualAccounts = accountService.getAllAccountsByUserId(userId);
+
+        // Assert
+        assertEquals(expectedAccounts.size(), actualAccounts.size());
+        assertEquals(expectedAccounts, actualAccounts);
+
+        // Verify
+        verify(accountRepository, times(1)).findAllByUserId(userId);
+    }
+
 
 //    @Test
 //    void testAddAccount() {
@@ -240,17 +262,37 @@ class AccountServiceTest {
         assertEquals(account.getDailyLimit(), accountDTO.getDailyLimit());
     }
 
+//    @Test
+//    void testMapToDebitCardDTO() {
+//
+//        DebitCard debitCard = new DebitCard();
+//        debitCard.setCardNumber("1234567890");
+//
+//        DebitCardDTO debitCardDTO = accountService.mapToDebitCardDTO(debitCard);
+//
+//        assertNotNull(debitCardDTO);
+//
+//        assertEquals("1234567890", debitCardDTO.getCardNumber());
+//    }
+
     @Test
     void testMapToDebitCardDTO() {
+        // Arrange
+        DebitCard card = new DebitCard();
+        card.setCardNumber("1234567890");
+        card.setUuid("abc123");
+        card.setExpirationDate(LocalDate.of(2023, 5, 1));
+        card.setActive(true);
 
-        DebitCard debitCard = new DebitCard();
-        debitCard.setCardNumber("1234567890");
+        // Act
+        DebitCardDTO result = accountService.mapToDebitCardDTO(card);
 
-        DebitCardDTO debitCardDTO = accountService.mapToDebitCardDTO(debitCard);
-
-        assertNotNull(debitCardDTO);
-
-        assertEquals("1234567890", debitCardDTO.getCardNumber());
+        // Assert
+        assertNotNull(result);
+        assertEquals("1234567890", result.getCardNumber());
+        assertEquals("abc123", result.getUuid());
+        assertEquals("2023-05-01", result.getExpirationDate());
+        assertTrue(result.isActive());
     }
 
     private static final String IBAN_PREFIX = "NL01INHO";
@@ -288,51 +330,104 @@ class AccountServiceTest {
         }
     }
 
+//    @Test
+//    void testCreateDebitCard() {
+//        // Arrange
+//        Account account = new Account();
+//        account.setAccountType("Current");
+//
+//        // Create a new debit card
+//        DebitCard newCard = new DebitCard();
+//        newCard.setAccount(account);
+//
+//        // Mock the repository method calls
+//        when(debitCardRepository.save(any(DebitCard.class))).thenReturn(newCard);
+//        when(accountRepository.save(any(Account.class))).thenReturn(account);
+//
+//        // Act
+//        DebitCardDTO result = debitCardService.createDebitCard(account);
+//
+//        // Assert
+//        assertNotNull(result);
+//        assertEquals(newCard.getId(), result.getCardNumber());
+//        assertEquals(newCard.getCardNumber(), result.getCardNumber());
+//    }
+
     @Test
     void testCreateDebitCard() {
         // Arrange
         Account account = new Account();
         account.setAccountType("Current");
 
-        // Create a new debit card
-        DebitCard newCard = new DebitCard();
-        newCard.setAccount(account);
-
         // Mock the repository method calls
-        when(debitCardRepository.save(any(DebitCard.class))).thenReturn(newCard);
         when(accountRepository.save(any(Account.class))).thenReturn(account);
+        when(debitCardRepository.findByAccountAndIsActive(account, true)).thenReturn(null);
+        when(debitCardRepository.save(any(DebitCard.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
         // Act
         DebitCardDTO result = debitCardService.createDebitCard(account);
 
         // Assert
         assertNotNull(result);
-        assertEquals(newCard.getId(), result.getCardNumber());
-        assertEquals(newCard.getCardNumber(), result.getCardNumber());
+        assertTrue(result.isActive());
+        assertNotNull(result.getCardNumber());
+        assertNotNull(result.getExpirationDate());
+
+        // Verify
+        verify(accountRepository, times(1)).save(account);
+        verify(debitCardRepository, times(1)).findByAccountAndIsActive(account, true);
+        verify(debitCardRepository, times(1)).save(any(DebitCard.class));
     }
 
+//    @Test
+//    public void testGetAccountsByCustomerId() {
+//
+//        Long customerId = 1L;
+//        User user = new User();
+//        user.setId(customerId);
+//
+//        Account account1 = new Account();
+//        account1.setUser(user);
+//
+//        Account account2 = new Account();
+//        account2.setUser(user);
+//
+//        List<Account> accounts = new ArrayList<>();
+//        accounts.add(account1);
+//        accounts.add(account2);
+//
+//        when(accountRepository.findAllByUserId(customerId)).thenReturn(accounts);
+//
+//        List<AccountDTO> accountDTOs = accountService.getCurrentAccountsByCustomerId(customerId);
+//
+//        assertEquals(accounts.size(), accountDTOs.size());
+//    }
+
     @Test
-    public void testGetAccountsByCustomerId() {
-
+    void testGetCurrentAccountsByCustomerId() {
+        // Arrange
         Long customerId = 1L;
-        User user = new User();
-        user.setId(customerId);
-
-        Account account1 = new Account();
-        account1.setUser(user);
-
-        Account account2 = new Account();
-        account2.setUser(user);
-
         List<Account> accounts = new ArrayList<>();
+        Account account1 = new Account();
+        account1.setAccountType("Current");
         accounts.add(account1);
+        Account account2 = new Account();
+        account2.setAccountType("Savings");
         accounts.add(account2);
 
+        // Mock the repository method calls
         when(accountRepository.findAllByUserId(customerId)).thenReturn(accounts);
 
-        List<AccountDTO> accountDTOs = accountService.getCurrentAccountsByCustomerId(customerId);
+        // Act
+        List<AccountDTO> result = accountService.getCurrentAccountsByCustomerId(customerId);
 
-        assertEquals(accounts.size(), accountDTOs.size());
+        // Assert
+        assertNotNull(result);
+        assertEquals(1, result.size());
+        // Add additional assertions as needed
+
+        // Verify
+        verify(accountRepository, times(1)).findAllByUserId(customerId);
     }
 
     @Test

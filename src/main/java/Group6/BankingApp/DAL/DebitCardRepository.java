@@ -13,6 +13,8 @@ public interface DebitCardRepository extends CrudRepository<DebitCard, Long> {
     @Override
     Iterable<DebitCard> findAll();
 
+    Iterable<DebitCard> findAllByAccount(Account account);
+
     @Override
     Optional<DebitCard> findById(Long id);
 
@@ -29,4 +31,6 @@ public interface DebitCardRepository extends CrudRepository<DebitCard, Long> {
     DebitCard findByUuidAndIsActive(String uuid, boolean isActive);
 
     DebitCard findByAccountAndCardNumber(Account account, String cardNumber);
+
+    DebitCard findByAccount(Account account);
 }

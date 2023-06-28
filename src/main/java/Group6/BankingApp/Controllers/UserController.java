@@ -65,7 +65,7 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.CREATED).body(userService.addUser(userDTO));
     }
 
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN','ROLE_USER')")
     @PutMapping(value = "/{id}")
     public ResponseEntity<UserDTO2> updateUser(@PathVariable Long id, @RequestBody UserDTO userDTO) {
         UserDTO2 user=userService.updateUser(id, userDTO);

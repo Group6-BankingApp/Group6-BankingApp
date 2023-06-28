@@ -20,6 +20,7 @@ public class Account {
     private double transactionLimit;
     private boolean hasCard;
     private String cardNumber;
+    private Integer cardPublicNumber;
 
 
     public Account(String iban, String accountType, String pin, double dailyLimit, double balance, double absoluteLimit, double transactionLimit) {
@@ -138,6 +139,14 @@ public class Account {
 
     public void setCardNumber(String cardNumber) {
         this.cardNumber = cardNumber;
+    }
+
+    public Integer getCardPublicNumber() {
+        return cardPublicNumber;
+    }
+
+    public void setCardPublicNumber(Integer cardPublicNumber) {
+        this.cardPublicNumber = cardPublicNumber;
     }
 
     private User mapToUser(UserDTO2 userDTO2) {
