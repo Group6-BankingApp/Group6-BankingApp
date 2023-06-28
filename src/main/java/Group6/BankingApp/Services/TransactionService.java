@@ -114,7 +114,6 @@ public class TransactionService {
         }
     }
     public void TransferMoney(TransactionDTO transaction) {
-        //TODO: add transfer money logic
         Account senderAccount = accountService.findAccountByIban(transaction.getSenderIban());
         Account receiverAccount = accountService.findAccountByIban(transaction.getReceiverIban());
 
@@ -133,7 +132,6 @@ public class TransactionService {
     }
 
     public void DespositMoney(Transaction transaction) {
-        //TODO: add transfer money logic
         Account receiverAccount = accountService.findAccountByIban(transaction.getReceiverIban());
         if(receiverAccount.getAccountType() == "Current")    {
             receiverAccount.setBalance(receiverAccount.getBalance() + transaction.getAmount());
