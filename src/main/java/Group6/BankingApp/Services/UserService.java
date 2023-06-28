@@ -21,7 +21,7 @@ import java.util.List;
 public class UserService {
 
     private final UserRepository userRepository;
-    private  AccountService accountService;
+    private AccountService accountService;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
     private final JwtTokenProvider jwtTokenProvider;
 

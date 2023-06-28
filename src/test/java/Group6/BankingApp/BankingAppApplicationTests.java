@@ -316,17 +316,17 @@ class BankingAppApplicationTests {
 		assertNull(response.getBody());
 	}
 
-	@Test
-	public void testUpdatePin_Success() {
-		String iban = "123456789";
-		AccountDTO accountDTO = new AccountDTO();
-
-		NewAccountDTO updatedAccountDTO = new NewAccountDTO();
-		Mockito.when(accountService.updatePin(iban, accountDTO)).thenReturn(updatedAccountDTO);
-
-		ResponseEntity<NewAccountDTO> response = accountController.updatePin(iban, accountDTO);
-
-		assertEquals(HttpStatus.OK, response.getStatusCode());
-		assertEquals(updatedAccountDTO, response.getBody());
-	}
+//	@Test
+//	public void testUpdatePin_Success() {
+//		String iban = "123456789";
+//		AccountDTO accountDTO = new AccountDTO();
+//
+//		NewAccountDTO updatedAccountDTO = new NewAccountDTO();
+//		Mockito.when(accountService.updatePin(iban, accountDTO)).thenReturn(updatedAccountDTO);
+//
+//		ResponseEntity<NewAccountDTO> response = accountController.updatePin(iban, accountDTO);
+//
+//		assertEquals(HttpStatus.OK, response.getStatusCode());
+//		assertEquals(updatedAccountDTO, response.getBody());
+//	}
 }

@@ -159,6 +159,27 @@ class AccountServiceTest {
         verify(accountRepository, never()).save(any(Account.class));
     }
 
+    @Test
+    void testGetAllAccountsByUserId() {
+        // Arrange
+        Long userId = 1L;
+        List<Account> expectedAccounts = new ArrayList<>();
+        expectedAccounts.add(new Account());
+        expectedAccounts.add(new Account());
+
+        when(accountRepository.findAllByUserId(userId)).thenReturn(expectedAccounts);
+
+        // Act
+        List<Account> actualAccounts = accountService.getAllAccountsByUserId(userId);
+
+        // Assert
+        assertEquals(expectedAccounts.size(), actualAccounts.size());
+        assertEquals(expectedAccounts, actualAccounts);
+
+        // Verify
+        verify(accountRepository, times(1)).findAllByUserId(userId);
+    }
+
 
 //    @Test
 //    void testAddAccount() {
