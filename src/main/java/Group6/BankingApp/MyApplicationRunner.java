@@ -83,15 +83,17 @@ public class MyApplicationRunner implements ApplicationRunner {
         userRepository.save(user2);
         accountRepository.save(account3);
 
-        DebitCard debitCard1 = new DebitCard("1111222233334444", LocalDate.now().plusYears(3), true, "UUID1", account1);
+        DebitCard debitCard1 = new DebitCard("1111222233334444",1, LocalDate.now().plusYears(3), true, "UUID1", account1);
         account1.setHasCard(true);
         account1.setCardNumber(debitCard1.getCardNumber());
+        account1.setCardPublicNumber(debitCard1.getPublicNumber());
         accountRepository.save(account1);
         debitCardRepository.save(debitCard1);
 
-        DebitCard debitCard2 = new DebitCard("5555666677778888", LocalDate.now().plusYears(2), true, "UUID2", account2);
+        DebitCard debitCard2 = new DebitCard("5555666677778888", 1, LocalDate.now().plusYears(2), true, "UUID2", account2);
         account2.setHasCard(true);
         account2.setCardNumber(debitCard2.getCardNumber());
+        account2.setCardPublicNumber(debitCard2.getPublicNumber());
         accountRepository.save(account2);
         debitCardRepository.save(debitCard2);
 

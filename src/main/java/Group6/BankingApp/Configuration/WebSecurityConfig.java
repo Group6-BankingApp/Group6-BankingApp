@@ -58,7 +58,8 @@ public class WebSecurityConfig {
                 .requestMatchers("/transactions/customer/{iban}").authenticated()
                 .requestMatchers("/transactions/customer/{iban}/filter").authenticated()
                 .requestMatchers("/debitcards").authenticated()
-                .requestMatchers("/debitcards/cardInsert").permitAll();
+                .requestMatchers("/debitcards/cardInsert").permitAll()
+                .requestMatchers("/debitcards/{iban}").authenticated();
 
         httpSecurity.addFilterBefore(jwtTokenFilter, UsernamePasswordAuthenticationFilter.class);
 

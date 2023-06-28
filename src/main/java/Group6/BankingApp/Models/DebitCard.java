@@ -3,6 +3,8 @@ package Group6.BankingApp.Models;
 import jakarta.persistence.*;
 
 import java.time.LocalDate;
+import java.util.HashMap;
+import java.util.Map;
 
 @Entity
 @Table(name = "debit_cards")
@@ -11,8 +13,8 @@ public class DebitCard {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
-
     private String cardNumber;
+    private Integer publicNumber;
     private LocalDate expirationDate;
     private boolean isActive;
     private String uuid;
@@ -23,13 +25,15 @@ public class DebitCard {
     public DebitCard() {
     }
 
-    public DebitCard(String cardNumber, LocalDate expirationDate, boolean isActive, String uuid, Account account) {
+    public DebitCard(String cardNumber, Integer publicNumber, LocalDate expirationDate, boolean isActive, String uuid, Account account) {
         this.cardNumber = cardNumber;
+        this.publicNumber = publicNumber;
         this.expirationDate = expirationDate;
         this.isActive = isActive;
         this.uuid = uuid;
         this.account = account;
     }
+
 
     public Long getId() {
         return id;
@@ -45,6 +49,14 @@ public class DebitCard {
 
     public void setCardNumber(String cardNumber) {
         this.cardNumber = cardNumber;
+    }
+
+    public Integer getPublicNumber() {
+        return publicNumber;
+    }
+
+    public void setPublicNumber(Integer publicNumber) {
+        this.publicNumber = publicNumber;
     }
 
     public LocalDate getExpirationDate() {

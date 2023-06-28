@@ -15,6 +15,7 @@ public class AccountDTO {
     private double transactionLimit;
     private String hasCard;
     private String cardNumber;
+    public String cardPublicNumber;
 
     public AccountDTO() {
     }
@@ -30,9 +31,11 @@ public class AccountDTO {
         if(account.getHasCard()){
             this.hasCard = "Yes";
             this.cardNumber = account.getCardNumber();
+            this.cardPublicNumber = String.valueOf(account.getCardPublicNumber());
         }   else {
             this.hasCard = "No";
-            this.cardNumber = "No card";
+            this.cardNumber = "N/A";
+            this.cardPublicNumber = "N/A";
         }
     }
 
@@ -119,4 +122,9 @@ public class AccountDTO {
     public void setCardNumber(String cardNumber) {
         this.cardNumber = cardNumber;
     }
+
+    public String getCardPublicNumber() {
+        return cardPublicNumber;
+    }
+
 }

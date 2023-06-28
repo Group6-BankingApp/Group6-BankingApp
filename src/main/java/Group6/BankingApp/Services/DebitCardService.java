@@ -4,10 +4,7 @@ import Group6.BankingApp.DAL.AccountRepository;
 import Group6.BankingApp.DAL.DebitCardRepository;
 import Group6.BankingApp.Models.Account;
 import Group6.BankingApp.Models.DebitCard;
-import Group6.BankingApp.Models.dto.AccountDTO;
-import Group6.BankingApp.Models.dto.AtmLoginDTO;
-import Group6.BankingApp.Models.dto.AtmResponseDTO;
-import Group6.BankingApp.Models.dto.DebitCardDTO;
+import Group6.BankingApp.Models.dto.*;
 import org.hibernate.service.spi.ServiceException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -51,9 +48,18 @@ public class DebitCardService {
         if (existingActiveCard != null) {
             throw new ServiceException("Account already has an active debit card!");
         }
-
+        List <DebitCard> accountCards = (List<DebitCard>) debitCardRepository.findAllByAccount(account);
+        Integer cardPublicNumber = 0;
+        if(!accountCards.isEmpty()){
+            DebitCard lastCard = accountCards.get(accountCards.size()-1);
+            cardPublicNumber = lastCard.getPublicNumber()+1;
+        }
+        else {
+            cardPublicNumber = 1;
+        }
         DebitCard newCard = new DebitCard();
         newCard.setCardNumber(generateDebitCardNumber());
+        newCard.setPublicNumber(cardPublicNumber);
         newCard.setExpirationDate(LocalDate.now().plusYears(5));
         newCard.setActive(true);
         newCard.setUuid(generateCardUUID());
@@ -62,6 +68,7 @@ public class DebitCardService {
         debitCardRepository.save(newCard);
         account.setHasCard(true);
         account.setCardNumber(newCard.getCardNumber());
+        account.setCardPublicNumber(newCard.getPublicNumber());
         accountRepository.save(account);
         return mapToDebitCardDTO(newCard);
     }
@@ -153,5 +160,19 @@ public class DebitCardService {
         String balance=Double.toString(debitcard.getAccount().getBalance());
         AtmResponseDTO atmResponseDTO=new AtmResponseDTO(debitcard.getAccount().getUser().getFirstName()+" "+debitcard.getAccount().getUser().getLastName(),debitcard.getCardNumber(),debitcard.getAccount().getIban(),balance);
         return atmResponseDTO;
+    }
+
+    public List<DebitCardDTO2> getDebitCardsByIban(String iban) {
+        try{
+            Account account=accountRepository.findByIban(iban);
+            List<DebitCard> debitCards= (List<DebitCard>) debitCardRepository.findAllByAccount(account);
+            List<DebitCardDTO2> debitCardDTOS=new ArrayList<>();
+            for(DebitCard debitCard:debitCards){
+                debitCardDTOS.add(new DebitCardDTO2(debitCard));
+            }
+            return debitCardDTOS;
+        }catch (ServiceException ex){
+            throw new ServiceException("Invalid IBAN");
+        }
     }
 }
