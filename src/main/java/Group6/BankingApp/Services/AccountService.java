@@ -408,8 +408,8 @@ public class AccountService {
             if (user == null)
                 throw new ServiceException("User does not exist!");
             List <Account> accounts = accountRepository.findAllByUserId(user.getId());
-            if (accounts == null)
-                throw new ServiceException("Account does not exist!");
+            if (accounts == null || accounts.isEmpty())
+                throw new ServiceException("User Has no accounts yet!");
             Account account = accounts.get(0);
             for (Account account1 : accounts) {
                 if (account1.getAccountType().equals("Current"))

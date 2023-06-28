@@ -13,6 +13,8 @@ public interface DebitCardRepository extends CrudRepository<DebitCard, Long> {
     @Override
     Iterable<DebitCard> findAll();
 
+    Iterable<DebitCard> findAllByAccount(Account account);
+
     @Override
     Optional<DebitCard> findById(Long id);
 
