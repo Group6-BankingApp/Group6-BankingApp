@@ -7,7 +7,10 @@ import Group6.BankingApp.Models.Transaction;
 import Group6.BankingApp.Models.User;
 import Group6.BankingApp.Models.dto.AccountDTO;
 import Group6.BankingApp.Models.dto.TransactionDTO;
+import Group6.BankingApp.Models.dto.UserDTO2;
 import Group6.BankingApp.Services.AccountService;
+
+import org.hibernate.service.spi.ServiceException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -102,54 +105,110 @@ class TransactionServiceTest {
         assertEquals(transaction.getReceiverIban(), result.getReceiverIban());
         assertEquals(transaction.getAmount(), result.getAmount());
     }
-//     @Test
-//     public void testAddTransfer() {
-//         // Mock the necessary dependencies
-//         AccountService accountServiceMock = mock(AccountService.class);
-//         AccountRepository accountRepository = mock(AccountRepository.class);
-//         TransactionRepository transactionRepositoryMock = mock(TransactionRepository.class);
-//         // Crreate Users
-//         User user1 = new User();
-//         user1.setFirstName("John");
-//         user1.setLastName("Doe");
-//         user1.setEmail("john.doe@gmail.com");
-//         user1.setPassword("password");
-//         user1.setPhoneNumber("0612345678");
-//         user1.setHasCurrentAccount(false);
-//         user1.setHasSavingsAccount(false);
-//         user1.setRoles(List.of(Role.ROLE_ADMIN));
+    @Test
+    public void testAddTransfer() {
 
-//         User user2 = new User();
-//         user2.setFirstName("Jane");
-//         user2.setLastName("Smith");
-//         user2.setEmail("jane.smith@gmail.com");
-//         user2.setPassword("password2");
-//         user2.setPhoneNumber("0612345678");
-//         user2.setHasCurrentAccount(false);
-//         user2.setHasSavingsAccount(false);
-//         user2.setRoles(List.of(Role.ROLE_ADMIN));
+        float originalBalance = 1000;
+        //Create users to send and receive money
+        User sendUser = new User();
+        sendUser.setFirstName("John");
+        sendUser.setLastName("Doe");
+        sendUser.setEmail("john.doe@gmail.com");
+        sendUser.setPassword("password");
+        sendUser.setPhoneNumber("0612345678");
+        sendUser.setHasCurrentAccount(false);
+        sendUser.setHasSavingsAccount(false);
+        sendUser.setRoles(List.of(Role.ROLE_ADMIN));
 
-//         List<User> users = Arrays.asList(user1, user2);
-//         userRepository.saveAll(users);
+        User receiverUser = new User();
+        receiverUser.setFirstName("John");
+        receiverUser.setLastName("Doe");
+        receiverUser.setEmail("john.doe@gmail.com");
+        receiverUser.setPassword("password");
+        receiverUser.setPhoneNumber("0612345678");
+        receiverUser.setHasCurrentAccount(false);
+        receiverUser.setHasSavingsAccount(false);
+        receiverUser.setRoles(List.of(Role.ROLE_ADMIN));
 
-//         //Create accounts
-//         Account account1 = new Account("NL01INHO9501054837",user1,"Current", "1234", 200.0, 1000.0, 0,100);
-//         Account account2 = new Account("NL01INHO9501054804",user1,"Current", "1234", 1000.0, 1000.0, 0, 100);
-//         accountRepository.save(account1);
-//         accountRepository.save(account2);
-//         // Create a sample transactionDTO
-//         TransactionDTO transactionDTO = new TransactionDTO();
-//         transactionDTO.setSenderIban("NL01INHO9501054804");
-//         transactionDTO.setReceiverIban("NL01INHO9501054837");
-//         transactionDTO.setAmount(100.0);
+        // Set up test data
+        TransactionDTO transactionDTO = new TransactionDTO();
+        transactionDTO.setSenderIban("NL01INHO9501054837");
+        transactionDTO.setReceiverIban("NL01INHO9501054123");
+        transactionDTO.setAmount(100.0);
+        UserDTO2 userDTO2 = new UserDTO2(receiverUser);
+        userDTO2.setId(1L);
+        transactionDTO.setUserDTO2(userDTO2);
+        
+        Account senderAccount = new Account("NL01INHO9501054837",sendUser,"Current", "1234", 200.0, originalBalance, 0,1000);
+        when(accountService.findAccountByIban(transactionDTO.getSenderIban())).thenReturn(senderAccount);
+        
+        Account receiverAccount = new Account("NL01INHO9501054123",receiverUser,"Current", "1234", 200.0, originalBalance, 0,1000);
+        when(accountService.findAccountByIban(transactionDTO.getReceiverIban())).thenReturn(receiverAccount);
+        
+        //run method
+        Transaction result = transactionService.addTransfer(transactionDTO);
 
-//         // Perform the test
-//         Transaction result = transactionService.addTransfer(transactionDTO);
+        // Assertions
 
-//         // Assert the result or perform any necessary verifications
-//         assertNotNull(result);
-//         // Add additional assertions based on your requirements
-// }
+        assertEquals(originalBalance - transactionDTO.getAmount(), senderAccount.getBalance());
+        assertEquals(originalBalance + transactionDTO.getAmount(), receiverAccount.getBalance());
 
+        verify(accountService, times(1)).findAccountByIban(transactionDTO.getSenderIban());
+        verify(accountService, times(1)).findAccountByIban(transactionDTO.getReceiverIban());
+        verify(accountService, times(1)).updateAccountByIban(senderAccount.getIban(), senderAccount);
+        verify(accountService, times(1)).updateAccountByIban(receiverAccount.getIban(), receiverAccount);
+        verify(transactionRepository, times(1)).save(any(Transaction.class));
+    }
+
+    @Test
+    public void testAddTransfer_InsufficientBalance() {
+
+        float originalBalance = 10;
+        //Create users to send and receive money
+        User sendUser = new User();
+        sendUser.setFirstName("John");
+        sendUser.setLastName("Doe");
+        sendUser.setEmail("john.doe@gmail.com");
+        sendUser.setPassword("password");
+        sendUser.setPhoneNumber("0612345678");
+        sendUser.setHasCurrentAccount(false);
+        sendUser.setHasSavingsAccount(false);
+        sendUser.setRoles(List.of(Role.ROLE_ADMIN));
+
+        User receiverUser = new User();
+        receiverUser.setFirstName("John");
+        receiverUser.setLastName("Doe");
+        receiverUser.setEmail("john.doe@gmail.com");
+        receiverUser.setPassword("password");
+        receiverUser.setPhoneNumber("0612345678");
+        receiverUser.setHasCurrentAccount(false);
+        receiverUser.setHasSavingsAccount(false);
+        receiverUser.setRoles(List.of(Role.ROLE_ADMIN));
+
+        // Set up test data
+        TransactionDTO transactionDTO = new TransactionDTO();
+        transactionDTO.setSenderIban("NL01INHO9501054837");
+        transactionDTO.setReceiverIban("NL01INHO9501054123");
+        transactionDTO.setAmount(100.0);
+        UserDTO2 userDTO2 = new UserDTO2(receiverUser);
+        userDTO2.setId(1L);
+        transactionDTO.setUserDTO2(userDTO2);
+        
+        Account senderAccount = new Account("NL01INHO9501054837",sendUser,"Current", "1234", 200.0, originalBalance, 0,1000);
+        when(accountService.findAccountByIban(transactionDTO.getSenderIban())).thenReturn(senderAccount);
+        
+        Account receiverAccount = new Account("NL01INHO9501054123",receiverUser,"Current", "1234", 200.0, originalBalance, 0,1000);
+        when(accountService.findAccountByIban(transactionDTO.getReceiverIban())).thenReturn(receiverAccount);
+        
+        //run method
+        ServiceException exception = assertThrows(ServiceException.class, () -> {
+            transactionService.addTransfer(transactionDTO);
+        });
+        
+        // Assert the specific error message
+        String expectedErrorMessage = "Failed to add transaction. ";
+        String actualErrorMessage = exception.getMessage();
+        assertEquals(expectedErrorMessage, actualErrorMessage);
+    }
 
 }
