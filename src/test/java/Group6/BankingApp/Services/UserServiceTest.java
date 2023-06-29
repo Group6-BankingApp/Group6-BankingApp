@@ -125,36 +125,6 @@ public class UserServiceTest {
         assertThrows(EntityNotFoundException.class, () -> userService.updateUser(userId, userDTO));
     }
 
-//    @Test
-//    void testDeleteUser() {
-//        // Arrange
-//        Long userId = 1L;
-//        User user = new User();
-//        user.setId(userId);
-//        List<Role> roles = new ArrayList<>();
-//        roles.add(Role.ROLE_USER);
-//        user.setRoles(roles);
-//
-//        List<Account> accounts = new ArrayList<>();
-//        Account account1 = new Account();
-//        account1.setIban("1234567890");
-//        Account account2 = new Account();
-//        account2.setIban("0987654321");
-//        accounts.add(account1);
-//        accounts.add(account2);
-//
-//        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
-//        when(accountService.getAllAccountsByUserId(userId)).thenReturn(accounts);
-//
-//        // Act & Assert
-//        assertDoesNotThrow(() -> userService.deleteUser(userId));
-//
-//        // Assert
-//        verify(accountService, times(1)).deleteAccount(account1.getIban());
-//        verify(accountService, times(1)).deleteAccount(account2.getIban());
-//        verify(userRepository, times(1)).deleteById(userId);
-//    }
-
     @Test
     void testLogin_UserExists_CorrectCredentials() throws Exception {
         // Arrange

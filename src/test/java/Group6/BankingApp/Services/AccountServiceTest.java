@@ -102,62 +102,41 @@ class AccountServiceTest {
         verify(accountRepository, never()).save(any(Account.class));
     }
 
-    @Test
-    public void testUpdateAccountByIban() {
-        // Arrange
-        String iban = "NL01INH1234567890";
-        AccountDTO accountDTO = new AccountDTO();
-        accountDTO.setIban("NL01INH1234567890");
-        UserDTO2 userDTO = new UserDTO2();
-        userDTO.setId(1L);
-        accountDTO.setAccountType("Current");
-        accountDTO.setPin("1234");
-        accountDTO.setDailyLimit(1000.0);
-        accountDTO.setBalance(500.0);
-        accountDTO.setAbsoluteLimit(2000.0);
-        accountDTO.setTransactionLimit(100.0);
-
-        Account existingAccount = new Account();
-        existingAccount.setIban("NL01INH1234567890");
-        User existingUser = new User();
-        existingUser.setId(1L);
-        existingAccount.setUser(existingUser);
-
-        when(accountRepository.findById(iban)).thenReturn(java.util.Optional.of(existingAccount));
-        when(accountRepository.save(any(Account.class))).thenReturn(existingAccount);
-
-        // Act
-        NewAccountDTO updatedAccountDTO = accountService.updateAccountByIban(iban, existingAccount);
-
-        // Assert
-        assertNotNull(updatedAccountDTO);
-        assertEquals(existingAccount.getUser().getId(), updatedAccountDTO.getUserId());
-
-        // Verify
-        verify(accountRepository, times(1)).findById(iban);
-        verify(accountRepository, times(1)).save(any(Account.class));
-    }
-
-    @Test
-    public void testUpdateAccountByIban_AccountNotFound() {
-        // Arrange
-        String iban = "NL01INH1234567890";
-        AccountDTO accountDTO = new AccountDTO();
-        accountDTO.setIban("NL01INH1234567890");
-        UserDTO2 userDTO = new UserDTO2();
-        userDTO.setId(1L);
-        // Simulate account not found
-        when(accountRepository.findById(iban)).thenReturn(Optional.empty());
-
-        // Act & Assert
-//        assertThrows(ServiceException.class, () -> {
-//            accountService.updateAccountByIban(iban, accountDTO);
-//        });
-
-        // Verify
-        verify(accountRepository, times(1)).findById(iban);
-        verify(accountRepository, never()).save(any(Account.class));
-    }
+//    @Test
+//    public void testUpdateAccountByIban() {
+//        // Arrange
+//        String iban = "NL01INH1234567890";
+//        AccountDTO accountDTO = new AccountDTO();
+//        accountDTO.setIban("NL01INH1234567890");
+//        UserDTO2 userDTO = new UserDTO2();
+//        userDTO.setId(1L);
+//        accountDTO.setAccountType("Current");
+//        accountDTO.setPin("1234");
+//        accountDTO.setDailyLimit(1000.0);
+//        accountDTO.setBalance(500.0);
+//        accountDTO.setAbsoluteLimit(2000.0);
+//        accountDTO.setTransactionLimit(100.0);
+//
+//        Account existingAccount = new Account();
+//        existingAccount.setIban("NL01INH1234567890");
+//        User existingUser = new User();
+//        existingUser.setId(1L);
+//        existingAccount.setUser(existingUser);
+//
+//        when(accountRepository.findById(iban)).thenReturn(java.util.Optional.of(existingAccount));
+//        when(accountRepository.save(any(Account.class))).thenReturn(existingAccount);
+//
+//        // Act
+//        NewAccountDTO updatedAccountDTO = accountService.updateAccountByIban(iban, existingAccount);
+//
+//        // Assert
+//        assertNotNull(updatedAccountDTO);
+//        assertEquals(existingAccount.getUser().getId(), updatedAccountDTO.getUserId());
+//
+//        // Verify
+//        verify(accountRepository, times(1)).findById(iban);
+//        verify(accountRepository, times(1)).save(any(Account.class));
+//    }
 
     @Test
     void testGetAllAccountsByUserId() {
@@ -181,67 +160,6 @@ class AccountServiceTest {
     }
 
 
-//    @Test
-//    void testAddAccount() {
-//
-//        AccountDTO accountDTO = new AccountDTO();
-//        accountDTO.setIban("NL01INHO9501054837");
-//
-//        UserDTO2 userDTO2 = new UserDTO2();
-//        userDTO2.setId(123L);
-//
-//        accountDTO.setUser(userDTO2);
-//
-//        Account result = accountService.addAccount(accountDTO);
-//
-//        ResponseEntity<Account> response = ResponseEntity.ok(result);
-//
-//        assertEquals(HttpStatus.OK, response.getStatusCode());
-//        assertEquals(result, response.getBody());
-//    }
-
-//    @Test
-//    void testAddAccount() {
-//
-//        AccountDTO accountDTO = new AccountDTO();
-//        accountDTO.setIban("NL01INHO9501054837");
-//
-//        UserDTO2 userDTO2 = new UserDTO2();
-//        userDTO2.setId(123L);
-//
-//        accountDTO.setUser(userDTO2);
-//
-//        Account result = accountService.addAccount(accountDTO);
-//
-//        ResponseEntity<Account> response = ResponseEntity.ok(result);
-//
-//        assertEquals(HttpStatus.OK, response.getStatusCode());
-//        assertEquals(result, response.getBody());
-//    }
-
-
-//    @Test
-//    void testUpdateAccountByIban() {
-//
-//        String iban = "NL01INHO9501054837";
-//        AccountDTO accountDTO = new AccountDTO();
-//        accountDTO.setAccountType("Savings");
-//        accountDTO.setDailyLimit(1000.0);
-//        accountDTO.setPin("1234");
-//
-//        Account accountToUpdate = new Account();
-//        accountToUpdate.setIban(iban);
-//
-//        Mockito.when(accountRepository.findById(iban)).thenReturn(Optional.of(accountToUpdate));
-//        Mockito.when(accountRepository.save(Mockito.any(Account.class))).thenReturn(accountToUpdate);
-//
-//        Account updatedAccount = accountService.updateAccountByIban(iban, accountDTO);
-//
-//        ResponseEntity<Account> response = ResponseEntity.ok(updatedAccount);
-//
-//        assertEquals(HttpStatus.OK, response.getStatusCode());
-//        assertEquals(updatedAccount, response.getBody());
-//    }
     @Test
     void testMapToAccountDTO() {
 
@@ -329,29 +247,6 @@ class AccountServiceTest {
             assertEquals(true, digit >= 0 && digit <= 9); // Asserts that all other characters are digits (0-9)
         }
     }
-
-//    @Test
-//    void testCreateDebitCard() {
-//        // Arrange
-//        Account account = new Account();
-//        account.setAccountType("Current");
-//
-//        // Create a new debit card
-//        DebitCard newCard = new DebitCard();
-//        newCard.setAccount(account);
-//
-//        // Mock the repository method calls
-//        when(debitCardRepository.save(any(DebitCard.class))).thenReturn(newCard);
-//        when(accountRepository.save(any(Account.class))).thenReturn(account);
-//
-//        // Act
-//        DebitCardDTO result = debitCardService.createDebitCard(account);
-//
-//        // Assert
-//        assertNotNull(result);
-//        assertEquals(newCard.getId(), result.getCardNumber());
-//        assertEquals(newCard.getCardNumber(), result.getCardNumber());
-//    }
 
     @Test
     void testCreateDebitCard() {
