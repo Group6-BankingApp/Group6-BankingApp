@@ -1,4 +1,4 @@
-Feature: Cars CRUD operations
+Feature: Transactions CRUD operations
 
   Scenario: Getting all transactions
     Given The endpoint for "transactions" is available for method "GET"
