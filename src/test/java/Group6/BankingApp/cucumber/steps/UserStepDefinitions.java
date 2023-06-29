@@ -8,6 +8,7 @@ import io.cucumber.java.en.When;
 import io.cucumber.java.en.Then;
 
 import org.springframework.http.*;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestTemplate;
 
@@ -18,6 +19,10 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 
 public class UserStepDefinitions {
+
+    TokenDTO _tokenDTO;
+
+    private RestTemplate restTemplate = new RestTemplate();
 
     // Inject your controllers and repositories here
     private UserController userController;
@@ -48,23 +53,27 @@ public class UserStepDefinitions {
 
     @When("I make a login request with valid credentials")
     public void makeLoginRequestWithValidCredentials() {
-        String username = "mohamad@gmail.com";
+        String username = "john.doe@gmail.com";
         String password = "123456";
 
-        // Prepare the login request body
-        LoginDTO loginDTO = new LoginDTO(username, password);
+        LoginDTO loginDTO = new LoginDTO();
+        loginDTO.setUsername(username);
+        loginDTO.setPassword(password);
+
+        RestTemplate restTemplate = new RestTemplate();
 
         // Set the login endpoint URL
-        String loginUrl = "http://localhost:8080/login";
+        String loginUrl = "http://localhost:8080/users/login";
 
         // Prepare the request headers
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
 
-        // Create the HTTP entity with request body and headers
-        HttpEntity<LoginDTO> requestEntity = new HttpEntity<>(loginDTO, headers);
+        // Create the JSON payload for login
+        String jsonPayload = "{\"username\": \"john.doe@gmail.com\", \"password\": \"123456\"}";
 
-        RestTemplate restTemplate = new RestTemplate();
+        // Create the HTTP entity with request body and headers
+        HttpEntity<String> requestEntity = new HttpEntity<>(jsonPayload, headers);
 
         // Send the POST request to login
         ResponseEntity<TokenDTO> response = restTemplate.exchange(loginUrl, HttpMethod.POST, requestEntity, TokenDTO.class);
@@ -72,36 +81,43 @@ public class UserStepDefinitions {
         // Check the response status and perform further actions if needed
         if (response.getStatusCode().is2xxSuccessful()) {
             TokenDTO tokenDTO = response.getBody();
-            assertNotNull(tokenDTO);
+
+            _tokenDTO = tokenDTO;
             // Successfully logged in
-            // Handle the tokenDTO or perform other actions
         }
+
+        assertNotNull(_tokenDTO);
     }
 
     @Then("the response should contain a token")
     public void verifyResponseContainsToken() {
         // Assert that the response contains a token
-        // Example assertion:
-        assertNotNull(responseEntity);
-        assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
-        assertTrue(responseEntity.getBody() instanceof TokenDTO);
-        assertNotNull((responseEntity.getBody()));
+        assertNotNull(_tokenDTO);
     }
 
     @When("I request to get all users with associated accounts")
     public void requestAllUsersWithAccounts() {
-        responseEntity = userController.getAllUsersWithAccount();
+        String url = "http://localhost:8080/users/withAccount";
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Authorization", "Bearer " + _tokenDTO.token());
+
+        HttpEntity<String> entity = new HttpEntity<>(headers);
+
+        try {
+            responseEntity = restTemplate.exchange(url, HttpMethod.GET, entity, List.class);
+        } catch (HttpClientErrorException ex) {
+            responseEntity = new ResponseEntity<>(ex.getStatusCode());
+        }
     }
 
     @Then("the response should contain a list of users with their account details")
     public void verifyResponseContainsUsersWithAccounts() {
         // Assert that the response contains a list of users with their account details
-        // Example assertion:
         assertNotNull(responseEntity);
         assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
         assertTrue(responseEntity.getBody() instanceof List<?>);
         List<?> usersWithAccounts = (List<?>) responseEntity.getBody();
-        // Perform additional assertions as per your application's response structure
     }
 
     @When("I request to get all users without associated accounts")
@@ -112,12 +128,10 @@ public class UserStepDefinitions {
     @Then("the response should contain a list of users without any account details")
     public void verifyResponseContainsUsersWithoutAccounts() {
         // Assert that the response contains a list of users without any account details
-        // Example assertion:
         assertNotNull(responseEntity);
         assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
         assertTrue(responseEntity.getBody() instanceof List<?>);
         List<?> usersWithoutAccounts = (List<?>) responseEntity.getBody();
-        // Perform additional assertions as per your application's response structure
     }
 
     @Given("I have admin access")
