@@ -21,19 +21,16 @@ import org.springframework.http.ResponseEntity;
 import java.util.Arrays;
 import java.util.List;
 
-public class TransactionStepDefinitions extends BaseStepDefinitions {
+public class TransactionStepDefinitions {
 
-    @Autowired
     private TestRestTemplate restTemplate;
 
-    @Autowired
     private TransactionService transactionService;
 
     private final HttpHeaders httpHeaders = new HttpHeaders();
 
     private ResponseEntity<String> response;
 
-    @Autowired
     private ObjectMapper mapper;
 
     @Given("The endpoint for {string} is available for method {string}")
