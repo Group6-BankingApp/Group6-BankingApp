@@ -122,7 +122,6 @@ public class UserStepDefinitions {
 
     @Given("I have admin access")
     public void haveAdminAccess() {
-        // No action needed for this step definition as it is a setup step
     }
 
     @When("I request to get all users")

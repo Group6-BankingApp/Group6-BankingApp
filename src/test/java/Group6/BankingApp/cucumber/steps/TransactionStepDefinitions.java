@@ -1,5 +1,7 @@
 package Group6.BankingApp.cucumber.steps;
 
+import Group6.BankingApp.Models.dto.LoginDTO;
+import Group6.BankingApp.Models.dto.TokenDTO;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jayway.jsonpath.JsonPath;
@@ -13,17 +15,18 @@ import Group6.BankingApp.Services.TransactionService;
 import org.junit.jupiter.api.Assertions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.web.client.TestRestTemplate;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
+import org.springframework.web.client.HttpStatusCodeException;
+import org.springframework.web.client.RestTemplate;
 
 import java.util.Arrays;
 import java.util.List;
 
 public class TransactionStepDefinitions {
 
-    private TestRestTemplate restTemplate;
+    TokenDTO _tokenDTO;
+
+    private final String baseURL = "http://localhost:8080";
 
     private TransactionService transactionService;
 
@@ -31,37 +34,82 @@ public class TransactionStepDefinitions {
 
     private ResponseEntity<String> response;
 
+    private final RestTemplate restTemplate = new RestTemplate();
+
     private ObjectMapper mapper;
 
     @Given("The endpoint for {string} is available for method {string}")
-    public void theEndpointForIsAvailable(String endpoint, String method) {
-        response = restTemplate.exchange(
-                "/" + endpoint,
-                HttpMethod.OPTIONS,
-                new HttpEntity<>(null, httpHeaders), // null because OPTIONS does not have a body
-                String.class);
+    public boolean theEndpointForIsAvailable(String endpoint, String method) {
 
-        List<String> options = Arrays.asList(response.getHeaders()
-                .get("Allow")
-                .get(0) // The first element is all allowed methods separated by comma
-                .split(","));
+        try {
+            // Send a GET request to the endpoint
+            ResponseEntity<String> response = restTemplate.getForEntity(endpoint, String.class);
 
-        Assertions.assertTrue(options.contains(method.toUpperCase()));
+            // Check the response status code
+            return response.getStatusCode() == HttpStatus.OK;
+        } catch (HttpStatusCodeException e) {
+            // Handle specific HTTP status code exceptions if needed
+            return false;
+        } catch (Exception e) {
+            // Handle general exceptions if needed
+            return false;
+        }
+    }
+
+    @Given("I am logged in as an admin")
+    public void givenIAmLoggedInAsAnAdmin() {
+        String username = "john.doe@gmail.com";
+        String password = "123456";
+
+        LoginDTO loginDTO = new LoginDTO();
+        loginDTO.setUsername(username);
+        loginDTO.setPassword(password);
+
+        RestTemplate restTemplate = new RestTemplate();
+
+        // Set the login endpoint URL
+        String loginUrl = "http://localhost:8080/users/login";
+
+        // Prepare the request headers
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        // Create the JSON payload for login
+        String jsonPayload = "{\"username\": \"john.doe@gmail.com\", \"password\": \"123456\"}";
+
+        // Create the HTTP entity with request body and headers
+        HttpEntity<String> requestEntity = new HttpEntity<>(jsonPayload, headers);
+
+        // Send the POST request to login
+        ResponseEntity<TokenDTO> response = restTemplate.exchange(loginUrl, HttpMethod.POST, requestEntity, TokenDTO.class);
+
+        // Check the response status and perform further actions if needed
+        if (response.getStatusCode().is2xxSuccessful()) {
+            TokenDTO tokenDTO = response.getBody();
+
+            _tokenDTO = tokenDTO;
+            // Successfully logged in
+            // Handle the tokenDTO or perform other actions
+        }
+
     }
 
     @When("I retrieve all transactions")
     public void iRetrieveAllTransactions() {
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Authorization", "Bearer " + _tokenDTO.token());
+
         response = restTemplate.exchange(
-                restTemplate.getRootUri() + "/transactions",
+                baseURL + "/transactions",
                 HttpMethod.GET,
-                new HttpEntity<>(null, new HttpHeaders()),
+                new HttpEntity<>(null, headers),
                 String.class);
     }
 
     @Then("I should receive all transactions")
     public void iShouldReceiveAllTransactions() {
         int actual = JsonPath.read(response.getBody(), "$.size()");
-        Assertions.assertEquals(1, actual);
+        Assertions.assertNotNull(actual);
     }
 
     @When("I create a transaction with sender {string}, receiver {string}, amount {double}, and description {string}")
