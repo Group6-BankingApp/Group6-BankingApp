@@ -114,7 +114,6 @@ public class TransactionService {
         }
     }
     public void TransferMoney(TransactionDTO transaction) {
-        //TODO: add transfer money logic
         Account senderAccount = accountService.findAccountByIban(transaction.getSenderIban());
         Account receiverAccount = accountService.findAccountByIban(transaction.getReceiverIban());
 
@@ -133,7 +132,6 @@ public class TransactionService {
     }
 
     public void DespositMoney(Transaction transaction) {
-        //TODO: add transfer money logic
         Account receiverAccount = accountService.findAccountByIban(transaction.getReceiverIban());
         if(receiverAccount.getAccountType() == "Current")    {
             receiverAccount.setBalance(receiverAccount.getBalance() + transaction.getAmount());
@@ -293,45 +291,59 @@ public class TransactionService {
             Iterable<Transaction> transactions = null;
             List<Transaction> filteredTransactions = null;
             if((filter.getAccount()==null)||(filter.getAccount().equals(""))){
-                if((filter.getFromOrTo()==null)||(filter.getFromOrTo().equals(""))){
-                    transactions = transactionRepository.findAllBySenderIbanOrReceiverIban(iban, iban);
-                    filteredTransactions = applyFilters(transactions, filter);
-                }
-                else{
-                    if(filter.getFromOrTo().equals("from")){
-                        transactions = transactionRepository.findAllByReceiverIban(iban);
-                        filteredTransactions = applyFilters(transactions, filter);
-                    }
-                    else{
-                        transactions = transactionRepository.findAllBySenderIban(iban);
-                        filteredTransactions = applyFilters(transactions, filter);
-                    }
-                }
+                filteredTransactions = getFilteredTransactionsWithoutIban(iban, filter);
             }
             else{
-                if((filter.getFromOrTo()==null)||(filter.getFromOrTo().equals(""))){
-                    transactions = transactionRepository.findAllBySenderIbanAndReceiverIban(iban, filter.getAccount());
-                    Iterable<Transaction> transactions2 = transactionRepository.findAllBySenderIbanAndReceiverIban(filter.getAccount(), iban);
-                    filteredTransactions = applyFilters(transactions, filter);
-                    List<Transaction> filtered2 = applyFilters(transactions2, filter);
-                    filteredTransactions.addAll(filtered2);
-                }
-                else{
-                    if(filter.getFromOrTo().equals("from")){
-                        transactions = transactionRepository.findAllBySenderIbanAndReceiverIban(filter.getAccount(), iban);
-                        filteredTransactions = applyFilters(transactions, filter);
-                    }
-                    else{
-                        transactions = transactionRepository.findAllBySenderIbanAndReceiverIban(iban, filter.getAccount());
-                        filteredTransactions = applyFilters(transactions, filter);
-                    }
-                }
+                filteredTransactions = getFilteredTransactionsWithIban(iban, filter);
             }
             return  filteredTransactions;
         }
         catch(Exception ex){
             throw new ServiceException("Failed to retrieve transactions", ex);
         }
+    }
+
+    private List<Transaction> getFilteredTransactionsWithIban(String iban, FilterDTO filter) {
+        List<Transaction> filteredTransactions;
+        Iterable<Transaction> transactions;
+        if((filter.getFromOrTo()==null)||(filter.getFromOrTo().equals(""))){
+            transactions = transactionRepository.findAllBySenderIbanAndReceiverIban(iban, filter.getAccount());
+            Iterable<Transaction> transactions2 = transactionRepository.findAllBySenderIbanAndReceiverIban(filter.getAccount(), iban);
+            filteredTransactions = applyFilters(transactions, filter);
+            List<Transaction> filtered2 = applyFilters(transactions2, filter);
+            filteredTransactions.addAll(filtered2);
+        }
+        else{
+            if(filter.getFromOrTo().equals("from")){
+                transactions = transactionRepository.findAllBySenderIbanAndReceiverIban(filter.getAccount(), iban);
+                filteredTransactions = applyFilters(transactions, filter);
+            }
+            else{
+                transactions = transactionRepository.findAllBySenderIbanAndReceiverIban(iban, filter.getAccount());
+                filteredTransactions = applyFilters(transactions, filter);
+            }
+        }
+        return filteredTransactions;
+    }
+
+    private List<Transaction> getFilteredTransactionsWithoutIban(String iban, FilterDTO filter) {
+        List<Transaction> filteredTransactions;
+        Iterable<Transaction> transactions;
+        if((filter.getFromOrTo()==null)||(filter.getFromOrTo().equals(""))){
+            transactions = transactionRepository.findAllBySenderIbanOrReceiverIban(iban, iban);
+            filteredTransactions = applyFilters(transactions, filter);
+        }
+        else{
+            if(filter.getFromOrTo().equals("from")){
+                transactions = transactionRepository.findAllByReceiverIban(iban);
+                filteredTransactions = applyFilters(transactions, filter);
+            }
+            else{
+                transactions = transactionRepository.findAllBySenderIban(iban);
+                filteredTransactions = applyFilters(transactions, filter);
+            }
+        }
+        return filteredTransactions;
     }
 
     private FilterDTO checkFilter(FilterDTO filter) {
