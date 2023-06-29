@@ -11,3 +11,4 @@ Feature: Retrieving accounts
     And I am logged in as a user
     When I request to get accounts with skip -1 and limit 10
     Then I should receive a bad request response
+
