@@ -16,7 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.util.List;
 
 @RestController
-@CrossOrigin(origins = "https://group6-bankingapp.github.io/Group6-BankingApp-FrontEnd/")
+@CrossOrigin(origins = "https://group6-banking-app-front-end.vercel.app")
 @RequestMapping(value="/users", produces = MediaType.APPLICATION_JSON_VALUE)
 @Log
 public class UserController {
