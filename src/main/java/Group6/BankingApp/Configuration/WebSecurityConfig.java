@@ -69,7 +69,7 @@ public class WebSecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(Arrays.asList("https://group6-rbank.netlify.app"));
+        configuration.setAllowedOrigins(Arrays.asList("https://group6-bankingapp.github.io/Group6-BankingApp-FrontEnd/"));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE"));
         configuration.setAllowedHeaders(Arrays.asList("Content-Type", "Authorization"));
 
