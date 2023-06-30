@@ -16,7 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.util.List;
 
 @RestController
-@CrossOrigin(origins = "http://localhost:5173")
+@CrossOrigin(origins = "https://group6-rbank.netlify.app")
 @RequestMapping(value="/users", produces = MediaType.APPLICATION_JSON_VALUE)
 @Log
 public class UserController {
