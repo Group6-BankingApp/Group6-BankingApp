@@ -21,7 +21,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping(value="/transactions", produces = MediaType.APPLICATION_JSON_VALUE)
-@CrossOrigin(origins = "https://group6-rbank.netlify.app")
+@CrossOrigin(origins = "https://group6-bankingapp.github.io/Group6-BankingApp-FrontEnd/")
 public class TransactionController {
     // private static final String SECRET_KEY = "fDKiV3Rq7t";
     private  final TransactionService transactionService;

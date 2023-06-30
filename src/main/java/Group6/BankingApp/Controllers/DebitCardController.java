@@ -15,7 +15,7 @@ import org.springframework.web.server.ResponseStatusException;
 import java.util.List;
 
 @RestController
-@CrossOrigin(origins = "https://group6-rbank.netlify.app")
+@CrossOrigin(origins = "https://group6-bankingapp.github.io/Group6-BankingApp-FrontEnd/")
 @RequestMapping(value="/debitcards", produces = MediaType.APPLICATION_JSON_VALUE)
 @Log
 public class DebitCardController {

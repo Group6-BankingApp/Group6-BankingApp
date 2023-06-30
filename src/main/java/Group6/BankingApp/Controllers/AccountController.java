@@ -19,7 +19,7 @@ import java.util.Map;
 import java.util.List;
 
 @RestController
-@CrossOrigin(origins = "https://group6-rbank.netlify.app")
+@CrossOrigin(origins = "https://group6-bankingapp.github.io/Group6-BankingApp-FrontEnd/")
 @RequestMapping(value="/accounts", produces = MediaType.APPLICATION_JSON_VALUE)
 @Log
 public class AccountController {
